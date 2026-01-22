@@ -47,8 +47,7 @@ h1, h2, h3, h4, h5, h6 {
     right: 0;
     bottom: 0;
     background-image: url('/background-texture.jpeg');
-    background-size: cover;
-    background-position: center;
+    background-size: auto;
     opacity: 0.3;
     z-index: -1;
   }
