@@ -99,10 +99,10 @@ const Portfolio = () => {
   }
 
   return (
-      <section id="portfolio" className="relative py-20 md:py-32 bg-beige-50">
+      <section id="portfolio" className="relative md:py-8 bg-beige-50">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           {/* Section Header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <h2
                 className="text-5xl md:text-6xl lg:text-7xl font-normal text-gray-800 mb-6"
                 style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 300 }}
@@ -117,7 +117,7 @@ const Portfolio = () => {
           {/* Carousel Container */}
           <div className="relative max-w-5xl mx-auto">
             {/* Main Image Display */}
-            <div className="relative aspect-[16/10] bg-gray-200 rounded-lg overflow-hidden shadow-2xl">
+            <div className="relative aspect-[16/10] bg-beige-50 rounded-lg overflow-hidden shadow-xl">
               <Image
                   src={portfolioImages[currentIndex].image_url}
                   alt={portfolioImages[currentIndex].title}
@@ -128,6 +128,28 @@ const Portfolio = () => {
                   priority
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
               />
+
+              <button
+                  onClick={prevSlide}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 group"
+                  aria-label="Imagem anterior"
+              >
+                <ChevronLeft
+                    size={28}
+                    className="text-gray-700 group-hover:text-coral-600 transition-colors"
+                />
+              </button>
+
+              <button
+                  onClick={nextSlide}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 group"
+                  aria-label="Próxima imagem"
+              >
+                <ChevronRight
+                    size={28}
+                    className="text-gray-700 group-hover:text-coral-600 transition-colors"
+                />
+              </button>
             </div>
 
             {/* Image Title and Description */}
@@ -146,27 +168,6 @@ const Portfolio = () => {
             </div>
 
             {/* Navigation Buttons */}
-            <button
-                onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-                aria-label="Imagem anterior"
-            >
-              <ChevronLeft
-                  size={28}
-                  className="text-gray-700 group-hover:text-coral-600 transition-colors"
-              />
-            </button>
-
-            <button
-                onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-                aria-label="Próxima imagem"
-            >
-              <ChevronRight
-                  size={28}
-                  className="text-gray-700 group-hover:text-coral-600 transition-colors"
-              />
-            </button>
 
             {/* Dots Indicator */}
             <div className="flex justify-center gap-2 mt-8">
@@ -190,21 +191,6 @@ const Portfolio = () => {
                 {currentIndex + 1} / {portfolioImages.length}
               </p>
             </div>
-          </div>
-
-          {/* Instagram Link */}
-          <div className="text-center mt-12">
-            <p className="text-gray-600 mb-4">
-              Veja mais projetos no meu Instagram
-            </p>
-            <a
-                href="https://www.instagram.com/nathalia_malinowski/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              @nathalia_malinowski
-            </a>
           </div>
         </div>
       </section>
