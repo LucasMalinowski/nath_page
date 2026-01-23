@@ -4,56 +4,53 @@ import Image from 'next/image'
 
 const About = () => {
   return (
-      <section
-          id="sobre"
-          className="relative"
-          style={{
-            backgroundImage: 'url(/background-texture.jpeg)',
-            backgroundSize: 'auto',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'repeat',
-          }}
-      >
-        <div className="grid grid-cols-1 lg:grid-cols-2 bg-[#525432]/60 px-48">
-          {/* Left side - Text */}
-          <div className="relative py-16 md:py-20 px-8 sm:px-12 lg:px-16">
-            <div className="relative space-y-5 max-w-xl">
-              <h2 className="text-7xl font-bold text-[#ffe8ce] mb-6" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 600 }}>
-                Sobre mim
-              </h2>
+    <section
+      id="sobre"
+      className="relative py-section md:py-24 lg:py-32 bg-warm-beige paper-texture"
+    >
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Text Content */}
+          <div className="space-y-8">
+            <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite">
+              Sobre mim
+            </h2>
 
-              <p className="text-lg md:text-lg text-white" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
-                Sou Nathalia Malinowski, designer de interiores e artista muralista. Transformo ambientes em extensões da personalidade e da história de cada cliente.
+            <div className="space-y-6 text-body-mobile md:text-body font-sans text-graphite leading-relaxed">
+              <p>
+                Sou Nathalia Malinowski, designer de interiores e artista muralista.
+                Meu trabalho nasce da escuta atenta e da sensibilidade em traduzir histórias, 
+                estilos e vivências em espaços que fazem sentido para quem os habita.
               </p>
 
-              <p className="text-3xl text-[#ffe8ce]" style={{ fontFamily: 'Cormorant Garamond, serif', fontWeight: 500, fontStyle: 'italic' }}>
-                Cada projeto nasce da escuta, da sensibilidade e do propósito.
-              </p>
-
-              <p className="text-lg md:text-lg text-white" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
-                Acredito que o design vai além da estética. Ele nutre o corpo, a mente e a alma, criando espaços que acolhem, funcionam e fazem sentido no dia a dia.
-              </p>
-
-              <p className="text-lg md:text-lg text-white" style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 400 }}>
-                Meu trabalho traduz histórias em soluções autorais, onde cada detalhe, do mais sutil ao mais marcante, carrega significado.
+              <p>
+                Acredito em um design que vai além da estética: que acolhe, que respeita o tempo 
+                e que constrói identidade. Cada projeto é pensado como uma composição de camadas — 
+                do clássico ao contemporâneo, do vivido ao novo — sempre com propósito e significado.
               </p>
             </div>
+
+            {/* Featured Quote */}
+            <blockquote className="text-2xl md:text-3xl font-serif italic text-olive-green leading-snug border-l-4 border-soft-terracotta pl-6 py-2">
+              Projetar é interpretar histórias e transformá-las em espaços.
+            </blockquote>
           </div>
 
-          {/* Right side - Photo */}
-          <div className="relative flex items-end justify-center lg:justify-end py-0 px-6 sm:px-8 lg:px-12">
-            <div className="relative w-80 h-96 md:w-96 md:h-[480px] lg:w-[420px] lg:h-[550px] overflow-hidden shadow-2xl" style={{ borderRadius: '50% 50% 0 0' }}>
+          {/* Profile Photo */}
+          <div className="flex justify-center lg:justify-end">
+            <div className="relative w-full max-w-md aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                  src="/profile-photo.jpeg"
-                  alt="Nathalia Malinowski"
-                  fill
-                  className="object-cover object-top"
-                  priority
+                src="/profile-photo.jpeg"
+                alt="Nathalia Malinowski"
+                fill
+                className="object-cover object-center"
+                priority
               />
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
   )
 }
 
