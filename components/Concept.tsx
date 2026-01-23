@@ -4,7 +4,7 @@ const Concept = () => {
   return (
     <section
       id="conceito"
-      className="relative py-section md:py-24 lg:py-32 bg-off-white paper-texture"
+      className="relative py-section md:py-12 lg:py-16 bg-off-white paper-texture"
     >
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-16 text-center">
         {/* Title */}

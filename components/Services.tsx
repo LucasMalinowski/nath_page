@@ -41,7 +41,7 @@ const Services = () => {
   return (
     <section
       id="servicos"
-      className="relative py-section md:py-24 lg:py-32 bg-warm-beige paper-texture"
+      className="relative py-section md:py-12 lg:py-16 bg-warm-beige paper-texture"
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
         {/* Header */}

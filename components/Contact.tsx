@@ -6,11 +6,11 @@ const Contact = () => {
   return (
     <section
       id="contato"
-      className="relative py-section md:py-24 lg:py-32 bg-warm-beige paper-texture"
+      className="relative py-section md:py-12 lg:py-16 bg-warm-beige paper-texture"
     >
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-16">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-6">
             Vamos conversar?
           </h2>

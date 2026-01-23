@@ -46,7 +46,7 @@ const Portfolio = () => {
 
   if (loading) {
     return (
-      <section id="portfolio" className="relative py-section md:py-24 lg:py-32 bg-off-white paper-texture">
+      <section id="portfolio" className="relative py-section md:py-12 lg:py-16 bg-off-white paper-texture">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
           <div className="text-center mb-16">
             <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-4">
