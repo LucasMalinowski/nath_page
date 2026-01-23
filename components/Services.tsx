@@ -1,26 +1,40 @@
 'use client'
 
+import { useSiteText } from '@/lib/siteText'
+
 const Services = () => {
+  const servicesTitle = useSiteText('services_title', 'Vamos transformar seu espaço?')
+  const servicesSubtitle = useSiteText('services_subtitle', 'Um processo sensível, autoral e bem conduzido — do conceito à materialização.')
+  const service1Title = useSiteText('services_item_1_title', 'Projetos de Interiores')
+  const service1Desc = useSiteText('services_item_1_desc', 'Desenvolvimento completo de ambientes residenciais, com foco em identidade, funcionalidade e estética atemporal. Cada projeto é único, pensado para refletir a essência de quem vive o espaço.')
+  const service2Title = useSiteText('services_item_2_title', 'Consultoria de Interiores')
+  const service2Desc = useSiteText('services_item_2_desc', 'Orientação estratégica para transformar ambientes de forma prática e personalizada, ideal para quem busca direcionamento estético sem um projeto completo.')
+  const service3Title = useSiteText('services_item_3_title', 'Murais e Intervenções Artísticas')
+  const service3Desc = useSiteText('services_item_3_desc', 'Criação de pinturas e murais autorais que acrescentam significado, textura e personalidade aos espaços, conectando arte e arquitetura.')
+  const service4Title = useSiteText('services_item_4_title', 'Modelagem 3D')
+  const service4Desc = useSiteText('services_item_4_desc', 'Visualização do projeto para facilitar decisões com mais segurança, clareza e compreensão do resultado final.')
+  const servicesCta = useSiteText('services_cta', 'Entre em contato')
+
   const services = [
     {
       number: '01',
-      title: 'Projetos de Interiores',
-      description: 'Desenvolvimento completo de ambientes residenciais, com foco em identidade, funcionalidade e estética atemporal. Cada projeto é único, pensado para refletir a essência de quem vive o espaço.'
+      title: service1Title,
+      description: service1Desc
     },
     {
       number: '02',
-      title: 'Consultoria de Interiores',
-      description: 'Orientação estratégica para transformar ambientes de forma prática e personalizada, ideal para quem busca direcionamento estético sem um projeto completo.'
+      title: service2Title,
+      description: service2Desc
     },
     {
       number: '03',
-      title: 'Murais e Intervenções Artísticas',
-      description: 'Criação de pinturas e murais autorais que acrescentam significado, textura e personalidade aos espaços, conectando arte e arquitetura.'
+      title: service3Title,
+      description: service3Desc
     },
     {
       number: '04',
-      title: 'Modelagem 3D',
-      description: 'Visualização do projeto para facilitar decisões com mais segurança, clareza e compreensão do resultado final.'
+      title: service4Title,
+      description: service4Desc
     }
   ]
 
@@ -47,10 +61,10 @@ const Services = () => {
         {/* Header */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-6">
-            Vamos transformar seu espaço?
+            {servicesTitle}
           </h2>
           <p className="text-body-mobile md:text-body font-sans text-graphite/80">
-            Um processo sensível, autoral e bem conduzido — do conceito à materialização.
+            {servicesSubtitle}
           </p>
         </div>
 
@@ -85,7 +99,7 @@ const Services = () => {
             onClick={scrollToContact}
             className="btn-primary px-12 py-4 bg-olive-green text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-soft-terracotta transition-all duration-300"
           >
-            Entre em contato
+            {servicesCta}
           </button>
         </div>
       </div>

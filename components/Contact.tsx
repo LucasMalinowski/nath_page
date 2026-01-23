@@ -1,8 +1,17 @@
 'use client'
 
 import { Mail, Phone, Instagram } from 'lucide-react'
+import { useSiteText } from '@/lib/siteText'
 
 const Contact = () => {
+  const contactTitle = useSiteText('contact_title', 'Vamos conversar?')
+  const contactSubtitle = useSiteText('contact_subtitle', 'Me conte sobre seu espaço, seu momento e o que você deseja sentir ao entrar nele. A partir disso, eu te ajudo a entender o melhor caminho para o seu projeto.')
+  const contactPhoneLabel = useSiteText('contact_phone_label', '(45) 99802-8130')
+  const contactEmailLabel = useSiteText('contact_email_label', 'malinowskinathalia@gmail.com')
+  const contactInstagramLabel = useSiteText('contact_instagram_label', '@nathalia_malinowski')
+  const contactCta = useSiteText('contact_cta', 'Agendar conversa')
+  const contactClosing = useSiteText('contact_closing', 'Vamos criar algo que atravesse o tempo.')
+
   return (
     <section
       id="contato"
@@ -12,11 +21,10 @@ const Contact = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-6">
-            Vamos conversar?
+            {contactTitle}
           </h2>
           <p className="text-body-mobile md:text-body font-sans text-graphite/80 leading-relaxed max-w-2xl mx-auto">
-            Me conte sobre seu espaço, seu momento e o que você deseja sentir ao entrar nele.
-            A partir disso, eu te ajudo a entender o melhor caminho para o seu projeto.
+            {contactSubtitle}
           </p>
         </div>
 
@@ -27,7 +35,7 @@ const Contact = () => {
             className="flex items-center justify-center gap-4 text-body-mobile md:text-body font-sans font-medium text-graphite hover:text-olive-green transition-colors duration-300"
           >
             <Phone size={24} className="text-soft-terracotta" />
-            <span>(45) 99802-8130</span>
+            <span>{contactPhoneLabel}</span>
           </a>
 
           <a
@@ -35,7 +43,7 @@ const Contact = () => {
             className="flex items-center justify-center gap-4 text-body-mobile md:text-body font-sans font-medium text-graphite hover:text-olive-green transition-colors duration-300 break-all"
           >
             <Mail size={24} className="text-soft-terracotta" />
-            <span>malinowskinathalia@gmail.com</span>
+            <span>{contactEmailLabel}</span>
           </a>
 
           <a
@@ -45,7 +53,7 @@ const Contact = () => {
             className="flex items-center justify-center gap-4 text-body-mobile md:text-body font-sans font-medium text-graphite hover:text-olive-green transition-colors duration-300"
           >
             <Instagram size={24} className="text-soft-terracotta" />
-            <span>@nathalia_malinowski</span>
+            <span>{contactInstagramLabel}</span>
           </a>
         </div>
 
@@ -57,13 +65,13 @@ const Contact = () => {
             rel="noopener noreferrer"
             className="inline-block btn-primary px-12 py-4 bg-olive-green text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-soft-terracotta transition-all duration-300"
           >
-            Agendar conversa
+            {contactCta}
           </a>
         </div>
 
         {/* Closing Message */}
         <p className="text-center text-xl md:text-2xl font-serif italic text-olive-green">
-          Vamos criar algo que atravesse o tempo.
+          {contactClosing}
         </p>
       </div>
     </section>

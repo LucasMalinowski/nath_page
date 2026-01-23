@@ -2,13 +2,21 @@
 
 import Image from 'next/image'
 import { useBrandAsset } from '@/lib/useBrandAsset'
+import { useSiteText } from '@/lib/siteText'
 
 const Footer = () => {
   const brandAsset = useBrandAsset('footer')
+  const footerCopyright = useSiteText(
+    'footer_copyright',
+    '© {year} Nathalia Malinowski. Todos os direitos reservados.'
+  )
+  const footerTagline = useSiteText('footer_tagline', 'Camadas do Tempo | Clássico Vivo')
   const logoSize = {
     width: `${brandAsset?.width_px ?? 64}px`,
     height: `${brandAsset?.height_px ?? 64}px`,
   }
+  const year = new Date().getFullYear()
+  const copyright = footerCopyright.replace('{year}', String(year))
 
   return (
     <footer className="relative bg-olive-green py-2">
@@ -28,12 +36,12 @@ const Footer = () => {
 
           {/* Copyright */}
           <p className="text-sm font-sans text-off-white/80 text-center">
-            © {new Date().getFullYear()} Nathalia Malinowski. Todos os direitos reservados.
+            {copyright}
           </p>
 
           {/* Tagline */}
           <p className="text-sm font-serif italic text-off-white/70 text-center">
-            Camadas do Tempo | Clássico Vivo
+            {footerTagline}
           </p>
         </div>
       </div>

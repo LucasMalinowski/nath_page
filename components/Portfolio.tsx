@@ -4,11 +4,20 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { supabase, PortfolioImage } from '@/lib/supabase'
+import { useSiteText } from '@/lib/siteText'
 
 const Portfolio = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [portfolioImages, setPortfolioImages] = useState<PortfolioImage[]>([])
   const [loading, setLoading] = useState(true)
+  const portfolioTitle = useSiteText('portfolio_title', 'Portfólio')
+  const portfolioSubtitle = useSiteText('portfolio_subtitle', 'Projetos que equilibram estética, história e vida real.')
+  const portfolioLoading = useSiteText('portfolio_loading', 'Carregando...')
+  const portfolioEmpty = useSiteText('portfolio_empty', 'Em breve, novos projetos serão adicionados')
+  const portfolioCta = useSiteText('portfolio_cta', 'Ver todos os projetos')
+  const portfolioPrevLabel = useSiteText('portfolio_prev_label', 'Imagem anterior')
+  const portfolioNextLabel = useSiteText('portfolio_next_label', 'Próxima imagem')
+  const portfolioDotLabel = useSiteText('portfolio_dot_label', 'Ir para imagem {index}')
 
   useEffect(() => {
     fetchPortfolioImages()
@@ -50,14 +59,14 @@ const Portfolio = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
           <div className="text-center mb-16">
             <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-4">
-              Portfólio
+              {portfolioTitle}
             </h2>
             <p className="text-body-mobile md:text-body font-sans text-graphite/80">
-              Projetos que equilibram estética, história e vida real.
+              {portfolioSubtitle}
             </p>
           </div>
           <div className="flex items-center justify-center h-96">
-            <p className="text-graphite/60 font-sans">Carregando...</p>
+            <p className="text-graphite/60 font-sans">{portfolioLoading}</p>
           </div>
         </div>
       </section>
@@ -70,16 +79,16 @@ const Portfolio = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
           <div className="text-center mb-16">
             <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-4">
-              Portfólio
+              {portfolioTitle}
             </h2>
             <p className="text-body-mobile md:text-body font-sans text-graphite/80 mb-12">
-              Projetos que equilibram estética, história e vida real.
+              {portfolioSubtitle}
             </p>
           </div>
 
           <div className="text-center py-20">
             <p className="text-graphite/60 text-lg mb-8 font-sans">
-              Em breve, novos projetos serão adicionados
+              {portfolioEmpty}
             </p>
             <a
               href="https://www.instagram.com/nathalia_malinowski/"
@@ -87,7 +96,7 @@ const Portfolio = () => {
               rel="noopener noreferrer"
               className="inline-block px-10 py-4 bg-olive-green text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-soft-terracotta transition-all duration-300"
             >
-              Ver todos os projetos
+              {portfolioCta}
             </a>
           </div>
         </div>
@@ -101,10 +110,10 @@ const Portfolio = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-4">
-            Portfólio
+            {portfolioTitle}
           </h2>
           <p className="text-body-mobile md:text-body font-sans text-graphite/80">
-            Projetos que equilibram estética, história e vida real.
+            {portfolioSubtitle}
           </p>
         </div>
 
@@ -127,7 +136,7 @@ const Portfolio = () => {
             <button
               onClick={prevSlide}
               className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-off-white/90 hover:bg-off-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-              aria-label="Imagem anterior"
+              aria-label={portfolioPrevLabel}
             >
               <ChevronLeft
                 size={28}
@@ -139,7 +148,7 @@ const Portfolio = () => {
             <button
               onClick={nextSlide}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-off-white/90 hover:bg-off-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-              aria-label="Próxima imagem"
+              aria-label={portfolioNextLabel}
             >
               <ChevronRight
                 size={28}
@@ -171,7 +180,7 @@ const Portfolio = () => {
                     ? 'bg-olive-green w-8'
                     : 'bg-graphite/30 w-2 hover:bg-graphite/50'
                 }`}
-                aria-label={`Ir para imagem ${index + 1}`}
+                aria-label={portfolioDotLabel.replace('{index}', String(index + 1))}
               />
             ))}
           </div>
@@ -192,7 +201,7 @@ const Portfolio = () => {
             rel="noopener noreferrer"
             className="inline-block px-10 py-4 bg-transparent border-2 border-olive-green text-olive-green font-sans font-medium rounded-button text-base tracking-wide hover:bg-olive-green hover:text-off-white transition-all duration-300"
           >
-            Ver todos os projetos
+            {portfolioCta}
           </a>
         </div>
       </div>

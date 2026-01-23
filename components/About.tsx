@@ -1,8 +1,14 @@
 'use client'
 
 import Image from 'next/image'
+import { useSiteText } from '@/lib/siteText'
 
 const About = () => {
+  const aboutTitle = useSiteText('about_title', 'Sobre mim')
+  const aboutParagraph1 = useSiteText('about_paragraph_1', 'Sou Nathalia Malinowski, designer de interiores e artista muralista. Meu trabalho nasce da escuta atenta e da sensibilidade em traduzir histórias, estilos e vivências em espaços que fazem sentido para quem os habita.')
+  const aboutParagraph2 = useSiteText('about_paragraph_2', 'Acredito em um design que vai além da estética: que acolhe, que respeita o tempo e que constrói identidade. Cada projeto é pensado como uma composição de camadas — do clássico ao contemporâneo, do vivido ao novo — sempre com propósito e significado.')
+  const aboutQuote = useSiteText('about_quote', 'Projetar é interpretar histórias e transformá-las em espaços.')
+
   return (
     <section
       id="sobre"
@@ -13,26 +19,22 @@ const About = () => {
           {/* Text Content */}
           <div className="space-y-8">
             <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite">
-              Sobre mim
+              {aboutTitle}
             </h2>
 
             <div className="space-y-6 text-body-mobile md:text-body font-sans text-graphite leading-relaxed">
               <p>
-                Sou Nathalia Malinowski, designer de interiores e artista muralista.
-                Meu trabalho nasce da escuta atenta e da sensibilidade em traduzir histórias, 
-                estilos e vivências em espaços que fazem sentido para quem os habita.
+                {aboutParagraph1}
               </p>
 
               <p>
-                Acredito em um design que vai além da estética: que acolhe, que respeita o tempo 
-                e que constrói identidade. Cada projeto é pensado como uma composição de camadas — 
-                do clássico ao contemporâneo, do vivido ao novo — sempre com propósito e significado.
+                {aboutParagraph2}
               </p>
             </div>
 
             {/* Featured Quote */}
             <blockquote className="text-2xl md:text-3xl font-serif italic text-olive-green leading-snug border-l-4 border-soft-terracotta pl-6 py-2">
-              Projetar é interpretar histórias e transformá-las em espaços.
+              {aboutQuote}
             </blockquote>
           </div>
 

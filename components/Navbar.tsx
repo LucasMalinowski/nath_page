@@ -4,11 +4,17 @@ import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import { useBrandAsset } from '@/lib/useBrandAsset'
+import { useSiteText } from '@/lib/siteText'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const brandAsset = useBrandAsset('navbar')
+  const navSobre = useSiteText('nav_sobre', 'SOBRE')
+  const navServicos = useSiteText('nav_servicos', 'SERVIÇOS')
+  const navPortfolio = useSiteText('nav_portfolio', 'PORTFÓLIO')
+  const navContato = useSiteText('nav_contato', 'CONTATO')
+  const navToggleLabel = useSiteText('nav_toggle_label', 'Alternar menu')
   const logoSize = {
     width: `${brandAsset?.width_px ?? 48}px`,
     height: `${brandAsset?.height_px ?? 48}px`,
@@ -23,10 +29,10 @@ const Navbar = () => {
   }, [])
 
   const navItems = [
-    { name: 'SOBRE', href: '#sobre' },
-    { name: 'SERVIÇOS', href: '#servicos' },
-    { name: 'PORTFÓLIO', href: '#portfolio' },
-    { name: 'CONTATO', href: '#contato' },
+    { name: navSobre, href: '#sobre' },
+    { name: navServicos, href: '#servicos' },
+    { name: navPortfolio, href: '#portfolio' },
+    { name: navContato, href: '#contato' },
   ]
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -86,7 +92,7 @@ const Navbar = () => {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 rounded-lg text-graphite hover:text-olive-green transition-colors"
-            aria-label="Toggle menu"
+            aria-label={navToggleLabel}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

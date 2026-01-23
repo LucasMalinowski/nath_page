@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase, PortfolioImage, BrandAsset, SiteMedia } from '@/lib/supabase'
-import { Upload, Trash2, Eye, EyeOff, Save, X, Edit2, CheckCircle2, ImagePlus } from 'lucide-react'
+import { Upload, Trash2, Eye, EyeOff, Save, X, Edit2, CheckCircle2, ImagePlus, ChevronDown, ChevronUp } from 'lucide-react'
 import Image from 'next/image'
 
 export default function AdminDashboard() {
@@ -36,6 +36,93 @@ export default function AdminDashboard() {
         hero_video: { title: 'Video do Hero', url: '/hero-video.mp4' }
     }
 
+    const siteTextGroups = [
+        {
+            title: 'Menu',
+            items: [
+                { key: 'nav_sobre', label: 'Menu: Sobre', defaultValue: 'SOBRE' },
+                { key: 'nav_servicos', label: 'Menu: Servicos', defaultValue: 'SERVIÇOS' },
+                { key: 'nav_portfolio', label: 'Menu: Portfolio', defaultValue: 'PORTFÓLIO' },
+                { key: 'nav_contato', label: 'Menu: Contato', defaultValue: 'CONTATO' },
+                { key: 'nav_toggle_label', label: 'Menu: Botao mobile', defaultValue: 'Alternar menu' }
+            ]
+        },
+        {
+            title: 'Hero',
+            items: [
+                { key: 'hero_headline', label: 'Titulo principal', defaultValue: 'Design de interiores com história,\nsensibilidade e identidade.', multiline: true },
+                { key: 'hero_subtitle', label: 'Subtitulo', defaultValue: 'Projetos autorais que unem o clássico ao vivido, criando espaços atemporais, afetivos e cheios de significado.', multiline: true },
+                { key: 'hero_cta_primary', label: 'CTA principal', defaultValue: 'Agendar conversa' },
+                { key: 'hero_cta_secondary', label: 'CTA secundario', defaultValue: 'Ver portfólio' }
+            ]
+        },
+        {
+            title: 'Sobre',
+            items: [
+                { key: 'about_title', label: 'Titulo', defaultValue: 'Sobre mim' },
+                { key: 'about_paragraph_1', label: 'Paragrafo 1', defaultValue: 'Sou Nathalia Malinowski, designer de interiores e artista muralista. Meu trabalho nasce da escuta atenta e da sensibilidade em traduzir histórias, estilos e vivências em espaços que fazem sentido para quem os habita.', multiline: true },
+                { key: 'about_paragraph_2', label: 'Paragrafo 2', defaultValue: 'Acredito em um design que vai além da estética: que acolhe, que respeita o tempo e que constrói identidade. Cada projeto é pensado como uma composição de camadas — do clássico ao contemporâneo, do vivido ao novo — sempre com propósito e significado.', multiline: true },
+                { key: 'about_quote', label: 'Citação', defaultValue: 'Projetar é interpretar histórias e transformá-las em espaços.' }
+            ]
+        },
+        {
+            title: 'Conceito',
+            items: [
+                { key: 'concept_title', label: 'Titulo', defaultValue: 'Camadas do Tempo' },
+                { key: 'concept_poetic', label: 'Texto poetico', defaultValue: 'Cada espaço carrega memórias.\nCada escolha constrói uma narrativa.', multiline: true },
+                { key: 'concept_paragraph', label: 'Paragrafo', defaultValue: 'Meu design parte do encontro entre épocas, referências e afetos, criando ambientes que não seguem tendências passageiras, mas refletem quem você é — hoje e ao longo do tempo.', multiline: true }
+            ]
+        },
+        {
+            title: 'Servicos',
+            items: [
+                { key: 'services_title', label: 'Titulo', defaultValue: 'Vamos transformar seu espaço?' },
+                { key: 'services_subtitle', label: 'Subtitulo', defaultValue: 'Um processo sensível, autoral e bem conduzido — do conceito à materialização.', multiline: true },
+                { key: 'services_item_1_title', label: 'Servico 1 - Titulo', defaultValue: 'Projetos de Interiores' },
+                { key: 'services_item_1_desc', label: 'Servico 1 - Descricao', defaultValue: 'Desenvolvimento completo de ambientes residenciais, com foco em identidade, funcionalidade e estética atemporal. Cada projeto é único, pensado para refletir a essência de quem vive o espaço.', multiline: true },
+                { key: 'services_item_2_title', label: 'Servico 2 - Titulo', defaultValue: 'Consultoria de Interiores' },
+                { key: 'services_item_2_desc', label: 'Servico 2 - Descricao', defaultValue: 'Orientação estratégica para transformar ambientes de forma prática e personalizada, ideal para quem busca direcionamento estético sem um projeto completo.', multiline: true },
+                { key: 'services_item_3_title', label: 'Servico 3 - Titulo', defaultValue: 'Murais e Intervenções Artísticas' },
+                { key: 'services_item_3_desc', label: 'Servico 3 - Descricao', defaultValue: 'Criação de pinturas e murais autorais que acrescentam significado, textura e personalidade aos espaços, conectando arte e arquitetura.', multiline: true },
+                { key: 'services_item_4_title', label: 'Servico 4 - Titulo', defaultValue: 'Modelagem 3D' },
+                { key: 'services_item_4_desc', label: 'Servico 4 - Descricao', defaultValue: 'Visualização do projeto para facilitar decisões com mais segurança, clareza e compreensão do resultado final.', multiline: true },
+                { key: 'services_cta', label: 'CTA', defaultValue: 'Entre em contato' }
+            ]
+        },
+        {
+            title: 'Portfolio',
+            items: [
+                { key: 'portfolio_title', label: 'Titulo', defaultValue: 'Portfólio' },
+                { key: 'portfolio_subtitle', label: 'Subtitulo', defaultValue: 'Projetos que equilibram estética, história e vida real.', multiline: true },
+                { key: 'portfolio_loading', label: 'Carregando', defaultValue: 'Carregando...' },
+                { key: 'portfolio_empty', label: 'Mensagem sem projetos', defaultValue: 'Em breve, novos projetos serão adicionados', multiline: true },
+                { key: 'portfolio_cta', label: 'CTA', defaultValue: 'Ver todos os projetos' },
+                { key: 'portfolio_prev_label', label: 'Aria anterior', defaultValue: 'Imagem anterior' },
+                { key: 'portfolio_next_label', label: 'Aria proxima', defaultValue: 'Próxima imagem' },
+                { key: 'portfolio_dot_label', label: 'Aria pontos', defaultValue: 'Ir para imagem {index}' }
+            ]
+        },
+        {
+            title: 'Contato',
+            items: [
+                { key: 'contact_title', label: 'Titulo', defaultValue: 'Vamos conversar?' },
+                { key: 'contact_subtitle', label: 'Subtitulo', defaultValue: 'Me conte sobre seu espaço, seu momento e o que você deseja sentir ao entrar nele. A partir disso, eu te ajudo a entender o melhor caminho para o seu projeto.', multiline: true },
+                { key: 'contact_phone_label', label: 'Telefone', defaultValue: '(45) 99802-8130' },
+                { key: 'contact_email_label', label: 'Email', defaultValue: 'malinowskinathalia@gmail.com' },
+                { key: 'contact_instagram_label', label: 'Instagram', defaultValue: '@nathalia_malinowski' },
+                { key: 'contact_cta', label: 'CTA', defaultValue: 'Agendar conversa' },
+                { key: 'contact_closing', label: 'Fechamento', defaultValue: 'Vamos criar algo que atravesse o tempo.' }
+            ]
+        },
+        {
+            title: 'Rodape',
+            items: [
+                { key: 'footer_copyright', label: 'Copyright', defaultValue: '© {year} Nathalia Malinowski. Todos os direitos reservados.' },
+                { key: 'footer_tagline', label: 'Tagline', defaultValue: 'Camadas do Tempo | Clássico Vivo' }
+            ]
+        }
+    ]
+
     const [images, setImages] = useState<PortfolioImage[]>([])
     const [loading, setLoading] = useState(true)
     const [uploading, setUploading] = useState(false)
@@ -62,12 +149,48 @@ export default function AdminDashboard() {
         background_texture: null,
         hero_video: null
     })
+    const [siteTexts, setSiteTexts] = useState<Record<string, string>>({})
+    const [siteTextsLoading, setSiteTextsLoading] = useState(true)
+    const [siteTextSaving, setSiteTextSaving] = useState<string | null>(null)
+    const [siteTextEdits, setSiteTextEdits] = useState<Record<string, string>>({})
+    const [brandSectionsOpen, setBrandSectionsOpen] = useState({
+        assets: true,
+        assetsLibrary: true,
+        publicAssets: true,
+        siteMedia: true,
+        siteTexts: true
+    })
+    const brandSectionsStorageKey = 'admin_brand_sections_open'
 
     useEffect(() => {
         fetchImages()
         fetchBrandAssets()
         fetchSiteMedia()
+        fetchSiteTexts()
     }, [])
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        const stored = window.localStorage.getItem(brandSectionsStorageKey)
+        if (!stored) return
+        try {
+            const parsed = JSON.parse(stored) as Partial<typeof brandSectionsOpen>
+            setBrandSectionsOpen((prev) => ({
+                assets: parsed.assets ?? prev.assets,
+                assetsLibrary: parsed.assetsLibrary ?? prev.assetsLibrary,
+                publicAssets: parsed.publicAssets ?? prev.publicAssets,
+                siteMedia: parsed.siteMedia ?? prev.siteMedia,
+                siteTexts: parsed.siteTexts ?? prev.siteTexts
+            }))
+        } catch {
+            window.localStorage.removeItem(brandSectionsStorageKey)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        window.localStorage.setItem(brandSectionsStorageKey, JSON.stringify(brandSectionsOpen))
+    }, [brandSectionsOpen])
 
     const fetchImages = async () => {
         try {
@@ -120,6 +243,26 @@ export default function AdminDashboard() {
             alert('Erro ao carregar midias do site')
         } finally {
             setSiteMediaLoading(false)
+        }
+    }
+
+    const fetchSiteTexts = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('site_texts')
+                .select('*')
+
+            if (error) throw error
+            const textMap = (data || []).reduce<Record<string, string>>((acc, item: { key: string; value: string }) => {
+                acc[item.key] = item.value
+                return acc
+            }, {})
+            setSiteTexts(textMap)
+        } catch (error) {
+            console.error('Error fetching site texts:', error)
+            alert('Erro ao carregar textos do site')
+        } finally {
+            setSiteTextsLoading(false)
         }
     }
 
@@ -433,6 +576,67 @@ export default function AdminDashboard() {
         }
     }
 
+    const getSiteTextValue = (key: string, fallback: string) => siteTexts[key] ?? fallback
+
+    const getSiteTextEditValue = (key: string, fallback: string) =>
+        siteTextEdits[key] ?? getSiteTextValue(key, fallback)
+
+    const setSiteTextEditValue = (key: string, value: string) => {
+        setSiteTextEdits((prev) => ({ ...prev, [key]: value }))
+    }
+
+    const saveSiteText = async (key: string, value: string) => {
+        const trimmed = value.trim()
+        setSiteTextSaving(key)
+
+        try {
+            if (!trimmed) {
+                const { error } = await supabase
+                    .from('site_texts')
+                    .delete()
+                    .eq('key', key)
+
+                if (error) throw error
+            } else {
+                const { error } = await supabase
+                    .from('site_texts')
+                    .upsert({ key, value: value }, { onConflict: 'key' })
+
+                if (error) throw error
+            }
+
+            await fetchSiteTexts()
+            alert('Texto atualizado com sucesso!')
+        } catch (error) {
+            console.error('Error saving site text:', error)
+            alert('Erro ao salvar texto')
+        } finally {
+            setSiteTextSaving(null)
+        }
+    }
+
+    const resetSiteText = async (key: string, fallback: string) => {
+        setSiteTextSaving(key)
+
+        try {
+            const { error } = await supabase
+                .from('site_texts')
+                .delete()
+                .eq('key', key)
+
+            if (error) throw error
+
+            setSiteTextEdits((prev) => ({ ...prev, [key]: fallback }))
+            await fetchSiteTexts()
+            alert('Texto restaurado para o padrao!')
+        } catch (error) {
+            console.error('Error resetting site text:', error)
+            alert('Erro ao restaurar texto')
+        } finally {
+            setSiteTextSaving(null)
+        }
+    }
+
     const updateAssetLocation = async (id: string, newLocation: string) => {
         try {
             const { error } = await supabase
@@ -644,6 +848,22 @@ export default function AdminDashboard() {
 
                 {activeTab === 'brand' && (
                     <section className="mt-8">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <p className="text-sm font-semibold text-graphite">Ativos de marca</p>
+                                <p className="text-xs text-graphite/60">Envie, ajuste e ative logos.</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setBrandSectionsOpen((prev) => ({ ...prev, assets: !prev.assets }))}
+                                className="text-olive-green hover:text-olive-green/80"
+                                aria-label={brandSectionsOpen.assets ? 'Recolher ativos de marca' : 'Expandir ativos de marca'}
+                            >
+                                {brandSectionsOpen.assets ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                            </button>
+                        </div>
+
+                        {brandSectionsOpen.assets && (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             {/* Upload Form */}
                             <form onSubmit={handleAssetUpload} className="bg-white rounded-2xl border border-warm-beige/80 p-6 space-y-4 shadow-sm">
@@ -827,10 +1047,22 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
                         </div>
+                        )}
 
                         <div className="mt-8">
-                            <h3 className="text-sm font-semibold text-graphite mb-3">Biblioteca de ativos</h3>
-                            {assetsLoading ? (
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-sm font-semibold text-graphite">Biblioteca de ativos</h3>
+                                <button
+                                    type="button"
+                                    onClick={() => setBrandSectionsOpen((prev) => ({ ...prev, assetsLibrary: !prev.assetsLibrary }))}
+                                    className="text-olive-green hover:text-olive-green/80"
+                                    aria-label={brandSectionsOpen.assetsLibrary ? 'Recolher biblioteca de ativos' : 'Expandir biblioteca de ativos'}
+                                >
+                                    {brandSectionsOpen.assetsLibrary ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                </button>
+                            </div>
+                            {brandSectionsOpen.assetsLibrary && (
+                            assetsLoading ? (
                                 <div className="bg-white rounded-2xl border border-warm-beige/80 p-6 text-graphite/70 shadow-sm">
                                     Carregando ativos de marca...
                                 </div>
@@ -861,7 +1093,7 @@ export default function AdminDashboard() {
                                                 <div className="flex-1">
                                                     <p className="text-sm font-semibold text-graphite">{asset.title}</p>
                                                     <p className="text-xs text-graphite/60 mt-0.5">
-                                                        Location: {assetLocationOptions.find((option) => option.value === asset.location)?.label || asset.location}
+                                                        Local: {assetLocationOptions.find((option) => option.value === asset.location)?.label || asset.location}
                                                     </p>
                                                     {asset.is_active && (
                                                         <p className="mt-1 inline-flex items-center text-xs font-medium text-olive-green bg-olive-green/10 px-2 py-0.5 rounded-full">
@@ -950,11 +1182,23 @@ export default function AdminDashboard() {
                                         )
                                     })}
                                 </div>
+                            )
                             )}
                         </div>
 
                         <div className="mt-10">
-                            <h3 className="text-sm font-semibold text-graphite mb-3">Ativos publicos</h3>
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-sm font-semibold text-graphite">Ativos publicos</h3>
+                                <button
+                                    type="button"
+                                    onClick={() => setBrandSectionsOpen((prev) => ({ ...prev, publicAssets: !prev.publicAssets }))}
+                                    className="text-olive-green hover:text-olive-green/80"
+                                    aria-label={brandSectionsOpen.publicAssets ? 'Recolher ativos publicos' : 'Expandir ativos publicos'}
+                                >
+                                    {brandSectionsOpen.publicAssets ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                </button>
+                            </div>
+                            {brandSectionsOpen.publicAssets && (
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                                 {publicBrandAssets.map((asset) => {
                                     const location = getPublicPlacement(asset.id)
@@ -1035,11 +1279,23 @@ export default function AdminDashboard() {
                                     )
                                 })}
                             </div>
+                            )}
                         </div>
 
                         <div className="mt-10">
-                            <h3 className="text-sm font-semibold text-graphite mb-3">Midias do site</h3>
-                            {siteMediaLoading ? (
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-sm font-semibold text-graphite">Midias do site</h3>
+                                <button
+                                    type="button"
+                                    onClick={() => setBrandSectionsOpen((prev) => ({ ...prev, siteMedia: !prev.siteMedia }))}
+                                    className="text-olive-green hover:text-olive-green/80"
+                                    aria-label={brandSectionsOpen.siteMedia ? 'Recolher midias do site' : 'Expandir midias do site'}
+                                >
+                                    {brandSectionsOpen.siteMedia ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                </button>
+                            </div>
+                            {brandSectionsOpen.siteMedia && (
+                            siteMediaLoading ? (
                                 <div className="bg-white rounded-2xl border border-warm-beige/80 p-6 text-graphite/70 shadow-sm">
                                     Carregando midias do site...
                                 </div>
@@ -1158,6 +1414,99 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
                                 </div>
+                            )
+                            )}
+                        </div>
+
+                        <div className="mt-10">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-sm font-semibold text-graphite">Textos do site</h3>
+                                <button
+                                    type="button"
+                                    onClick={() => setBrandSectionsOpen((prev) => ({ ...prev, siteTexts: !prev.siteTexts }))}
+                                    className="text-olive-green hover:text-olive-green/80"
+                                    aria-label={brandSectionsOpen.siteTexts ? 'Recolher textos do site' : 'Expandir textos do site'}
+                                >
+                                    {brandSectionsOpen.siteTexts ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                </button>
+                            </div>
+                            {brandSectionsOpen.siteTexts && (
+                            siteTextsLoading ? (
+                                <div className="bg-white rounded-2xl border border-warm-beige/80 p-6 text-graphite/70 shadow-sm">
+                                    Carregando textos do site...
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    {siteTextGroups.map((group) => (
+                                        <div key={group.title} className="bg-white rounded-2xl border border-warm-beige/80 p-6 shadow-sm">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <p className="text-sm font-semibold text-graphite">{group.title}</p>
+                                                <span className="text-xs text-graphite/60">
+                                                    {group.items.length} campos
+                                                </span>
+                                            </div>
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                                {group.items.map((item) => {
+                                                    const currentValue = getSiteTextEditValue(item.key, item.defaultValue)
+                                                    const isOverride = siteTexts[item.key] !== undefined
+
+                                                    return (
+                                                        <div key={item.key} className="border border-warm-beige/60 rounded-xl p-4 bg-off-white/60">
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <label className="text-xs font-medium text-graphite/80">
+                                                                    {item.label}
+                                                                </label>
+                                                                {isOverride && (
+                                                                    <span className="text-[10px] uppercase tracking-widest text-olive-green">
+                                                                        personalizado
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            {item.multiline ? (
+                                                                <textarea
+                                                                    value={currentValue}
+                                                                    onChange={(e) => setSiteTextEditValue(item.key, e.target.value)}
+                                                                    className="w-full min-h-[110px] px-3 py-2 text-sm border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white resize-vertical"
+                                                                    placeholder={item.defaultValue}
+                                                                />
+                                                            ) : (
+                                                                <input
+                                                                    type="text"
+                                                                    value={currentValue}
+                                                                    onChange={(e) => setSiteTextEditValue(item.key, e.target.value)}
+                                                                    className="w-full px-3 py-2 text-sm border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
+                                                                    placeholder={item.defaultValue}
+                                                                />
+                                                            )}
+                                                            <p className="text-[11px] text-graphite/60 mt-2">
+                                                                Padrao: {item.defaultValue}
+                                                            </p>
+                                                            <div className="mt-3 flex gap-2">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => saveSiteText(item.key, currentValue)}
+                                                                    disabled={siteTextSaving === item.key}
+                                                                    className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-olive-green hover:bg-olive-green/90 text-off-white text-xs font-medium rounded-md transition-colors disabled:opacity-60"
+                                                                >
+                                                                    {siteTextSaving === item.key ? 'Salvando...' : 'Salvar'}
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => resetSiteText(item.key, item.defaultValue)}
+                                                                    disabled={siteTextSaving === item.key}
+                                                                    className="px-3 py-2 bg-warm-beige text-graphite text-xs font-medium rounded-md transition-colors hover:bg-warm-beige/80 disabled:opacity-60"
+                                                                >
+                                                                    Usar padrao
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
                             )}
                         </div>
                     </section>
@@ -1243,7 +1592,7 @@ export default function AdminDashboard() {
                                                                 maxLength={100}
                                                             />
                                                             <p className="text-xs text-graphite/60 mt-1">
-                                                                {editForm.title.length}/100 characters
+                                                                {editForm.title.length}/100 caracteres
                                                             </p>
                                                         </div>
 
@@ -1260,7 +1609,7 @@ export default function AdminDashboard() {
                                                                 maxLength={500}
                                                             />
                                                             <p className="text-xs text-graphite/60 mt-1">
-                                                                {editForm.description.length}/500 characters
+                                                                {editForm.description.length}/500 caracteres
                                                             </p>
                                                         </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import SiteMediaProvider from '@/components/SiteMediaProvider'
+import { SiteTextProvider } from '@/lib/siteText'
 
 export const metadata: Metadata = {
   title: 'Nathalia Malinowski | Design de Interiores',
@@ -25,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        <SiteMediaProvider>{children}</SiteMediaProvider>
+        <SiteTextProvider>
+          <SiteMediaProvider>{children}</SiteMediaProvider>
+        </SiteTextProvider>
       </body>
     </html>
   )
