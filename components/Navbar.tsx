@@ -3,10 +3,16 @@
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 import Image from 'next/image'
+import { useBrandAsset } from '@/lib/useBrandAsset'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const brandAsset = useBrandAsset('navbar')
+  const logoSize = {
+    width: `${brandAsset?.width_px ?? 48}px`,
+    height: `${brandAsset?.height_px ?? 48}px`,
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,13 +56,14 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <a href="#hero" className="flex items-center">
-            <div className="relative w-12 h-12">
+            <div className="relative" style={logoSize}>
               <Image
-                src="/nm-logo.png"
-                alt="Nathalia Malinowski"
+                src={brandAsset?.image_url || '/nm-logo.png'}
+                alt={brandAsset?.title || 'Nathalia Malinowski'}
                 fill
                 className="object-contain"
                 priority
+                unoptimized
               />
             </div>
           </a>

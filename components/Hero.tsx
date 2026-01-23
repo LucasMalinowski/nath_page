@@ -1,8 +1,16 @@
 'use client'
 
 import Image from 'next/image'
+import { useBrandAsset } from '@/lib/useBrandAsset'
+import { useSiteMedia } from '@/lib/useSiteMedia'
 
 const Hero = () => {
+  const brandAsset = useBrandAsset('hero')
+  const heroVideo = useSiteMedia('hero_video')
+  const logoSize = brandAsset?.width_px && brandAsset?.height_px
+    ? { width: `${brandAsset.width_px}px`, height: `${brandAsset.height_px}px` }
+    : { width: 'clamp(128px, 18vw, 192px)', height: 'clamp(128px, 18vw, 192px)' }
+
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId)
     if (element) {
@@ -28,7 +36,7 @@ const Hero = () => {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/hero-video.mp4" type="video/mp4" />
+          <source src={heroVideo?.url || '/hero-video.mp4'} type="video/mp4" />
         </video>
         
         {/* Overlay with green tint as per document (20-30% opacity) */}
@@ -39,13 +47,14 @@ const Hero = () => {
       <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-16 text-center">
         {/* Logo Overlay */}
         <div className="mb-12 animate-fade-in flex justify-center">
-          <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
+          <div className="relative" style={logoSize}>
             <Image
-              src="/nm-logo.png"
-              alt="NM Logo"
+              src={brandAsset?.image_url || '/nm-logo.png'}
+              alt={brandAsset?.title || 'NM Logo'}
               fill
               className="object-contain drop-shadow-2xl"
               priority
+              unoptimized
             />
           </div>
         </div>

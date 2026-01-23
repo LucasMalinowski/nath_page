@@ -1,20 +1,28 @@
 'use client'
 
 import Image from 'next/image'
+import { useBrandAsset } from '@/lib/useBrandAsset'
 
 const Footer = () => {
+  const brandAsset = useBrandAsset('footer')
+  const logoSize = {
+    width: `${brandAsset?.width_px ?? 64}px`,
+    height: `${brandAsset?.height_px ?? 64}px`,
+  }
+
   return (
     <footer className="relative bg-olive-green py-2">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
         <div className="flex flex-col items-center justify-center space-y-3">
           {/* Logo */}
-          <div className="relative w-16 h-16">
+          <div className="relative" style={logoSize}>
             <Image
-              src="/nm-logo.png"
-              alt="NM Logo"
+              src={brandAsset?.image_url || '/nm-logo.png'}
+              alt={brandAsset?.title || 'NM Logo'}
               fill
               className="object-contain brightness-0 invert"
               priority
+              unoptimized
             />
           </div>
 
