@@ -1,56 +1,99 @@
 'use client'
 
 import Image from 'next/image'
+import { useBrandAsset } from '@/lib/useBrandAsset'
+import { useSiteMedia } from '@/lib/useSiteMedia'
+import { useSiteText, renderTextWithBreaks } from '@/lib/siteText'
 
 const Hero = () => {
+  const brandAsset = useBrandAsset('hero')
+  const heroVideo = useSiteMedia('hero_video')
+  const heroHeadline = useSiteText('hero_headline', 'Design de interiores com história,\nsensibilidade e identidade.')
+  const heroSubtitle = useSiteText('hero_subtitle', 'Projetos autorais que unem o clássico ao vivido, criando espaços atemporais, afetivos e cheios de significado.')
+  const heroCtaPrimary = useSiteText('hero_cta_primary', 'Agendar conversa')
+  const heroCtaSecondary = useSiteText('hero_cta_secondary', 'Ver portfólio')
+  const logoSize = brandAsset?.width_px && brandAsset?.height_px
+    ? { width: `${brandAsset.width_px}px`, height: `${brandAsset.height_px}px` }
+    : { width: 'clamp(128px, 18vw, 192px)', height: 'clamp(128px, 18vw, 192px)' }
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.querySelector(sectionId)
+    if (element) {
+      const offset = 80
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - offset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
+    }
+  }
+
   return (
-      <section id="hero" className="relative pt-14 pb-8 bg-[#ebeae0]">
-        {/* Video Container with larger side padding and reduced height */}
-        <div className="w-full px-10 md:px-16 lg:px-28">
-          <div className="relative w-full overflow-hidden" style={{ paddingBottom: '50%' }}>
-            <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source src="/hero-video.mp4" type="video/mp4" />
-            </video>
+    <section id="hero" className="relative min-h-screen flex items-center justify-center pt-20">
+      {/* Video Background */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src={heroVideo?.url || '/hero-video.mp4'} type="video/mp4" />
+        </video>
+        
+        {/* Overlay with green tint as per document (20-30% opacity) */}
+        <div className="absolute inset-0 bg-olive-green/40"></div>
+      </div>
 
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black/20"></div>
-
-            {/* Content Overlay on Video */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-white px-6">
-                {/* NM Logo Image */}
-                <div className="mb-4 animate-fade-in flex justify-center">
-                  <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
-                    <Image
-                        src="/nm-logo.png"
-                        alt="NM Logo"
-                        fill
-                        className="object-contain"
-                        priority
-                    />
-                  </div>
-                </div>
-
-                {/* Name and Title */}
-                <div className="animate-fade-in delay-200">
-                  <h2 className="text-xl md:text-2xl lg:text-3xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-                    Nathalia Malinowski
-                  </h2>
-                  <p className="text-xs md:text-sm tracking-widest font-light" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                    Design de Interiores
-                  </p>
-                </div>
-              </div>
-            </div>
+      {/* Content */}
+      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-16 text-center">
+        {/* Logo Overlay */}
+        <div className="mb-12 animate-fade-in flex justify-center">
+          <div className="relative" style={logoSize}>
+            <Image
+              src={brandAsset?.image_url || '/nm-logo.png'}
+              alt={brandAsset?.title || 'NM Logo'}
+              fill
+              className="object-contain drop-shadow-2xl"
+              priority
+              unoptimized
+            />
           </div>
         </div>
-      </section>
+
+        {/* Headline */}
+        <h1 className="text-4xl md:text-5xl lg:text-hero font-serif font-medium text-off-white mb-6 animate-fade-in delay-100 leading-tight">
+          {renderTextWithBreaks(heroHeadline)}
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-lg md:text-xl text-off-white/90 font-sans mb-12 max-w-3xl mx-auto animate-fade-in delay-200 leading-relaxed">
+          {heroSubtitle}
+        </p>
+
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in delay-300">
+          {/* Primary CTA */}
+          <button
+            onClick={() => scrollToSection('#contato')}
+            className="btn-primary px-10 py-4 bg-olive-green text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-soft-terracotta transition-all duration-300"
+          >
+            {heroCtaPrimary}
+          </button>
+
+          {/* Secondary CTA */}
+          <button
+            onClick={() => scrollToSection('#portfolio')}
+            className="px-10 py-4 bg-transparent border-2 border-off-white text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-off-white hover:text-olive-green transition-all duration-300"
+          >
+            {heroCtaSecondary}
+          </button>
+        </div>
+      </div>
+    </section>
   )
 }
 

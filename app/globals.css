@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -17,10 +17,12 @@ html {
 body {
   font-family: 'Montserrat', sans-serif;
   overflow-x: hidden;
+  background-color: #F6F2ED;
+  color: #2E2E2E;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Playfair Display', serif;
 }
 
 @layer utilities {
@@ -28,36 +30,37 @@ h1, h2, h3, h4, h5, h6 {
     text-wrap: balance;
   }
   
-  .bg-floral {
-    background-image: url('/background-texture.jpeg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-  }
-  
-  .bg-floral-overlay {
+  /* Paper texture overlay - 8% opacity as per document */
+  .paper-texture {
     position: relative;
   }
   
-  .bg-floral-overlay::before {
+  .paper-texture::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('/background-texture.jpeg');
+    background-image: var(--paper-texture-url, url('/background-texture.jpeg'));
     background-size: auto;
-    opacity: 0.3;
-    z-index: -1;
+    background-position: center;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .paper-texture > * {
+    position: relative;
+    z-index: 1;
   }
 }
 
-/* Custom animations */
+/* Smooth animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -68,7 +71,7 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -77,7 +80,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-fade-in {
-  animation: fadeIn 1s ease-out forwards;
+  animation: fadeIn 0.8s ease-out forwards;
 }
 
 .animate-fade-in-up {
@@ -100,18 +103,12 @@ h1, h2, h3, h4, h5, h6 {
   animation-delay: 0.4s;
 }
 
-/* Video overlay */
-.video-overlay {
-  position: relative;
+/* Button hover transitions */
+.btn-primary {
+  transition: all 0.3s ease;
 }
 
-.video-overlay::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  pointer-events: none;
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }

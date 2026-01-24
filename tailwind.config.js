@@ -8,46 +8,48 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        beige: {
-          50: '#faf8f5',
-          100: '#f5f2ec',
-          200: '#e8e2d5',
-          300: '#d9d0bd',
-          400: '#c9bda5',
-          500: '#b8aa8d',
-          600: '#a89675',
-          700: '#8a7a5d',
-          800: '#6b5e47',
-          900: '#4d4332',
-        },
-        sage: {
-          50: '#f6f7f6',
-          100: '#e3e6e3',
-          200: '#c7ccc7',
-          300: '#a8b0a8',
-          400: '#8a948a',
-          500: '#6d786d',
-          600: '#5a635a',
-          700: '#484f48',
-          800: '#363b36',
-          900: '#242724',
-        },
-        coral: {
-          50: '#fef5f3',
-          100: '#fce8e3',
-          200: '#f9d1c7',
-          300: '#f5b9ab',
-          400: '#f2a18f',
-          500: '#ee8973',
-          600: '#e86d52',
-          700: '#d85438',
-          800: '#b4442d',
-          900: '#8f3523',
-        },
+        // Neutros (base do site)
+        'off-white': '#F6F2ED',
+        'warm-beige': '#DED6CC',
+        
+        // Cores principais
+        'olive-green': '#5E6F64',
+        'sage-green': '#7A8F7A',
+        
+        // Cores de apoio/acento
+        'soft-terracotta': '#C47A5A',
+        'coffee-brown': '#4B3A2F',
+        'graphite': '#2E2E2E',
       },
       fontFamily: {
-        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+        serif: ['Playfair Display', 'Georgia', 'serif'],
         sans: ['Montserrat', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        // Desktop sizes
+        'hero': ['56px', { lineHeight: '1.2' }],
+        'h1': ['56px', { lineHeight: '1.2' }],
+        'h2': ['36px', { lineHeight: '1.3' }],
+        'h3': ['26px', { lineHeight: '1.3' }],
+        'body': ['18px', { lineHeight: '1.7' }],
+        'small': ['14px', { lineHeight: '1.6' }],
+        
+        // Mobile sizes
+        'hero-mobile': ['38px', { lineHeight: '1.2' }],
+        'h1-mobile': ['38px', { lineHeight: '1.2' }],
+        'h2-mobile': ['28px', { lineHeight: '1.3' }],
+        'body-mobile': ['16px', { lineHeight: '1.7' }],
+      },
+      letterSpacing: {
+        'wide-caps': '0.15em',
+        'wider-caps': '0.2em',
+      },
+      borderRadius: {
+        'button': '14px',
+      },
+      spacing: {
+        'section': '5rem',
+        'section-mobile': '3rem',
       },
     },
   },

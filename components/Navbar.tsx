@@ -2,10 +2,23 @@
 
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
+import Image from 'next/image'
+import { useBrandAsset } from '@/lib/useBrandAsset'
+import { useSiteText } from '@/lib/siteText'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const brandAsset = useBrandAsset('navbar')
+  const navSobre = useSiteText('nav_sobre', 'SOBRE')
+  const navServicos = useSiteText('nav_servicos', 'SERVIÇOS')
+  const navPortfolio = useSiteText('nav_portfolio', 'PORTFÓLIO')
+  const navContato = useSiteText('nav_contato', 'CONTATO')
+  const navToggleLabel = useSiteText('nav_toggle_label', 'Alternar menu')
+  const logoSize = {
+    width: `${brandAsset?.width_px ?? 48}px`,
+    height: `${brandAsset?.height_px ?? 48}px`,
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,19 +29,15 @@ const Navbar = () => {
   }, [])
 
   const navItems = [
-    { name: 'HOME', href: '#hero' },
-    { name: 'PORTFÓLIO', href: '#portfolio' },
-    { name: 'CONTATO', href: '#contato' },
+    { name: navSobre, href: '#sobre' },
+    { name: navServicos, href: '#servicos' },
+    { name: navPortfolio, href: '#portfolio' },
+    { name: navContato, href: '#contato' },
   ]
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
     setIsMobileMenuOpen(false)
-
-    if (href === '#portfolio') {
-      window.open('https://www.instagram.com/nathalia_malinowski/', '_blank')
-      return
-    }
 
     const element = document.querySelector(href)
     if (element) {
@@ -44,17 +53,35 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="fixed w-full z-50 bg-[#afae92] h-10 backdrop-blur-sm shadow-md">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-center pt-2.5">
+    <nav
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-off-white/95 backdrop-blur-sm shadow-sm' : 'bg-off-white'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <a href="#hero" className="flex items-center">
+            <div className="relative" style={logoSize}>
+              <Image
+                src={brandAsset?.image_url || '/nm-logo.png'}
+                alt={brandAsset?.title || 'Nathalia Malinowski'}
+                fill
+                className="object-contain"
+                priority
+                unoptimized
+              />
+            </div>
+          </a>
+
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-16">
+          <div className="hidden md:flex items-center space-x-10">
             {navItems.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item.href)}
-                className="text-sm font-medium tracking-wider text-white/90 hover:text-white transition-colors duration-300"
+                className="text-sm font-medium tracking-wide-caps text-graphite hover:text-olive-green transition-colors duration-300 font-sans uppercase"
               >
                 {item.name}
               </a>
@@ -64,8 +91,8 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-white hover:bg-[#94926a] transition-colors"
-            aria-label="Toggle menu"
+            className="md:hidden p-2 rounded-lg text-graphite hover:text-olive-green transition-colors"
+            aria-label={navToggleLabel}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -74,14 +101,14 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#afae92] border-t">
-          <div className="px-6 py-4 space-y-3">
+        <div className="md:hidden bg-off-white border-t border-warm-beige">
+          <div className="px-6 py-6 space-y-4">
             {navItems.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item.href)}
-                className="block py-2 text-sm font-medium tracking-wider text-white/90 hover:text-white transition-colors"
+                className="block py-3 text-sm font-medium tracking-wide-caps text-graphite hover:text-olive-green transition-colors font-sans uppercase"
               >
                 {item.name}
               </a>
