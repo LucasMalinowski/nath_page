@@ -9,15 +9,16 @@ import { useSiteText } from '@/lib/siteText'
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const brandAsset = useBrandAsset('navbar')
-  const navSobre = useSiteText('nav_sobre', 'SOBRE')
-  const navServicos = useSiteText('nav_servicos', 'SERVIÇOS')
-  const navPortfolio = useSiteText('nav_portfolio', 'PORTFÓLIO')
-  const navContato = useSiteText('nav_contato', 'CONTATO')
+  useBrandAsset('navbar')
+  const navSobre = useSiteText('nav_sobre', 'Sobre')
+  const navServicos = useSiteText('nav_servicos', 'Serviços')
+  const navPortfolio = useSiteText('nav_portfolio', 'Portfólio')
+  const navGaleria = useSiteText('nav_galeria', 'Galeria')
+  const navContato = useSiteText('nav_contato', 'Contato')
   const navToggleLabel = useSiteText('nav_toggle_label', 'Alternar menu')
   const logoSize = {
-    width: `${brandAsset?.width_px ?? 48}px`,
-    height: `${brandAsset?.height_px ?? 48}px`,
+    width: '72px',
+    height: '48px',
   }
 
   useEffect(() => {
@@ -30,9 +31,10 @@ const Navbar = () => {
 
   const navItems = [
     { name: navSobre, href: '#sobre' },
-    { name: navServicos, href: '#servicos' },
     { name: navPortfolio, href: '#portfolio' },
-    { name: navContato, href: '#contato' },
+    { name: navServicos, href: '#servicos' },
+    { name: navGaleria, href: '#galeria' },
+    { name: navContato, href: '#contato'}
   ]
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -55,37 +57,32 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-off-white/95 backdrop-blur-sm shadow-sm' : 'bg-off-white'
+        isScrolled ? 'bg-off-white/75 backdrop-blur-sm shadow-sm' : 'bg-off-white'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <a href="#hero" className="flex items-center">
-            <div className="relative" style={logoSize}>
+      <div className="px-6 sm:px-8 ">
+        <div className="flex items-center h-16">
+          <div className="hidden md:flex flex-1 items-center justify-center justify-between px-20">
+            <a href="#hero" className="flex items-center">
               <Image
-                src={brandAsset?.image_url || '/nm-logo.png'}
-                alt={brandAsset?.title || 'Nathalia Malinowski'}
-                fill
-                className="object-contain"
-                priority
-                unoptimized
-              />
-            </div>
-          </a>
+                  src="/nm-logo-black.png"
+                  alt="Nathalia Malinowski"
+                  width={20}
+                  height={20}
+                  className="object-contain w-20 h-20"
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-10">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
-                className="text-sm font-medium tracking-wide-caps text-graphite hover:text-olive-green transition-colors duration-300 font-sans uppercase"
-              >
-                {item.name}
-              </a>
-            ))}
+              />
+            </a>
+              {navItems.map((item, index) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
+                  className="px-1 py-1 text-[18px] rounded text-graphite transition-colors duration-300 hover:text-off-white hover:bg-olive-green"
+                >
+                  {item.name}
+                </a>
+              ))}
           </div>
 
           {/* Mobile Menu Button */}
@@ -108,11 +105,18 @@ const Navbar = () => {
                 key={item.name}
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item.href)}
-                className="block py-3 text-sm font-medium tracking-wide-caps text-graphite hover:text-olive-green transition-colors font-sans uppercase"
+                className="block py-3 text-sm font-medium text-graphite hover:text-olive-green transition-colors font-sans"
               >
                 {item.name}
               </a>
             ))}
+            <a
+              href="#contato"
+              onClick={(e) => handleNavClick(e, '#contato')}
+              className="block py-3 text-sm font-medium text-olive-green transition-colors font-sans"
+            >
+              {navContato}
+            </a>
           </div>
         </div>
       )}
