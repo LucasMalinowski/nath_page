@@ -10,58 +10,48 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const brandAsset = useBrandAsset('navbar')
-  const navSobre = useSiteText('nav_sobre', 'SOBRE')
-  const navServicos = useSiteText('nav_servicos', 'SERVIÇOS')
-  const navPortfolio = useSiteText('nav_portfolio', 'PORTFÓLIO')
-  const navContato = useSiteText('nav_contato', 'CONTATO')
+
+  const navSobre = useSiteText('nav_sobre', 'Sobre')
+  const navPortfolio = useSiteText('nav_portfolio', 'Portfólio')
+  const navServicos = useSiteText('nav_servicos', 'Serviços')
+  const navGaleria = useSiteText('nav_galeria', 'Galeria')
+  const navContato = useSiteText('nav_contato', 'Contato')
   const navToggleLabel = useSiteText('nav_toggle_label', 'Alternar menu')
+
   const logoSize = {
-    width: `${brandAsset?.width_px ?? 48}px`,
-    height: `${brandAsset?.height_px ?? 48}px`,
+    width: `${brandAsset?.width_px ?? 84}px`,
+    height: `${brandAsset?.height_px ?? 52}px`,
   }
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
+    const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const scrollToAnchor = (href: string) => {
+    const element = document.querySelector(href)
+    if (!element) return
+    const offset = 88
+    const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - offset
+    window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+  }
+
   const navItems = [
     { name: navSobre, href: '#sobre' },
-    { name: navServicos, href: '#servicos' },
     { name: navPortfolio, href: '#portfolio' },
-    { name: navContato, href: '#contato' },
+    { name: navServicos, href: '#servicos' },
   ]
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault()
-    setIsMobileMenuOpen(false)
-
-    const element = document.querySelector(href)
-    if (element) {
-      const offset = 80
-      const elementPosition = element.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - offset
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      })
-    }
-  }
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-off-white/95 backdrop-blur-sm shadow-sm' : 'bg-off-white'
+      className={`fixed inset-x-0 top-0 z-50 border-b border-border transition-all duration-300 ${
+        isScrolled ? 'bg-bg/95 backdrop-blur-sm' : 'bg-bg'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <a href="#hero" className="flex items-center">
+          <a href="#hero" className="flex items-center" aria-label="Início">
             <div className="relative" style={logoSize}>
               <Image
                 src={brandAsset?.image_url || '/nm-logo.png'}
@@ -74,24 +64,38 @@ const Navbar = () => {
             </div>
           </a>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-10">
+          <div className="hidden md:flex items-center gap-12">
             {navItems.map((item) => (
               <a
-                key={item.name}
+                key={item.href}
                 href={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
-                className="text-sm font-medium tracking-wide-caps text-graphite hover:text-olive-green transition-colors duration-300 font-sans uppercase"
+                onClick={(event) => {
+                  event.preventDefault()
+                  scrollToAnchor(item.href)
+                }}
+                className="text-body font-medium text-text hover:text-olive transition-colors"
               >
                 {item.name}
               </a>
             ))}
+            <a href="/galeria" className="text-body font-medium text-text hover:text-olive transition-colors">
+              {navGaleria}
+            </a>
+            <a
+              href="#contato"
+              onClick={(event) => {
+                event.preventDefault()
+                scrollToAnchor('#contato')
+              }}
+              className="px-5 py-2 rounded-card bg-olive text-bg text-body font-medium hover:bg-moss transition-colors"
+            >
+              {navContato}
+            </a>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-graphite hover:text-olive-green transition-colors"
+            onClick={() => setIsMobileMenuOpen((current) => !current)}
+            className="md:hidden p-2 rounded-card text-text"
             aria-label={navToggleLabel}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -99,20 +103,37 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-off-white border-t border-warm-beige">
-          <div className="px-6 py-6 space-y-4">
+        <div className="md:hidden border-t border-border bg-bg">
+          <div className="px-6 py-5 space-y-4">
             {navItems.map((item) => (
               <a
-                key={item.name}
+                key={item.href}
                 href={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
-                className="block py-3 text-sm font-medium tracking-wide-caps text-graphite hover:text-olive-green transition-colors font-sans uppercase"
+                onClick={(event) => {
+                  event.preventDefault()
+                  setIsMobileMenuOpen(false)
+                  scrollToAnchor(item.href)
+                }}
+                className="block text-body font-medium text-text"
               >
                 {item.name}
               </a>
             ))}
+            <a href="/galeria" className="block text-body font-medium text-text">
+              {navGaleria}
+            </a>
+            <a
+              href="#contato"
+              onClick={(event) => {
+                event.preventDefault()
+                setIsMobileMenuOpen(false)
+                scrollToAnchor('#contato')
+              }}
+              className="inline-block px-4 py-2 rounded-card bg-olive text-bg text-body"
+            >
+              {navContato}
+            </a>
           </div>
         </div>
       )}

@@ -1,33 +1,19 @@
 'use client'
 
-import { useSiteText, renderTextWithBreaks } from '@/lib/siteText'
+import { useSiteText } from '@/lib/siteText'
 
 const Concept = () => {
-  const conceptTitle = useSiteText('concept_title', 'Camadas do Tempo')
-  const conceptPoetic = useSiteText('concept_poetic', 'Cada espaço carrega memórias.\nCada escolha constrói uma narrativa.')
-  const conceptParagraph = useSiteText('concept_paragraph', 'Meu design parte do encontro entre épocas, referências e afetos, criando ambientes que não seguem tendências passageiras, mas refletem quem você é — hoje e ao longo do tempo.')
+  const conceptTitle = useSiteText('concept_title', 'Nada é estático.')
+  const conceptParagraph = useSiteText(
+    'concept_paragraph',
+    'Os espaços mudam, as pessoas também. Meu trabalho nasce do encontro entre história, identidade e modo de viver.'
+  )
 
   return (
-    <section
-      id="conceito"
-      className="relative py-section md:py-12 lg:py-16 bg-off-white paper-texture"
-    >
-      <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-16 text-center">
-        {/* Title */}
-        <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-12">
-          {conceptTitle}
-        </h2>
-
-        {/* Poetic Text - Short and with breathing room */}
-        <div className="space-y-8 text-xl md:text-2xl font-sans text-graphite leading-relaxed max-w-3xl mx-auto">
-          <p className="font-light">
-            {renderTextWithBreaks(conceptPoetic)}
-          </p>
-
-          <p className="text-body-mobile md:text-body font-sans leading-relaxed">
-            {conceptParagraph}
-          </p>
-        </div>
+    <section id="conceito" className="relative py-section bg-text text-bg paper-texture">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16 grid md:grid-cols-2 gap-10 items-center">
+        <h2 className="text-h1-mobile md:text-h1 font-serif text-gold leading-none">{conceptTitle}</h2>
+        <p className="text-h3-mobile md:text-h3 font-sans text-bg/90 max-w-xl">{conceptParagraph}</p>
       </div>
     </section>
   )

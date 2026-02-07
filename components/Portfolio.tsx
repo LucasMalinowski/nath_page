@@ -1,208 +1,87 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { supabase, PortfolioImage } from '@/lib/supabase'
+import { portfolioProjects } from '@/lib/content'
 import { useSiteText } from '@/lib/siteText'
 
-const Portfolio = () => {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [portfolioImages, setPortfolioImages] = useState<PortfolioImage[]>([])
-  const [loading, setLoading] = useState(true)
-  const portfolioTitle = useSiteText('portfolio_title', 'Portfólio')
-  const portfolioSubtitle = useSiteText('portfolio_subtitle', 'Projetos que equilibram estética, história e vida real.')
-  const portfolioLoading = useSiteText('portfolio_loading', 'Carregando...')
-  const portfolioEmpty = useSiteText('portfolio_empty', 'Em breve, novos projetos serão adicionados')
-  const portfolioCta = useSiteText('portfolio_cta', 'Ver todos os projetos')
-  const portfolioPrevLabel = useSiteText('portfolio_prev_label', 'Imagem anterior')
-  const portfolioNextLabel = useSiteText('portfolio_next_label', 'Próxima imagem')
-  const portfolioDotLabel = useSiteText('portfolio_dot_label', 'Ir para imagem {index}')
+const ProjectCard = ({
+  title,
+  shortDescription,
+  images,
+  slug,
+}: {
+  title: string
+  shortDescription: string
+  images: string[]
+  slug: string
+}) => {
+  const [index, setIndex] = useState(0)
 
-  useEffect(() => {
-    fetchPortfolioImages()
-  }, [])
-
-  const fetchPortfolioImages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('portfolio_images')
-        .select('*')
-        .eq('is_visible', true)
-        .order('display_order', { ascending: true })
-
-      if (error) throw error
-
-      setPortfolioImages(data || [])
-    } catch (error) {
-      console.error('Error fetching portfolio images:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === portfolioImages.length - 1 ? 0 : prevIndex + 1
-    )
-  }
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? portfolioImages.length - 1 : prevIndex - 1
-    )
-  }
-
-  if (loading) {
-    return (
-      <section id="portfolio" className="relative py-section md:py-12 lg:py-16 bg-off-white paper-texture">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-          <div className="text-center mb-16">
-            <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-4">
-              {portfolioTitle}
-            </h2>
-            <p className="text-body-mobile md:text-body font-sans text-graphite/80">
-              {portfolioSubtitle}
-            </p>
-          </div>
-          <div className="flex items-center justify-center h-96">
-            <p className="text-graphite/60 font-sans">{portfolioLoading}</p>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  if (portfolioImages.length === 0) {
-    return (
-      <section id="portfolio" className="relative py-section md:py-24 lg:py-32 bg-off-white paper-texture">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-          <div className="text-center mb-16">
-            <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-4">
-              {portfolioTitle}
-            </h2>
-            <p className="text-body-mobile md:text-body font-sans text-graphite/80 mb-12">
-              {portfolioSubtitle}
-            </p>
-          </div>
-
-          <div className="text-center py-20">
-            <p className="text-graphite/60 text-lg mb-8 font-sans">
-              {portfolioEmpty}
-            </p>
-            <a
-              href="https://www.instagram.com/nathalia_malinowski/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-10 py-4 bg-olive-green text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-soft-terracotta transition-all duration-300"
-            >
-              {portfolioCta}
-            </a>
-          </div>
-        </div>
-      </section>
-    )
-  }
+  const nextSlide = () => setIndex((current) => (current + 1) % images.length)
+  const prevSlide = () => setIndex((current) => (current - 1 + images.length) % images.length)
 
   return (
-    <section id="portfolio" className="relative py-section md:py-24 lg:py-32 bg-off-white paper-texture">
+    <article className="rounded-card border border-border bg-surface p-4 shadow-soft">
+      <div className="relative aspect-[4/3] rounded-card overflow-hidden border border-border bg-bg">
+        <Image src={images[index]} alt={`TODO: Add photo for ${title} (${index + 1}/${images.length})`} fill className="object-cover" />
+        <button
+          onClick={prevSlide}
+          className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-bg/80"
+          aria-label="Imagem anterior"
+        >
+          <ChevronLeft size={18} />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-bg/80"
+          aria-label="Próxima imagem"
+        >
+          <ChevronRight size={18} />
+        </button>
+        <span className="absolute bottom-2 right-2 text-small bg-text/70 text-bg px-2 py-1 rounded">{index + 1}/{images.length}</span>
+      </div>
+
+      <h3 className="text-h3-mobile md:text-h3 mt-4 text-text">{title}</h3>
+      <p className="text-body-mobile md:text-body text-text/85 mt-2">{shortDescription}</p>
+
+      <Link
+        href={`/portfolio/${slug}`}
+        className="inline-block mt-4 text-small md:text-body text-olive font-medium hover:text-moss transition-colors"
+      >
+        Ver projeto completo →
+      </Link>
+    </article>
+  )
+}
+
+const Portfolio = () => {
+  const portfolioTitle = useSiteText('portfolio_title', 'Portfólio')
+  const portfolioSubtitle = useSiteText(
+    'portfolio_subtitle',
+    'Meus serviços acompanham diferentes momentos, sempre com um olhar autoral, sensível e estruturado.'
+  )
+
+  return (
+    <section id="portfolio" className="py-section bg-moss text-bg paper-texture">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-4">
-            {portfolioTitle}
-          </h2>
-          <p className="text-body-mobile md:text-body font-sans text-graphite/80">
-            {portfolioSubtitle}
-          </p>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-10">
+          <h2 className="text-h1-mobile md:text-h1 text-mustard">{portfolioTitle}</h2>
+          <p className="max-w-xl text-h3-mobile md:text-h3 text-bg/90">{portfolioSubtitle}</p>
         </div>
 
-        {/* Carousel Container */}
-        <div className="relative max-w-5xl mx-auto">
-          {/* Main Image Display */}
-          <div className="relative aspect-[16/10] bg-warm-beige rounded-lg overflow-hidden shadow-xl">
-            <Image
-              src={portfolioImages[currentIndex].image_url}
-              alt={portfolioImages[currentIndex].title}
-              fill
-              className="object-contain"
-              quality={100}
-              unoptimized={true}
-              priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-5 text-text">
+          {portfolioProjects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              title={project.title}
+              shortDescription={project.shortDescription}
+              images={project.images}
+              slug={project.slug}
             />
-
-            {/* Previous Button */}
-            <button
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-off-white/90 hover:bg-off-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-              aria-label={portfolioPrevLabel}
-            >
-              <ChevronLeft
-                size={28}
-                className="text-graphite group-hover:text-olive-green transition-colors"
-              />
-            </button>
-
-            {/* Next Button */}
-            <button
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 md:w-14 md:h-14 bg-off-white/90 hover:bg-off-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-              aria-label={portfolioNextLabel}
-            >
-              <ChevronRight
-                size={28}
-                className="text-graphite group-hover:text-olive-green transition-colors"
-              />
-            </button>
-          </div>
-
-          {/* Image Title and Description */}
-          <div className="mt-8 text-center">
-            <h3 className="text-2xl md:text-3xl font-serif font-medium text-graphite mb-3">
-              {portfolioImages[currentIndex].title}
-            </h3>
-            {portfolioImages[currentIndex].description && (
-              <p className="text-body-mobile md:text-body font-sans text-graphite/80 max-w-2xl mx-auto">
-                {portfolioImages[currentIndex].description}
-              </p>
-            )}
-          </div>
-
-          {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-8">
-            {portfolioImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  index === currentIndex
-                    ? 'bg-olive-green w-8'
-                    : 'bg-graphite/30 w-2 hover:bg-graphite/50'
-                }`}
-                aria-label={portfolioDotLabel.replace('{index}', String(index + 1))}
-              />
-            ))}
-          </div>
-
-          {/* Image Counter */}
-          <div className="text-center mt-4">
-            <p className="text-sm font-sans text-graphite/60">
-              {currentIndex + 1} / {portfolioImages.length}
-            </p>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="text-center mt-16">
-          <a
-            href="https://www.instagram.com/nathalia_malinowski/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-10 py-4 bg-transparent border-2 border-olive-green text-olive-green font-sans font-medium rounded-button text-base tracking-wide hover:bg-olive-green hover:text-off-white transition-all duration-300"
-          >
-            {portfolioCta}
-          </a>
+          ))}
         </div>
       </div>
     </section>

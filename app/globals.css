@@ -1,8 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --bg: #f5f1eb;
+  --text: #3b2f26;
+  --olive: #4e5f4a;
+  --moss: #6b7a5e;
+  --terracotta: #c66a3d;
+  --mustard: #d9b65e;
+  --burgundy: #5a1e23;
+  --gold: #b89b5e;
+  --surface: rgba(255, 255, 255, 0.6);
+  --border: rgba(59, 47, 38, 0.18);
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  --radius: 12px;
+}
 
 * {
   box-sizing: border-box;
@@ -15,52 +28,53 @@ html {
 }
 
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
   overflow-x: hidden;
-  background-color: #F6F2ED;
-  color: #2E2E2E;
+  background-color: var(--bg);
+  color: var(--text);
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-title), Georgia, serif;
+}
+
+.poetic {
+  font-family: var(--font-poetic), Georgia, serif;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
-  
-  /* Paper texture overlay - 8% opacity as per document */
+
   .paper-texture {
     position: relative;
+    isolation: isolate;
   }
-  
+
   .paper-texture::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background-image: var(--paper-texture-url, url('/background-texture.jpeg'));
-    background-size: auto;
+    background-size: cover;
     background-position: center;
-    opacity: 0.08;
+    opacity: 0.06;
     pointer-events: none;
-    z-index: 0;
-  }
-  
-  .paper-texture > * {
-    position: relative;
-    z-index: 1;
+    z-index: -1;
   }
 }
 
-/* Smooth animations */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -68,47 +82,28 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-@keyframes fadeInUp {
-  from {
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
     opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.8s ease-out forwards;
+.typewriter-cursor {
+  animation: blink 1s steps(2, start) infinite;
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.8s ease-out forwards;
-}
-
-.delay-100 {
-  animation-delay: 0.1s;
-}
-
-.delay-200 {
-  animation-delay: 0.2s;
-}
-
-.delay-300 {
-  animation-delay: 0.3s;
-}
-
-.delay-400 {
-  animation-delay: 0.4s;
-}
-
-/* Button hover transitions */
-.btn-primary {
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

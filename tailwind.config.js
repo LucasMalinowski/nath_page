@@ -8,48 +8,42 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Neutros (base do site)
-        'off-white': '#F6F2ED',
-        'warm-beige': '#DED6CC',
-        
-        // Cores principais
-        'olive-green': '#5E6F64',
-        'sage-green': '#7A8F7A',
-        
-        // Cores de apoio/acento
-        'soft-terracotta': '#C47A5A',
-        'coffee-brown': '#4B3A2F',
-        'graphite': '#2E2E2E',
+        bg: 'var(--bg)',
+        text: 'var(--text)',
+        olive: 'var(--olive)',
+        moss: 'var(--moss)',
+        terracotta: 'var(--terracotta)',
+        mustard: 'var(--mustard)',
+        burgundy: 'var(--burgundy)',
+        gold: 'var(--gold)',
+        surface: 'var(--surface)',
+        border: 'var(--border)',
       },
       fontFamily: {
-        serif: ['Playfair Display', 'Georgia', 'serif'],
-        sans: ['Montserrat', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-title)', 'Georgia', 'serif'],
+        sans: ['var(--font-body)', 'system-ui', 'sans-serif'],
+        poetic: ['var(--font-poetic)', 'Georgia', 'serif'],
       },
       fontSize: {
-        // Desktop sizes
-        'hero': ['56px', { lineHeight: '1.2' }],
-        'h1': ['56px', { lineHeight: '1.2' }],
-        'h2': ['36px', { lineHeight: '1.3' }],
-        'h3': ['26px', { lineHeight: '1.3' }],
-        'body': ['18px', { lineHeight: '1.7' }],
-        'small': ['14px', { lineHeight: '1.6' }],
-        
-        // Mobile sizes
-        'hero-mobile': ['38px', { lineHeight: '1.2' }],
-        'h1-mobile': ['38px', { lineHeight: '1.2' }],
-        'h2-mobile': ['28px', { lineHeight: '1.3' }],
-        'body-mobile': ['16px', { lineHeight: '1.7' }],
-      },
-      letterSpacing: {
-        'wide-caps': '0.15em',
-        'wider-caps': '0.2em',
+        h1: ['52px', { lineHeight: '1.1' }],
+        'h1-mobile': ['36px', { lineHeight: '1.15' }],
+        h2: ['36px', { lineHeight: '1.2' }],
+        'h2-mobile': ['28px', { lineHeight: '1.25' }],
+        h3: ['24px', { lineHeight: '1.3' }],
+        'h3-mobile': ['20px', { lineHeight: '1.3' }],
+        body: ['18px', { lineHeight: '1.7' }],
+        'body-mobile': ['16px', { lineHeight: '1.65' }],
+        small: ['14px', { lineHeight: '1.4' }],
+        'small-mobile': ['13px', { lineHeight: '1.4' }],
       },
       borderRadius: {
-        'button': '14px',
+        card: '12px',
+      },
+      boxShadow: {
+        soft: 'var(--shadow)',
       },
       spacing: {
-        'section': '5rem',
-        'section-mobile': '3rem',
+        section: '5rem',
       },
     },
   },
