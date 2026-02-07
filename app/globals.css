@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400&family=Inter:wght@400;500&family=Libre+Baskerville:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,15 +14,38 @@ html {
   scroll-behavior: smooth;
 }
 
+:root {
+  /* Base */
+  --bg: #F5F1EB;
+  --text: #3B2F26;
+
+  /* Marca */
+  --olive: #4E5F4A;
+  --moss: #6B7A5E;
+
+  /* Acentos */
+  --terracotta: #C66A3D;
+  --mustard: #D9B65E;
+
+  /* Nobres */
+  --burgundy: #5A1E23;
+  --gold: #B89B5E;
+
+  /* UI */
+  --surface: rgba(255, 255, 255, 0.6);
+  --border: rgba(59, 47, 38, 0.18);
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Inter', sans-serif;
   overflow-x: hidden;
-  background-color: #F6F2ED;
-  color: #2E2E2E;
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Libre Baskerville', serif;
 }
 
 @layer utilities {

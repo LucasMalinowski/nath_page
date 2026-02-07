@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   keywords: ['design de interiores', 'arquitetura', 'decoração', 'murais', 'Nathalia Malinowski', 'projetos autorais', 'design atemporal'],
   authors: [{ name: 'Nathalia Malinowski' }],
   viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#5E6F64',
+  themeColor: '#4E5F4A',
   openGraph: {
     title: 'Nathalia Malinowski | Design de Interiores',
     description: 'Design de interiores com história, sensibilidade e identidade',
