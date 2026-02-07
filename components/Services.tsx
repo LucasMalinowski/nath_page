@@ -3,102 +3,76 @@
 import { useSiteText } from '@/lib/siteText'
 
 const Services = () => {
-  const servicesTitle = useSiteText('services_title', 'Vamos transformar seu espaço?')
-  const servicesSubtitle = useSiteText('services_subtitle', 'Um processo sensível, autoral e bem conduzido — do conceito à materialização.')
-  const service1Title = useSiteText('services_item_1_title', 'Projetos de Interiores')
-  const service1Desc = useSiteText('services_item_1_desc', 'Desenvolvimento completo de ambientes residenciais, com foco em identidade, funcionalidade e estética atemporal. Cada projeto é único, pensado para refletir a essência de quem vive o espaço.')
-  const service2Title = useSiteText('services_item_2_title', 'Consultoria de Interiores')
-  const service2Desc = useSiteText('services_item_2_desc', 'Orientação estratégica para transformar ambientes de forma prática e personalizada, ideal para quem busca direcionamento estético sem um projeto completo.')
-  const service3Title = useSiteText('services_item_3_title', 'Murais e Intervenções Artísticas')
-  const service3Desc = useSiteText('services_item_3_desc', 'Criação de pinturas e murais autorais que acrescentam significado, textura e personalidade aos espaços, conectando arte e arquitetura.')
-  const service4Title = useSiteText('services_item_4_title', 'Modelagem 3D')
-  const service4Desc = useSiteText('services_item_4_desc', 'Visualização do projeto para facilitar decisões com mais segurança, clareza e compreensão do resultado final.')
-  const servicesCta = useSiteText('services_cta', 'Entre em contato')
+  const servicesTitle = useSiteText('services_title', 'Serviços')
+  const servicesIntro = useSiteText(
+    'services_intro',
+    'Meus serviços acompanham diferentes momentos, sempre com um olhar autoral, sensível e estruturado.'
+  )
+  const servicesCta = useSiteText('services_cta', 'Agendar conversa')
 
-  const services = [
+  const cards = [
     {
-      number: '01',
-      title: service1Title,
-      description: service1Desc
+      title: useSiteText('services_1_title', 'Projeto de Interiores Residencial'),
+      description: useSiteText(
+        'services_1_description',
+        'Desenvolvimento completo de projetos residenciais, do conceito à definição de layout, materiais e acabamentos.'
+      ),
+      poetic: useSiteText('services_1_poetic', 'Projetos pensados em camadas de tempo, história e vivência.'),
     },
     {
-      number: '02',
-      title: service2Title,
-      description: service2Desc
+      title: useSiteText('services_2_title', 'Consultoria e Curadoria'),
+      description: useSiteText(
+        'services_2_description',
+        'Atendimento estratégico para orientar escolhas estéticas e funcionais, incluindo curadoria de itens decorativos.'
+      ),
+      poetic: useSiteText('services_2_poetic', 'Pequenas escolhas transformam a experiência do espaço.'),
     },
     {
-      number: '03',
-      title: service3Title,
-      description: service3Desc
+      title: useSiteText('services_3_title', 'Pinturas Murais Autorais'),
+      description: useSiteText(
+        'services_3_description',
+        'Criação de murais desenvolvidos a partir do espaço e da história de quem o habita.'
+      ),
+      poetic: useSiteText('services_3_poetic', 'Arte que nasce do espaço.'),
     },
     {
-      number: '04',
-      title: service4Title,
-      description: service4Desc
-    }
+      title: useSiteText('services_4_title', 'Curadoria de Peças Autorais'),
+      description: useSiteText(
+        'services_4_description',
+        'Curadoria de objetos e telas autorais, além de peças de artistas independentes, selecionadas com intenção e propósito.'
+      ),
+      poetic: useSiteText('services_4_poetic', 'Disponíveis sob curadoria pontual na aba Galeria.'),
+    },
   ]
 
   const scrollToContact = () => {
     const element = document.querySelector('#contato')
-    if (element) {
-      const offset = 80
-      const elementPosition = element.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - offset
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      })
-    }
+    if (!element) return
+    const offset = 88
+    const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - offset
+    window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
   }
 
   return (
-    <section
-      id="servicos"
-      className="relative py-section md:py-12 lg:py-16 bg-warm-beige paper-texture"
-    >
+    <section id="servicos" className="py-section bg-bg paper-texture">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-        {/* Header */}
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-6">
-            {servicesTitle}
-          </h2>
-          <p className="text-body-mobile md:text-body font-sans text-graphite/80">
-            {servicesSubtitle}
-          </p>
+        <div className="mb-10">
+          <h2 className="text-h2-mobile md:text-h2 text-gold mb-4">{servicesTitle}</h2>
+          <p className="text-h3-mobile md:text-h3 max-w-3xl text-text">{servicesIntro}</p>
         </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          {services.map((service, index) => (
-            <div
-              key={index}
-              className="bg-off-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
-            >
-              {/* Service Number */}
-              <div className="text-soft-terracotta font-sans font-bold text-lg mb-4">
-                {service.number}
-              </div>
-
-              {/* Service Title */}
-              <h3 className="text-h3 font-serif font-semibold text-graphite mb-4">
-                {service.title}
-              </h3>
-
-              {/* Service Description */}
-              <p className="text-body-mobile md:text-body font-sans text-graphite/80 leading-relaxed">
-                {service.description}
-              </p>
-            </div>
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          {cards.map((service) => (
+            <article key={service.title} className="rounded-card border border-border bg-surface p-6 shadow-soft">
+              <h3 className="text-h3-mobile md:text-h3 text-text mb-3">{service.title}</h3>
+              <p className="text-body-mobile md:text-body text-text/85">{service.description}</p>
+              <p className="poetic text-2xl text-mustard mt-5">{service.poetic}</p>
+            </article>
           ))}
         </div>
 
-        {/* CTA */}
         <div className="text-center">
-          <button
-            onClick={scrollToContact}
-            className="btn-primary px-12 py-4 bg-olive-green text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-soft-terracotta transition-all duration-300"
-          >
+          <button onClick={scrollToContact} className="px-10 py-3 rounded-card bg-olive text-bg font-medium hover:bg-moss transition-colors">
             {servicesCta}
           </button>
         </div>

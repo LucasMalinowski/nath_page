@@ -5,50 +5,31 @@ import { useSiteText } from '@/lib/siteText'
 
 const About = () => {
   const aboutTitle = useSiteText('about_title', 'Sobre mim')
-  const aboutParagraph1 = useSiteText('about_paragraph_1', 'Sou Nathalia Malinowski, designer de interiores e artista muralista. Meu trabalho nasce da escuta atenta e da sensibilidade em traduzir histórias, estilos e vivências em espaços que fazem sentido para quem os habita.')
-  const aboutParagraph2 = useSiteText('about_paragraph_2', 'Acredito em um design que vai além da estética: que acolhe, que respeita o tempo e que constrói identidade. Cada projeto é pensado como uma composição de camadas — do clássico ao contemporâneo, do vivido ao novo — sempre com propósito e significado.')
-  const aboutQuote = useSiteText('about_quote', 'Projetar é interpretar histórias e transformá-las em espaços.')
+  const aboutParagraph1 = useSiteText(
+    'about_paragraph_1',
+    'Sou Nathalia Malinowski, designer de interiores e artista. Meu trabalho nasce da escuta atenta e da observação sensível dos espaços e das pessoas.'
+  )
+  const aboutParagraph2 = useSiteText(
+    'about_paragraph_2',
+    'Acredito que o design vai além da estética: ele organiza, acolhe e traduz identidade. Cada projeto é pensado como uma construção cuidadosa, respeitando o tempo, a história e o modo de viver de quem habita o espaço.'
+  )
+  const aboutQuote = useSiteText('about_quote', 'Projetar é dar forma ao que faz sentido.')
 
   return (
-    <section
-      id="sobre"
-      className="relative py-section md:py-24 lg:py-32 bg-warm-beige paper-texture"
-    >
+    <section id="sobre" className="py-section bg-bg paper-texture">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Text Content */}
-          <div className="space-y-8">
-            <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite">
-              {aboutTitle}
-            </h2>
-
-            <div className="space-y-6 text-body-mobile md:text-body font-sans text-graphite leading-relaxed">
-              <p>
-                {aboutParagraph1}
-              </p>
-
-              <p>
-                {aboutParagraph2}
-              </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch border border-border rounded-card overflow-hidden bg-surface shadow-soft">
+          <div className="p-8 lg:p-12 flex flex-col justify-center">
+            <h2 className="text-h1-mobile md:text-h1 text-gold mb-8">{aboutTitle}</h2>
+            <div className="space-y-6 text-body-mobile md:text-body text-text/90">
+              <p>{aboutParagraph1}</p>
+              <p>{aboutParagraph2}</p>
             </div>
-
-            {/* Featured Quote */}
-            <blockquote className="text-2xl md:text-3xl font-serif italic text-olive-green leading-snug border-l-4 border-soft-terracotta pl-6 py-2">
-              {aboutQuote}
-            </blockquote>
+            <p className="poetic text-3xl md:text-4xl text-moss mt-10">{aboutQuote}</p>
           </div>
 
-          {/* Profile Photo */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-md aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
-              <Image
-                src="/profile-photo.jpeg"
-                alt="Nathalia Malinowski"
-                fill
-                className="object-cover object-center"
-                priority
-              />
-            </div>
+          <div className="relative min-h-[420px]">
+            <Image src="/profile-photo.jpeg" alt="Nathalia Malinowski em retrato externo" fill className="object-cover" priority />
           </div>
         </div>
       </div>

@@ -1,93 +1,76 @@
 'use client'
 
 import Image from 'next/image'
+import Typewriter from '@/components/Typewriter'
 import { useBrandAsset } from '@/lib/useBrandAsset'
 import { useSiteMedia } from '@/lib/useSiteMedia'
-import { useSiteText, renderTextWithBreaks } from '@/lib/siteText'
+import { useSiteText } from '@/lib/siteText'
 
 const Hero = () => {
   const brandAsset = useBrandAsset('hero')
   const heroVideo = useSiteMedia('hero_video')
-  const heroHeadline = useSiteText('hero_headline', 'Design de interiores com história,\nsensibilidade e identidade.')
-  const heroSubtitle = useSiteText('hero_subtitle', 'Projetos autorais que unem o clássico ao vivido, criando espaços atemporais, afetivos e cheios de significado.')
+  const heroHeadline = useSiteText('hero_headline', 'Projetos autorais que unem estética, história e funcionalidade...')
+  const heroSubtitle = useSiteText(
+    'hero_subtitle',
+    'Do conceito à execução, cada escolha é guiada por narrativa, sensibilidade e propósito.'
+  )
   const heroCtaPrimary = useSiteText('hero_cta_primary', 'Agendar conversa')
   const heroCtaSecondary = useSiteText('hero_cta_secondary', 'Ver portfólio')
+
   const logoSize = brandAsset?.width_px && brandAsset?.height_px
     ? { width: `${brandAsset.width_px}px`, height: `${brandAsset.height_px}px` }
-    : { width: 'clamp(128px, 18vw, 192px)', height: 'clamp(128px, 18vw, 192px)' }
+    : { width: 'clamp(120px, 16vw, 180px)', height: 'clamp(90px, 12vw, 130px)' }
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId)
-    if (element) {
-      const offset = 80
-      const elementPosition = element.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - offset
+    if (!element) return
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      })
-    }
+    const offset = 88
+    const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - offset
+    window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
   }
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center pt-20">
-      {/* Video Background */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
+        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
           <source src={heroVideo?.url || '/hero-video.mp4'} type="video/mp4" />
         </video>
-        
-        {/* Overlay with green tint as per document (20-30% opacity) */}
-        <div className="absolute inset-0 bg-olive-green/40"></div>
+        <div className="absolute inset-0 bg-text/55" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-16 text-center">
-        {/* Logo Overlay */}
-        <div className="mb-12 animate-fade-in flex justify-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8 lg:px-16 text-center text-bg">
+        <div className="mb-10 flex justify-center">
           <div className="relative" style={logoSize}>
             <Image
               src={brandAsset?.image_url || '/nm-logo.png'}
               alt={brandAsset?.title || 'NM Logo'}
               fill
-              className="object-contain drop-shadow-2xl"
+              className="object-contain"
               priority
               unoptimized
             />
           </div>
         </div>
 
-        {/* Headline */}
-        <h1 className="text-4xl md:text-5xl lg:text-hero font-serif font-medium text-off-white mb-6 animate-fade-in delay-100 leading-tight">
-          {renderTextWithBreaks(heroHeadline)}
+        <h1 className="text-h1-mobile md:text-h1 font-serif text-balance mb-6 leading-tight">
+          <Typewriter text={heroHeadline} speedMs={35} />
         </h1>
 
-        {/* Subtitle */}
-        <p className="text-lg md:text-xl text-off-white/90 font-sans mb-12 max-w-3xl mx-auto animate-fade-in delay-200 leading-relaxed">
+        <p className="text-body-mobile md:text-body text-bg/95 max-w-3xl mx-auto mb-10">
           {heroSubtitle}
         </p>
 
-        {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in delay-300">
-          {/* Primary CTA */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={() => scrollToSection('#contato')}
-            className="btn-primary px-10 py-4 bg-olive-green text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-soft-terracotta transition-all duration-300"
+            className="px-10 py-3 rounded-card bg-olive text-bg text-body-mobile md:text-body font-medium hover:bg-moss transition-colors"
           >
             {heroCtaPrimary}
           </button>
-
-          {/* Secondary CTA */}
           <button
             onClick={() => scrollToSection('#portfolio')}
-            className="px-10 py-4 bg-transparent border-2 border-off-white text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-off-white hover:text-olive-green transition-all duration-300"
+            className="px-10 py-3 rounded-card border border-bg/60 text-bg text-body-mobile md:text-body font-medium hover:bg-bg/10 transition-colors"
           >
             {heroCtaSecondary}
           </button>
