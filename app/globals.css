@@ -102,6 +102,20 @@ html {
   }
 }
 
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.page-fade-in {
+  animation: pageFadeIn 0.35s ease-out;
+}
+
+body.page-fade-out {
+  opacity: 0;
+  transition: opacity 0.2s ease-in;
+}
+
 .animate-fade-in {
   animation: fadeIn 1.2s ease-out forwards;
 }

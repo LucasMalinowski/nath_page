@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import SiteMediaProvider from '@/components/SiteMediaProvider'
+import PageFadeProvider from '@/components/PageFadeProvider'
 import { SiteTextProvider } from '@/lib/siteText'
 
 export const metadata: Metadata = {
@@ -27,7 +28,9 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body>
         <SiteTextProvider>
-          <SiteMediaProvider>{children}</SiteMediaProvider>
+          <SiteMediaProvider>
+            <PageFadeProvider>{children}</PageFadeProvider>
+          </SiteMediaProvider>
         </SiteTextProvider>
       </body>
     </html>
