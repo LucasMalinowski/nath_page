@@ -11,7 +11,6 @@ import { useSiteText } from '@/lib/siteText'
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState('#hero')
   useBrandAsset('navbar')
   const pathname = usePathname()
 
@@ -39,41 +38,10 @@ const Navbar = () => {
     { name: navContato, href: '#contato' }
   ]), [navSobre, navPortfolio, navServicos, navGaleria, navContato])
 
-  useEffect(() => {
-    if (pathname !== '/') return
-    const sectionIds = ['#sobre', '#portfolio', '#servicos', '#contato']
-    const sections = sectionIds
-      .map((id) => document.querySelector(id))
-      .filter((el): el is Element => Boolean(el))
-
-    if (sections.length === 0) return
-
-    const updateActive = () => {
-      const scrollY = window.scrollY + 120
-      let current = '#hero'
-      sections.forEach((section) => {
-        if (scrollY >= section.getBoundingClientRect().top + window.scrollY) {
-          current = `#${section.id}`
-        }
-      })
-      setActiveSection(current)
-    }
-
-    updateActive()
-    window.addEventListener('scroll', updateActive, { passive: true })
-    window.addEventListener('resize', updateActive)
-
-    return () => {
-      window.removeEventListener('scroll', updateActive)
-      window.removeEventListener('resize', updateActive)
-    }
-  }, [pathname])
-
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!href.startsWith('#')) return
     e.preventDefault()
     setIsMobileMenuOpen(false)
-    setActiveSection(href)
 
     const element = document.querySelector(href)
     if (element) {
@@ -89,58 +57,57 @@ const Navbar = () => {
   }
 
   const isHome = pathname === '/'
+  const toHomeHref = (href: string, isRoute?: boolean) => {
+    if (isHome) return href
+    if (isRoute) return '/'
+    if (href.startsWith('#')) return `/${href}`
+    return href
+  }
 
   return (
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-bg/80 backdrop-blur-sm shadow-sm' : 'bg-bg'
+        isScrolled ? 'bg-bg/70 backdrop-blur-sm shadow-sm' : 'bg-bg/90'
       }`}
     >
       <div className="px-6 sm:px-8 ">
         <div className="flex items-center h-16">
-          <div className="hidden md:flex flex-1 items-center justify-center justify-between px-20">
-            {isHome ? (
-              <a href="#hero" className="flex items-center">
-                <Image
-                  src="/nm-logo-black.png"
-                  alt="Nathalia Malinowski"
-                  width={20}
-                  height={20}
-                  className="object-contain w-20 h-20"
-                />
-              </a>
-            ) : (
-              <Link
-                href="/"
-                className="flex items-center text-sm font-medium text-text hover:text-olive transition-colors"
-              >
-                {navBackLabel}
-              </Link>
-            )}
+          <div className="hidden md:flex flex-1 items-center justify-center justify-between pr-20 pl-2">
+            <Link href={isHome ? '#hero' : '/#hero'} className="flex items-center">
+              <Image
+                src="/nm-logo-black.png"
+                alt="Nathalia Malinowski"
+                width={20}
+                height={20}
+                className="object-contain w-20 h-20"
+              />
+            </Link>
             {navItems.map((item) => {
-              if (item.isRoute) {
+              const href = toHomeHref(item.href, item.isRoute)
+              const isAnchor = isHome && item.href.startsWith('#')
+              const commonClass = `px-3 py-1 text-[20px] font-thin rounded-lg transition-colors duration-300 ${
+                item.href === '#contato'
+                  ? 'bg-olive text-bg hover:bg-moss'
+                  : item.isRoute
+                    ? 'bg-bg text-text hover:text-olive'
+                    : 'text-text hover:text-olive'
+              }`
+              if (isAnchor) {
                 return (
-                  <Link
+                  <a
                     key={item.name}
                     href={item.href}
-                    className="px-3 py-1 text-[20px] font-thin rounded-full text-text hover:text-olive transition-colors duration-300"
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    className={commonClass}
                   >
                     {item.name}
-                  </Link>
+                  </a>
                 )
               }
-              const isActive = isHome && activeSection === item.href
               return (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href)}
-                  className={`px-3 py-1 text-[20px] font-thin rounded-lg transition-colors duration-300 ${
-                    isActive ? 'bg-olive text-bg' : 'text-text hover:text-olive'
-                  }`}
-                >
+                <Link key={item.name} href={href} className={commonClass}>
                   {item.name}
-                </a>
+                </Link>
               )
             })}
           </div>
@@ -161,39 +128,39 @@ const Navbar = () => {
         <div className="md:hidden bg-bg border-t border-border">
           <div className="px-6 py-6 space-y-4">
             {!isHome && (
-              <Link
-                href="/"
-                className="block py-3 text-sm font-medium text-text hover:text-olive transition-colors font-sans"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {navBackLabel}
-              </Link>
+              <div className="h-0" aria-hidden="true" />
             )}
             {navItems.map((item) => {
-              if (item.isRoute) {
+              const href = toHomeHref(item.href, item.isRoute)
+              const isAnchor = isHome && item.href.startsWith('#')
+              const commonClass = `block py-3 text-sm font-medium transition-colors font-sans ${
+                item.href === '#contato'
+                  ? 'bg-olive text-bg rounded-md px-3'
+                  : item.isRoute
+                    ? 'text-text bg-bg rounded-md px-3'
+                    : 'text-text hover:text-olive'
+              }`
+              if (isAnchor) {
                 return (
-                  <Link
+                  <a
                     key={item.name}
                     href={item.href}
-                    className="block py-3 text-sm font-medium text-text hover:text-olive transition-colors font-sans"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    className={commonClass}
                   >
                     {item.name}
-                  </Link>
+                  </a>
                 )
               }
-              const isActive = isHome && activeSection === item.href
               return (
-                <a
+                <Link
                   key={item.name}
-                  href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href)}
-                  className={`block py-3 text-sm font-medium transition-colors font-sans ${
-                    isActive ? 'text-olive' : 'text-text hover:text-olive'
-                  }`}
+                  href={href}
+                  className={commonClass}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
-                </a>
+                </Link>
               )
             })}
           </div>
