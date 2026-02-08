@@ -59,6 +59,7 @@ const Navbar = () => {
   const isHome = pathname === '/'
   const toHomeHref = (href: string, isRoute?: boolean) => {
     if (isHome) return href
+    if (isRoute && href === '/galeria') return ''
     if (isRoute) return '/'
     if (href.startsWith('#')) return `/${href}`
     return href
@@ -92,6 +93,13 @@ const Navbar = () => {
                     ? 'bg-bg text-text hover:text-olive'
                     : 'text-text hover:text-olive'
               }`
+              if (!isHome && item.isRoute && item.href === '/galeria') {
+                return (
+                  <span key={item.name} className={`${commonClass} cursor-default`}>
+                    {item.name}
+                  </span>
+                )
+              }
               if (isAnchor) {
                 return (
                   <a
@@ -140,6 +148,13 @@ const Navbar = () => {
                     ? 'text-text bg-bg rounded-md px-3'
                     : 'text-text hover:text-olive'
               }`
+              if (!isHome && item.isRoute && item.href === '/galeria') {
+                return (
+                  <span key={item.name} className={`${commonClass} cursor-default`}>
+                    {item.name}
+                  </span>
+                )
+              }
               if (isAnchor) {
                 return (
                   <a
