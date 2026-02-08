@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400&family=Inter:wght@400;500&family=Libre+Baskerville:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400&family=Inter:wght@200;300;400;500&family=Libre+Baskerville:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -16,36 +16,38 @@ html {
 
 :root {
   /* Base */
-  --bg: #F5F1EB;
-  --text: #3B2F26;
+  --bg: 245 241 235;
+  --text: 59 47 38;
 
   /* Marca */
-  --olive: #4E5F4A;
-  --moss: #6B7A5E;
+  --olive: 78 95 74;
+  --moss: 107 122 94;
 
   /* Acentos */
-  --terracotta: #C66A3D;
-  --mustard: #D9B65E;
+  --terracotta: 198 106 61;
+  --mustard: 217 182 94;
 
   /* Nobres */
-  --burgundy: #5A1E23;
-  --gold: #B89B5E;
+  --burgundy: 90 30 35;
+  --gold: 184 155 94;
 
   /* UI */
-  --surface: rgba(255, 255, 255, 0.6);
-  --border: rgba(59, 47, 38, 0.18);
+  --surface: 255 255 255;
+  --border: 59 47 38;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
-body {
-  font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
-  background-color: var(--bg);
-  color: var(--text);
-}
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    background-color: var(--bg);
+    color: var(--text);
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Libre Baskerville', serif;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Libre Baskerville', serif;
+  }
 }
 
 @layer utilities {
@@ -83,11 +85,9 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -103,7 +103,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.8s ease-out forwards;
+  animation: fadeIn 1.2s ease-out forwards;
 }
 
 .animate-fade-in-up {
