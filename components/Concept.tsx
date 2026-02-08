@@ -22,7 +22,7 @@ const Concept = () => {
 
           {/* Texto no bottom direito */}
           <div className="self-end max-w-lg mt-8 md:mt-0">
-            <p className="text-sm md:text-base lg:text-xl font-sans text-bg text-left leading-relaxed">
+            <p className="text-sm md:text-base lg:text-xl font-sans text-bg/80 text-left leading-relaxed">
               {renderTextWithBreaks(`${conceptPoetic}\n${conceptParagraph}`)}
             </p>
           </div>
