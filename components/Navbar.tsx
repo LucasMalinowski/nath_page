@@ -123,7 +123,7 @@ const Navbar = () => {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="px-3 py-1 text-[18px] rounded-full text-text hover:text-olive transition-colors duration-300"
+                    className="px-3 py-1 text-[20px] font-thin rounded-full text-text hover:text-olive transition-colors duration-300"
                   >
                     {item.name}
                   </Link>

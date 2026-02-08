@@ -3,33 +3,31 @@
 import { useSiteText, renderTextWithBreaks } from '@/lib/siteText'
 
 const Concept = () => {
-  const conceptTitle = useSiteText('concept_title', 'Camadas do Tempo')
-  const conceptPoetic = useSiteText('concept_poetic', 'Cada espaço carrega memórias.\nCada escolha constrói uma narrativa.')
-  const conceptParagraph = useSiteText('concept_paragraph', 'Meu design parte do encontro entre épocas, referências e afetos, criando ambientes que não seguem tendências passageiras, mas refletem quem você é — hoje e ao longo do tempo.')
+  const conceptTitle = useSiteText('concept_title', 'Nada é\nestático.')
+  const conceptPoetic = useSiteText('concept_poetic', 'Os espaços mudam, as pessoas também.')
+  const conceptParagraph = useSiteText('concept_paragraph', 'Meu trabalho nasce do encontro entre história, identidade e modo de viver.')
 
   return (
-    <section
-      id="conceito"
-      className="relative py-section md:py-12 lg:py-16 bg-off-white paper-texture"
-    >
-      <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-16 text-center">
-        {/* Title */}
-        <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-12">
-          {conceptTitle}
-        </h2>
+      <section
+          id="conceito"
+          className="relative my-4 py-8 bg-[url('/carpet.png')] bg-cover bg-center"
+      >
+        <div className="container mx-auto py-8 px-20 md:px-20 flex flex-col justify-between min-h-[200px] md:min-h-[250px]">
+          {/* Título no topo esquerdo */}
+          <div className="self-start">
+            <h2 className="text-xl md:text-6xl font-serif font-normal text-gold/85 tracking-wide">
+              {renderTextWithBreaks(conceptTitle)}
+            </h2>
+          </div>
 
-        {/* Poetic Text - Short and with breathing room */}
-        <div className="space-y-8 text-xl md:text-2xl font-sans text-graphite leading-relaxed max-w-3xl mx-auto">
-          <p className="font-light">
-            {renderTextWithBreaks(conceptPoetic)}
-          </p>
-
-          <p className="text-body-mobile md:text-body font-sans leading-relaxed">
-            {conceptParagraph}
-          </p>
+          {/* Texto no bottom direito */}
+          <div className="self-end max-w-lg mt-8 md:mt-0">
+            <p className="text-sm md:text-base lg:text-xl font-sans text-bg text-left leading-relaxed">
+              {renderTextWithBreaks(`${conceptPoetic}\n${conceptParagraph}`)}
+            </p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
   )
 }
 

@@ -21,11 +21,30 @@ const Typewriter = ({text, speedMs = 35, classes}: TypewriterProps) => {
       setIndex(text.length)
       return
     }
-    const timer = setInterval(() => {
-      setIndex((current) => Math.min(current + 1, text.length))
-    }, speedMs)
 
-    return () => clearInterval(timer)
+    let isActive = true
+    let intervalId: NodeJS.Timeout | null = null
+    let restartId: NodeJS.Timeout | null = null
+
+    const startTyping = () => {
+      setIndex(0)
+      if (intervalId) clearInterval(intervalId)
+      intervalId = setInterval(() => {
+        setIndex((current) => Math.min(current + 1, text.length))
+      }, speedMs)
+    }
+
+    startTyping()
+    restartId = setInterval(() => {
+      if (!isActive) return
+      startTyping()
+    }, 10000)
+
+    return () => {
+      isActive = false
+      if (intervalId) clearInterval(intervalId)
+      if (restartId) clearInterval(restartId)
+    }
   }, [text, speedMs, reducedMotion])
 
   const visibleText = text.slice(0, index)
