@@ -84,11 +84,11 @@ const Navbar = () => {
             {isHome ? (
               <a href="#hero" className="flex items-center">
                 <Image
-                  src="/nm-logo-black.png"
+                  src="/nm-gold.png"
                   alt="Nathalia Malinowski"
                   width={20}
                   height={20}
-                  className="object-contain w-20 h-20"
+                  className="object-contain w-20 h-20 mb-2"
                 />
               </a>
             ) : (
