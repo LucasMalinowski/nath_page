@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import SiteMediaProvider from '@/components/SiteMediaProvider'
 import PageFadeProvider from '@/components/PageFadeProvider'
 import { SiteTextProvider } from '@/lib/siteText'
 
@@ -28,9 +27,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body>
         <SiteTextProvider>
-          <SiteMediaProvider>
-            <PageFadeProvider>{children}</PageFadeProvider>
-          </SiteMediaProvider>
+          <PageFadeProvider>{children}</PageFadeProvider>
         </SiteTextProvider>
       </body>
     </html>
