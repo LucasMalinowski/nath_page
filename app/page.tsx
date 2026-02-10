@@ -4,7 +4,6 @@ import About from '@/components/About'
 import Concept from '@/components/Concept'
 import Services from '@/components/Services'
 import Portfolio from '@/components/Portfolio'
-import Contact from '@/components/Contact'
 import Footer from '@/components/Footer'
 
 export default function Home() {
@@ -16,7 +15,6 @@ export default function Home() {
       <About />
       <Portfolio />
       <Services />
-      <Contact />
       <Footer />
     </main>
   )
