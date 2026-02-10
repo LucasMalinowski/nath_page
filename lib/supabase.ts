@@ -17,6 +17,32 @@ export type PortfolioImage = {
     updated_at: string
 }
 
+export type GalleryProduct = {
+    id: string
+    name: string
+    description: string | null
+    author: string | null
+    price_text: string | null
+    quantity: number | null
+    images: string[] | string | null
+    display_order: number | null
+    is_visible: boolean | null
+    created_at: string
+    updated_at: string | null
+}
+
+export type GalleryExhibitor = {
+    id: string
+    name: string
+    title: string | null
+    instagram_path: string | null
+    avatar_url: string | null
+    display_order: number | null
+    is_visible: boolean | null
+    created_at: string
+    updated_at: string | null
+}
+
 export type SiteText = {
     id: string
     key: string
