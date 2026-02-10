@@ -5,13 +5,11 @@ import { Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useBrandAsset } from '@/lib/useBrandAsset'
 import { useSiteText } from '@/lib/siteText'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  useBrandAsset('navbar')
   const pathname = usePathname()
 
   const navSobre = useSiteText('nav_sobre', 'Sobre')
@@ -65,6 +63,15 @@ const Navbar = () => {
     return href
   }
 
+  const handleRouteClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (isHome || !href) return
+    e.preventDefault()
+    document.body.classList.add('page-fade-out')
+    setTimeout(() => {
+      window.location.href = href
+    }, 200)
+  }
+
   return (
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
@@ -74,15 +81,31 @@ const Navbar = () => {
       <div className="px-6 sm:px-8 ">
         <div className="flex items-center h-16">
           <div className="hidden md:flex flex-1 items-center justify-center justify-between pr-20 pl-2">
-            <Link href={isHome ? '#hero' : '/#hero'} className="flex items-center">
-              <Image
-                src="/nm-logo-black.png"
-                alt="Nathalia Malinowski"
-                width={20}
-                height={20}
-                className="object-contain w-20 h-20"
-              />
-            </Link>
+            {isHome ? (
+              <a href="#hero" className="flex items-center">
+                <Image
+                  src="/nm-logo-black.png"
+                  alt="Nathalia Malinowski"
+                  width={20}
+                  height={20}
+                  className="object-contain w-20 h-20"
+                />
+              </a>
+            ) : (
+              <a
+                href="/#hero"
+                className="flex items-center"
+                onClick={(e) => handleRouteClick(e, '/#hero')}
+              >
+                <Image
+                  src="/nm-logo-black.png"
+                  alt="Nathalia Malinowski"
+                  width={20}
+                  height={20}
+                  className="object-contain w-20 h-20"
+                />
+              </a>
+            )}
             {navItems.map((item) => {
               const href = toHomeHref(item.href, item.isRoute)
               const isAnchor = isHome && item.href.startsWith('#')
@@ -107,6 +130,18 @@ const Navbar = () => {
                     href={item.href}
                     onClick={(e) => handleNavClick(e, item.href)}
                     className={commonClass}
+                  >
+                    {item.name}
+                  </a>
+                )
+              }
+              if (!isHome) {
+                return (
+                  <a
+                    key={item.name}
+                    href={href}
+                    className={commonClass}
+                    onClick={(e) => handleRouteClick(e, href)}
                   >
                     {item.name}
                   </a>
@@ -162,6 +197,21 @@ const Navbar = () => {
                     href={item.href}
                     onClick={(e) => handleNavClick(e, item.href)}
                     className={commonClass}
+                  >
+                    {item.name}
+                  </a>
+                )
+              }
+              if (!isHome) {
+                return (
+                  <a
+                    key={item.name}
+                    href={href}
+                    className={commonClass}
+                    onClick={(e) => {
+                      setIsMobileMenuOpen(false)
+                      handleRouteClick(e, href)
+                    }}
                   >
                     {item.name}
                   </a>
