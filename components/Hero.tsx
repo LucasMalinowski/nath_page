@@ -1,11 +1,8 @@
 'use client'
-
-import { useSiteMedia } from '@/lib/useSiteMedia'
 import { useSiteText } from '@/lib/siteText'
 import Typewriter from '@/components/Typewriter'
 
 const Hero = () => {
-  const heroVideo = useSiteMedia('hero_video')
   const heroHeadline = useSiteText('hero_headline', 'Projetos autorais que unem estética,\nhistória e funcionalidade...')
 
   return (
@@ -19,7 +16,7 @@ const Hero = () => {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src={heroVideo?.url || '/hero-video.mp4'} type="video/mp4" />
+          <source src="/hero-video.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-black/30"></div>
       </div>
