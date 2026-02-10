@@ -20,7 +20,7 @@ html {
   --text: 59 47 38;
 
   /* Marca */
-  --olive: 78 95 74;
+  --olive: 114 127 100;
   --moss: 107 122 94;
 
   /* Acentos */
@@ -29,7 +29,7 @@ html {
 
   /* Nobres */
   --burgundy: 90 30 35;
-  --gold: 184 155 94;
+  --gold: 222 189 118;
 
   /* UI */
   --surface: 255 255 255;
@@ -55,29 +55,24 @@ html {
     text-wrap: balance;
   }
   
-  /* Paper texture overlay - 8% opacity as per document */
-  .paper-texture {
-    position: relative;
-  }
-  
-  .paper-texture::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: var(--paper-texture-url, url('/background-texture.jpeg'));
-    background-size: auto;
+  .texture-white,
+  .texture-green,
+  .texture-brown {
+    background-repeat: no-repeat;
     background-position: center;
-    opacity: 0.08;
-    pointer-events: none;
-    z-index: 0;
+    background-size: 100% 100%;
   }
-  
-  .paper-texture > * {
-    position: relative;
-    z-index: 1;
+
+  .texture-white {
+    background-image: url('/texture-white.png');
+  }
+
+  .texture-green {
+    background-image: url('/texture-green.png');
+  }
+
+  .texture-brown {
+    background-image: url('/texture-brown.png');
   }
 }
 
