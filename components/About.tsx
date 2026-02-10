@@ -12,7 +12,7 @@ const About = () => {
   return (
     <section
       id="sobre"
-      className="relative bg-bg paper-texture"
+      className="relative texture-white"
     >
       <div className="lg:pl-20">
         <div className="flex flex-col lg:flex-row gap-32">
