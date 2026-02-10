@@ -1,40 +1,42 @@
 'use client'
 
-import { useSiteText } from '@/lib/siteText'
-
 const Services = () => {
-  const servicesTitle = useSiteText('services_title', 'Vamos transformar seu espaço?')
-  const servicesSubtitle = useSiteText('services_subtitle', 'Um processo sensível, autoral e bem conduzido — do conceito à materialização.')
-  const service1Title = useSiteText('services_item_1_title', 'Projetos de Interiores')
-  const service1Desc = useSiteText('services_item_1_desc', 'Desenvolvimento completo de ambientes residenciais, com foco em identidade, funcionalidade e estética atemporal. Cada projeto é único, pensado para refletir a essência de quem vive o espaço.')
-  const service2Title = useSiteText('services_item_2_title', 'Consultoria de Interiores')
-  const service2Desc = useSiteText('services_item_2_desc', 'Orientação estratégica para transformar ambientes de forma prática e personalizada, ideal para quem busca direcionamento estético sem um projeto completo.')
-  const service3Title = useSiteText('services_item_3_title', 'Murais e Intervenções Artísticas')
-  const service3Desc = useSiteText('services_item_3_desc', 'Criação de pinturas e murais autorais que acrescentam significado, textura e personalidade aos espaços, conectando arte e arquitetura.')
-  const service4Title = useSiteText('services_item_4_title', 'Modelagem 3D')
-  const service4Desc = useSiteText('services_item_4_desc', 'Visualização do projeto para facilitar decisões com mais segurança, clareza e compreensão do resultado final.')
-  const servicesCta = useSiteText('services_cta', 'Entre em contato')
+  const servicesTitle = 'Meus serviços acompanham diferentes momentos, sempre com um olhar autoral, sensível e estruturado.'
+  const servicesSubtitle = 'Um processo sensível, autoral e bem conduzido — do conceito à materialização.'
+  const service1Title = 'Projeto de Interiores Residencial'
+  const service1Desc = 'Desenvolvimento completo de projetos residenciais, do conceito à definição de layout, materiais e acabamentos.'
+  const service2Title = 'Consultoria e Curadoria'
+  const service2Desc = 'Atendimento estratégico para orientar escolhas estéticas e funcionais, incluindo curadoria de itens decorativos.'
+  const service3Title = 'Pinturas Murais Autorais'
+  const service3Desc = 'Criação de murais desenvolvidos a partir do espaço e da história de quem o habita.'
+  const service4Title = 'Curadoria e Peças Autorais'
+  const service4Desc = 'Curadoria de objetos e telas autorais, além de peças de artistas independentes, selecionadas com intenção e propósito.'
+  const servicesCta = 'Saber mais'
 
   const services = [
     {
       number: '01',
       title: service1Title,
-      description: service1Desc
+      description: service1Desc,
+      note: 'Projetos pensados em camadas de tempo, história e vivência.'
     },
     {
       number: '02',
       title: service2Title,
-      description: service2Desc
+      description: service2Desc,
+      note: 'Pequenas escolhas transformam a experiência do espaço.'
     },
     {
       number: '03',
       title: service3Title,
-      description: service3Desc
+      description: service3Desc,
+      note: 'Arte que nasce do espaço.'
     },
     {
       number: '04',
       title: service4Title,
-      description: service4Desc
+      description: service4Desc,
+      note: 'Disponíveis sob curadoria pontual na aba Galeria.'
     }
   ]
 
@@ -55,52 +57,62 @@ const Services = () => {
   return (
     <section
       id="servicos"
-      className="relative py-section md:py-12 lg:py-16 bg-warm-beige paper-texture"
+      className="relative bg-bg mb-4"
     >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-        {/* Header */}
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-h2-mobile md:text-h2 font-serif font-semibold text-graphite mb-6">
-            {servicesTitle}
-          </h2>
-          <p className="text-body-mobile md:text-body font-sans text-graphite/80">
-            {servicesSubtitle}
-          </p>
-        </div>
-
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          {services.map((service, index) => (
-            <div
-              key={index}
-              className="bg-off-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
-            >
-              {/* Service Number */}
-              <div className="text-soft-terracotta font-sans font-bold text-lg mb-4">
-                {service.number}
-              </div>
-
-              {/* Service Title */}
-              <h3 className="text-h3 font-serif font-semibold text-graphite mb-4">
-                {service.title}
-              </h3>
-
-              {/* Service Description */}
-              <p className="text-body-mobile md:text-body font-sans text-graphite/80 leading-relaxed">
-                {service.description}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <div className="text-center">
-          <button
-            onClick={scrollToContact}
-            className="btn-primary px-12 py-4 bg-olive-green text-off-white font-sans font-medium rounded-button text-base tracking-wide hover:bg-soft-terracotta transition-all duration-300"
+      <div className="flex flex-col lg:flex-row">
+        {/* Left: Video */}
+        <div className="relative min-h-[420px] lg:min-h-[760px] lg:w-1/3">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover"
           >
-            {servicesCta}
-          </button>
+            <source src="/service-video.mp4" type="video/mp4" />
+          </video>
+        </div>
+
+        {/* Right: Content */}
+        <div className="flex flex-col lg:w-2/3 mt-4">
+          {/* Title block with brown texture */}
+          <div className="texture-brown px-6 sm:px-10 py-8">
+            <div className="flex gap-6 items-start pl-8">
+              <h2 className="text-3xl-mobile md:text-3xl py-4 font-serif text-bg border-l-[3px] border-bg/30  pl-16 pr-12">
+                {servicesTitle}
+              </h2>
+            </div>
+          </div>
+
+          {/* Services grid on white texture */}
+          <div className="texture-white px-24 py-24">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-20">
+              {services.map((service, index) => (
+                <div key={index}>
+                  <div className="bg-[#f6f2ed] border border-border/50 p-6 rounded-xl text-[#735746] shadow-sm min-h-[240px]">
+                    <h3 className="text-h3 font-serif font-semibold  mb-6">
+                      {service.title}
+                    </h3>
+                    <p className="text-body-mobile md:text-body font-thin font-sans leading-relaxed">
+                      {service.description}
+                    </p>
+                  </div>
+                  <p className="mt-3 text-xl font-poetic italic text-gold text-center px-8">
+                    {service.note}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={scrollToContact}
+                className="btn-primary px-10 py-3 bg-gold/80 text-bg font-sans font-medium rounded-button text-lg tracking-wide hover:bg-gold transition-all duration-300"
+              >
+                {servicesCta}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
