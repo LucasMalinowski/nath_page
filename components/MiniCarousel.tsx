@@ -9,9 +9,10 @@ interface MiniCarouselProps {
     alt: string
     pauseUntil?: number
     onUserNavigate?: () => void
+    className?: string
 }
 
-export function MiniCarousel({ images, alt, pauseUntil = 0, onUserNavigate }: MiniCarouselProps) {
+export function MiniCarousel({ images, alt, pauseUntil = 0, onUserNavigate, className = '' }: MiniCarouselProps) {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [touchStart, setTouchStart] = useState(0)
     const [touchEnd, setTouchEnd] = useState(0)
@@ -96,7 +97,7 @@ export function MiniCarousel({ images, alt, pauseUntil = 0, onUserNavigate }: Mi
     // Single image - no carousel needed
     if (images.length <= 1) {
         return (
-            <div className="relative flex-1 min-h-[250px] md:min-h-[300px] p-3 md:p-4">
+            <div className={`relative flex-1 min-h-[250px] md:min-h-[300px] p-3 md:p-4 ${className}`}>
                 <div className="relative w-full h-full rounded-sm overflow-hidden">
                     <Image
                         src={images[0]}
@@ -113,7 +114,7 @@ export function MiniCarousel({ images, alt, pauseUntil = 0, onUserNavigate }: Mi
 
     return (
         <div
-            className="relative flex-1 min-h-[250px] md:min-h-[300px] group/carousel p-3 md:p-4"
+            className={`relative flex-1 min-h-[250px] md:min-h-[300px] group/carousel p-3 md:p-4 ${className}`}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
