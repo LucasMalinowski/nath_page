@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { supabase, PortfolioImage } from '@/lib/supabase'
-import { useSiteText } from '@/lib/siteText'
 import { MiniCarousel } from './MiniCarousel'
 
 // Extended type to support multiple images (will migrate DB later)
@@ -21,12 +20,12 @@ const Portfolio = () => {
   const [isPageFading, setIsPageFading] = useState(false)
   const fadeTimeout = useRef<NodeJS.Timeout | null>(null)
 
-  const portfolioTitle = useSiteText('portfolio_title', 'Portfólio')
-  const portfolioSubtitle = useSiteText('portfolio_subtitle', 'Meus serviços acompanham diferentes momentos, sempre com um olhar autoral, sensível e estruturado.')
-  const portfolioLoading = useSiteText('portfolio_loading', 'Carregando...')
-  const portfolioEmpty = useSiteText('portfolio_empty', 'Em breve, novos projetos serão adicionados')
-  const portfolioPrevLabel = useSiteText('portfolio_prev_label', 'Página anterior')
-  const portfolioNextLabel = useSiteText('portfolio_next_label', 'Próxima página')
+  const portfolioTitle = 'Portfólio'
+  const portfolioSubtitle = 'Meus serviços acompanham diferentes momentos, sempre com um olhar autoral, sensível e estruturado.'
+  const portfolioLoading = 'Carregando...'
+  const portfolioEmpty = 'Em breve, novos projetos serão adicionados'
+  const portfolioPrevLabel = 'Página anterior'
+  const portfolioNextLabel = 'Próxima página'
 
   useEffect(() => {
     fetchPortfolioImages()

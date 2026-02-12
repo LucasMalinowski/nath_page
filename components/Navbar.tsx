@@ -5,20 +5,18 @@ import { Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useSiteText } from '@/lib/siteText'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
-  const navSobre = useSiteText('nav_sobre', 'Sobre')
-  const navServicos = useSiteText('nav_servicos', 'Serviços')
-  const navPortfolio = useSiteText('nav_portfolio', 'Portfólio')
-  const navGaleria = useSiteText('nav_galeria', 'Galeria')
-  const navContato = useSiteText('nav_contato', 'Contato')
-  const navToggleLabel = useSiteText('nav_toggle_label', 'Alternar menu')
-  const navBackLabel = useSiteText('nav_back_label', 'Voltar')
+  const navSobre = 'Sobre'
+  const navServicos = 'Serviços'
+  const navPortfolio = 'Portfólio'
+  const navGaleria = 'Galeria'
+  const navContato = 'Contato'
+  const navToggleLabel = 'Alternar menu'
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,7 +72,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isScrolled ? 'bg-bg/70 backdrop-blur-sm shadow-sm' : 'bg-bg/90'
       }`}
     >

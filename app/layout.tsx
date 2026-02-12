@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import PageFadeProvider from '@/components/PageFadeProvider'
-import { SiteTextProvider } from '@/lib/siteText'
 
 export const metadata: Metadata = {
   title: 'Nathalia Malinowski | Design de Interiores',
@@ -26,9 +25,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        <SiteTextProvider>
-          <PageFadeProvider>{children}</PageFadeProvider>
-        </SiteTextProvider>
+        <PageFadeProvider>{children}</PageFadeProvider>
       </body>
     </html>
   )

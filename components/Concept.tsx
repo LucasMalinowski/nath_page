@@ -1,11 +1,19 @@
 'use client'
 
-import { useSiteText, renderTextWithBreaks } from '@/lib/siteText'
+const renderTextWithBreaks = (text: string) => {
+  const parts = text.split('\n')
+  return parts.map((part, index) => (
+    <span key={`${index}-${part}`}>
+      {part}
+      {index < parts.length - 1 && <br />}
+    </span>
+  ))
+}
 
 const Concept = () => {
-  const conceptTitle = useSiteText('concept_title', 'Nada é\nestático.')
-  const conceptPoetic = useSiteText('concept_poetic', 'Os espaços mudam, as pessoas também.')
-  const conceptParagraph = useSiteText('concept_paragraph', 'Meu trabalho nasce do encontro entre história, identidade e modo de viver.')
+  const conceptTitle = 'Nada é\nestático.'
+  const conceptPoetic = 'Os espaços mudam, as pessoas também.'
+  const conceptParagraph = 'Meu trabalho nasce do encontro entre história, identidade e modo de viver.'
 
   return (
       <section

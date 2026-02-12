@@ -1,9 +1,8 @@
 'use client'
-import { useSiteText } from '@/lib/siteText'
 import Typewriter from '@/components/Typewriter'
 
 const Hero = () => {
-  const heroHeadline = useSiteText('hero_headline', 'Projetos autorais que unem estética,\nhistória e funcionalidade...')
+  const heroHeadline = 'Projetos autorais que unem estética,\nhistória e funcionalidade...'
 
   return (
     <section id="hero" className="relative h-[90vh] md:h-[90vh] pt-20">

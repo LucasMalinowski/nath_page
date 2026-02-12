@@ -26,6 +26,7 @@ module.exports = {
         'soft-terracotta': 'rgb(var(--terracotta, 198 106 61) / <alpha-value>)',
         'coffee-brown': 'rgb(var(--text, 59 47 38) / <alpha-value>)',
         'graphite': 'rgb(var(--text, 59 47 38) / <alpha-value>)',
+        dirt: 'rgb(var(--dirt, 59 47 38) / <alpha-value>)',
       },
       fontFamily: {
         serif: ['Libre Baskerville', 'Georgia', 'serif'],
