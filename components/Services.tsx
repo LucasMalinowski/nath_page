@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 
 const Services = () => {
   const servicesTitle = 'Meus serviços acompanham diferentes momentos, sempre com um olhar autoral, sensível e estruturado.'
@@ -105,12 +106,12 @@ const Services = () => {
             </div>
 
             <div className="flex justify-center mt-8">
-              <button
-                onClick={scrollToContact}
-                className="btn-primary px-10 py-3 bg-gold/80 text-bg font-sans font-medium rounded-button text-lg tracking-wide hover:bg-gold transition-all duration-300"
+              <Link
+                  href="/servicos"
+                  className="inline-block btn-primary px-10 py-3 bg-gold/80 text-bg font-sans font-medium rounded-button text-lg tracking-wide hover:bg-gold transition-all duration-300"
               >
                 {servicesCta}
-              </button>
+              </Link>
             </div>
           </div>
         </div>
