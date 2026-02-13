@@ -6,7 +6,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-const Navbar = () => {
+type NavbarProps = {
+  backgroundVariant?: 'bg' | 'dirt'
+}
+
+const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
@@ -73,7 +77,13 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-bg/70 backdrop-blur-sm shadow-sm' : 'bg-bg/90'
+        isScrolled
+          ? backgroundVariant === 'dirt'
+            ? 'bg-dirt/70 backdrop-blur-sm shadow-sm'
+            : 'bg-bg/70 backdrop-blur-sm shadow-sm'
+          : backgroundVariant === 'dirt'
+            ? 'bg-dirt/90'
+            : 'bg-bg/90'
       }`}
     >
       <div className="px-6 sm:px-8 ">
@@ -111,8 +121,12 @@ const Navbar = () => {
                 item.href === '#contato'
                   ? 'bg-olive text-bg hover:bg-moss'
                   : item.isRoute
-                    ? 'bg-bg text-text hover:text-olive'
-                    : 'text-text hover:text-olive'
+                    ? backgroundVariant === 'dirt'
+                      ? 'bg-dirt text-bg hover:text-olive'
+                      : 'bg-bg text-text hover:text-olive'
+                    : backgroundVariant === 'dirt'
+                      ? 'text-bg hover:text-olive'
+                      : 'text-text hover:text-olive'
               }`
               if (!isHome && item.isRoute && item.href === '/galeria') {
                 return (
@@ -156,7 +170,11 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-text hover:text-olive transition-colors"
+            className={`md:hidden p-2 rounded-lg transition-colors ${
+              backgroundVariant === 'dirt'
+                ? 'text-bg hover:text-olive'
+                : 'text-text hover:text-olive'
+            }`}
             aria-label={navToggleLabel}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -166,7 +184,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-bg border-t border-border">
+        <div className={`md:hidden ${backgroundVariant === 'dirt' ? 'bg-dirt' : 'bg-bg'} border-t border-border`}>
           <div className="px-6 py-6 space-y-4">
             {!isHome && (
               <div className="h-0" aria-hidden="true" />
@@ -178,8 +196,12 @@ const Navbar = () => {
                 item.href === '#contato'
                   ? 'bg-olive text-bg rounded-md px-3'
                   : item.isRoute
-                    ? 'text-text bg-bg rounded-md px-3'
-                    : 'text-text hover:text-olive'
+                    ? backgroundVariant === 'dirt'
+                      ? 'text-bg bg-dirt rounded-md px-3'
+                      : 'text-text bg-bg rounded-md px-3'
+                    : backgroundVariant === 'dirt'
+                      ? 'text-bg hover:text-olive'
+                      : 'text-text hover:text-olive'
               }`
               if (!isHome && item.isRoute && item.href === '/galeria') {
                 return (
