@@ -27,6 +27,7 @@ module.exports = {
         'coffee-brown': 'rgb(var(--text, 59 47 38) / <alpha-value>)',
         'graphite': 'rgb(var(--text, 59 47 38) / <alpha-value>)',
         dirt: 'rgb(var(--dirt, 59 47 38) / <alpha-value>)',
+        darkGreen: 'rgb(var(--darkGreen, 62 95 75) / <alpha-value>)',
       },
       fontFamily: {
         serif: ['Libre Baskerville', 'Georgia', 'serif'],
