@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, Instagram, ShoppingCart } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { supabase, GalleryProduct, GalleryExhibitor } from '@/lib/supabase'
@@ -23,9 +24,12 @@ const parseImages = (item: { images?: string | string[] | null }): string[] => {
 }
 
 export default function GaleriaPage() {
+  const router = useRouter()
   const [products, setProducts] = useState<GalleryProduct[]>([])
   const [exhibitors, setExhibitors] = useState<GalleryExhibitor[]>([])
   const [loading, setLoading] = useState(true)
+  const [checkoutLoadingProductId, setCheckoutLoadingProductId] = useState<string | null>(null)
+  const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
   const [currentExhibitorPage, setCurrentExhibitorPage] = useState(0)
   const [currentProductPage, setCurrentProductPage] = useState(0)
   const [exhibitorsPerPage, setExhibitorsPerPage] = useState(2)
@@ -38,6 +42,7 @@ export default function GaleriaPage() {
             .from('gallery_products')
             .select('*')
             .eq('is_visible', true)
+            .gte('quantity', 1)
             .order('display_order', { ascending: true })
 
         const { data: exhibitorsData } = await supabase
@@ -122,6 +127,47 @@ export default function GaleriaPage() {
     if (currentProductPage > 0) {
       setCurrentProductPage(prev => prev - 1)
     }
+  }
+
+  const checkoutProduct = async (productId: string) => {
+    setCheckoutLoadingProductId(productId)
+    setCheckoutMessage(null)
+
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.user) {
+      setCheckoutLoadingProductId(null)
+      router.push('/login?next=/galeria')
+      return
+    }
+
+    const response = await fetch('/api/checkout/product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify({ productId, quantity: 1 })
+    })
+    const data = await response.json()
+    setCheckoutLoadingProductId(null)
+
+    if (!response.ok) {
+      setCheckoutMessage(data.error || 'Não foi possível iniciar o checkout.')
+      return
+    }
+
+    if (!data.init_point) {
+      setCheckoutMessage('URL de checkout indisponível.')
+      return
+    }
+
+    const link = document.createElement('a')
+    link.href = data.init_point
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
   }
 
   return (
@@ -212,14 +258,20 @@ export default function GaleriaPage() {
                                   {product.author}
                                 </p>
                             )}
-                            <div className="mt-3 flex items-center justify-between bg-[#3b2f26] px-3 py-2 rounded-sm text-bg/90">
-                        <span className="inline-flex items-center gap-2 font-sans">
-                          <ShoppingCart size={20} />
-                        </span>
+                            <button
+                                type="button"
+                                onClick={() => checkoutProduct(product.id)}
+                                disabled={checkoutLoadingProductId === product.id}
+                                className="mt-3 w-full flex items-center justify-between bg-[#3b2f26] hover:bg-[#48372c] px-3 py-2 rounded-sm text-bg/90 transition-colors disabled:opacity-60"
+                            >
+                              <span className="inline-flex items-center gap-2 font-sans text-sm">
+                                <ShoppingCart size={20} />
+                                {checkoutLoadingProductId === product.id ? '...' : 'Comprar'}
+                              </span>
                               <span className="font-sans tracking-wide text-lg">
                           {product.price_text ? `R$ ${product.price_text}` : 'R$ 0,00'}
                         </span>
-                            </div>
+                            </button>
                           </div>
                           <div className="mt-4 w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
                             <h3 className="flex justify-center text-2xl font-serif text-bg/80 text-left">
@@ -254,6 +306,9 @@ export default function GaleriaPage() {
                 </div>
             )}
           </div>
+          {checkoutMessage && (
+              <p className="text-center mt-8 text-sm text-bg/80">{checkoutMessage}</p>
+          )}
         </section>
 
         {/* Exhibitors - Chevrons only on hover, positioned at exhibitors */}

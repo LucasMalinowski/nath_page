@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, ShoppingCart, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
 type NavbarProps = {
   backgroundVariant?: 'bg' | 'dirt'
@@ -13,6 +14,7 @@ type NavbarProps = {
 const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [cartCount, setCartCount] = useState(0)
   const pathname = usePathname()
 
   const navSobre = 'Sobre'
@@ -29,6 +31,36 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    const loadCartCount = async () => {
+      const {
+        data: { session }
+      } = await supabase.auth.getSession()
+
+      if (!session?.user) {
+        setCartCount(0)
+        return
+      }
+
+      const { count } = await supabase
+        .from('cart_items')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', session.user.id)
+
+      setCartCount(count || 0)
+    }
+
+    void loadCartCount()
+
+    const { data: authSubscription } = supabase.auth.onAuthStateChange(() => {
+      void loadCartCount()
+    })
+
+    return () => {
+      authSubscription.subscription.unsubscribe()
+    }
+  }, [pathname])
 
   const navItems = useMemo(() => ([
     { name: navSobre, href: '#sobre' },
@@ -57,9 +89,10 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
   }
 
   const isHome = pathname === '/'
+  const isGaleria = pathname === '/galeria'
   const toHomeHref = (href: string, isRoute?: boolean) => {
     if (isHome) return href
-    if (isRoute && href === '/galeria') return ''
+    if (isRoute && href === '/galeria') return '/galeria'
     if (isRoute) return '/'
     if (href.startsWith('#')) return `/${href}`
     return href
@@ -128,7 +161,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                       ? 'text-bg hover:text-olive'
                       : 'text-text hover:text-olive'
               }`
-              if (!isHome && item.isRoute && item.href === '/galeria') {
+              if (!isHome && isGaleria && item.isRoute && item.href === '/galeria') {
                 return (
                   <span key={item.name} className={`${commonClass} cursor-default`}>
                     {item.name}
@@ -165,6 +198,20 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                 </Link>
               )
             })}
+            {cartCount > 0 && (
+              <Link
+                href="/carrinho"
+                className={`relative inline-flex items-center justify-center transition-colors ${
+                  backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-text hover:text-olive'
+                }`}
+                aria-label="Ir para carrinho"
+              >
+                <ShoppingCart size={22} />
+                <span className="absolute -top-2 -right-3 min-w-5 h-5 px-1 rounded-full bg-gold text-dirt text-[11px] font-semibold flex items-center justify-center">
+                  {cartCount}
+                </span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -203,7 +250,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                       ? 'text-bg hover:text-olive'
                       : 'text-text hover:text-olive'
               }`
-              if (!isHome && item.isRoute && item.href === '/galeria') {
+              if (!isHome && isGaleria && item.isRoute && item.href === '/galeria') {
                 return (
                   <span key={item.name} className={`${commonClass} cursor-default`}>
                     {item.name}
@@ -248,6 +295,20 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                 </Link>
               )
             })}
+            {cartCount > 0 && (
+              <Link
+                href="/carrinho"
+                className={`block py-3 text-sm font-medium transition-colors font-sans ${
+                  backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-text hover:text-olive'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <ShoppingCart size={16} />
+                  Carrinho ({cartCount})
+                </span>
+              </Link>
+            )}
           </div>
         </div>
       )}
