@@ -1,24 +1,28 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Menu, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Menu, ShoppingCart, X } from 'lucide-react'
 import Image from 'next/image'
-import { useBrandAsset } from '@/lib/useBrandAsset'
-import { useSiteText } from '@/lib/siteText'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
-const Navbar = () => {
+type NavbarProps = {
+  backgroundVariant?: 'bg' | 'dirt'
+}
+
+const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const brandAsset = useBrandAsset('navbar')
-  const navSobre = useSiteText('nav_sobre', 'SOBRE')
-  const navServicos = useSiteText('nav_servicos', 'SERVIÇOS')
-  const navPortfolio = useSiteText('nav_portfolio', 'PORTFÓLIO')
-  const navContato = useSiteText('nav_contato', 'CONTATO')
-  const navToggleLabel = useSiteText('nav_toggle_label', 'Alternar menu')
-  const logoSize = {
-    width: `${brandAsset?.width_px ?? 48}px`,
-    height: `${brandAsset?.height_px ?? 48}px`,
-  }
+  const [cartCount, setCartCount] = useState(0)
+  const pathname = usePathname()
+
+  const navSobre = 'Sobre'
+  const navServicos = 'Serviços'
+  const navPortfolio = 'Portfólio'
+  const navGaleria = 'Galeria'
+  const navContato = 'Contato'
+  const navToggleLabel = 'Alternar menu'
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,14 +32,46 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navItems = [
+  useEffect(() => {
+    const loadCartCount = async () => {
+      const {
+        data: { session }
+      } = await supabase.auth.getSession()
+
+      if (!session?.user) {
+        setCartCount(0)
+        return
+      }
+
+      const { count } = await supabase
+        .from('cart_items')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', session.user.id)
+
+      setCartCount(count || 0)
+    }
+
+    void loadCartCount()
+
+    const { data: authSubscription } = supabase.auth.onAuthStateChange(() => {
+      void loadCartCount()
+    })
+
+    return () => {
+      authSubscription.subscription.unsubscribe()
+    }
+  }, [pathname])
+
+  const navItems = useMemo(() => ([
     { name: navSobre, href: '#sobre' },
-    { name: navServicos, href: '#servicos' },
     { name: navPortfolio, href: '#portfolio' },
-    { name: navContato, href: '#contato' },
-  ]
+    { name: navServicos, href: '#servicos' },
+    { name: navGaleria, href: '/galeria', isRoute: true },
+    { name: navContato, href: '#contato' }
+  ]), [navSobre, navPortfolio, navServicos, navGaleria, navContato])
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.startsWith('#')) return
     e.preventDefault()
     setIsMobileMenuOpen(false)
 
@@ -52,46 +88,140 @@ const Navbar = () => {
     }
   }
 
+  const isHome = pathname === '/'
+  const isGaleria = pathname === '/galeria'
+  const toHomeHref = (href: string, isRoute?: boolean) => {
+    if (isHome) return href
+    if (isRoute && href === '/galeria') return '/galeria'
+    if (isRoute) return '/'
+    if (href.startsWith('#')) return `/${href}`
+    return href
+  }
+
+  const handleRouteClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (isHome || !href) return
+    e.preventDefault()
+    document.body.classList.add('page-fade-out')
+    setTimeout(() => {
+      window.location.href = href
+    }, 200)
+  }
+
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-off-white/95 backdrop-blur-sm shadow-sm' : 'bg-off-white'
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled
+          ? backgroundVariant === 'dirt'
+            ? 'bg-dirt/70 backdrop-blur-sm shadow-sm'
+            : 'bg-bg/70 backdrop-blur-sm shadow-sm'
+          : backgroundVariant === 'dirt'
+            ? 'bg-dirt/90'
+            : 'bg-bg/90'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <a href="#hero" className="flex items-center">
-            <div className="relative" style={logoSize}>
-              <Image
-                src={brandAsset?.image_url || '/nm-logo.png'}
-                alt={brandAsset?.title || 'Nathalia Malinowski'}
-                fill
-                className="object-contain"
-                priority
-                unoptimized
-              />
-            </div>
-          </a>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-10">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
-                className="text-sm font-medium tracking-wide-caps text-graphite hover:text-olive-green transition-colors duration-300 font-sans uppercase"
-              >
-                {item.name}
+      <div className="px-6 sm:px-8 ">
+        <div className="flex items-center h-16">
+          <div className="hidden md:flex flex-1 items-center justify-center justify-between pr-20 pl-2">
+            {isHome ? (
+              <a href="#hero" className="flex items-center">
+                <Image
+                  src="/nm-gold.png"
+                  alt="Nathalia Malinowski"
+                  width={20}
+                  height={20}
+                  className="object-contain w-20 h-20 mb-2"
+                />
               </a>
-            ))}
+            ) : (
+              <a
+                href="/#hero"
+                className="flex items-center"
+                onClick={(e) => handleRouteClick(e, '/#hero')}
+              >
+                <Image
+                    src="/nm-gold.png"
+                    alt="Nathalia Malinowski"
+                    width={20}
+                    height={20}
+                    className="object-contain w-20 h-20 mb-2"
+                />
+              </a>
+            )}
+            {navItems.map((item) => {
+              const href = toHomeHref(item.href, item.isRoute)
+              const isAnchor = isHome && item.href.startsWith('#')
+              const commonClass = `px-3 py-1 text-[20px] font-thin rounded-lg transition-colors duration-300 ${
+                item.href === '#contato'
+                  ? 'bg-olive text-bg hover:bg-moss'
+                  : item.isRoute
+                    ? backgroundVariant === 'dirt'
+                      ? 'bg-dirt text-bg hover:text-olive'
+                      : 'bg-bg text-text hover:text-olive'
+                    : backgroundVariant === 'dirt'
+                      ? 'text-bg hover:text-olive'
+                      : 'text-text hover:text-olive'
+              }`
+              if (!isHome && isGaleria && item.isRoute && item.href === '/galeria') {
+                return (
+                  <span key={item.name} className={`${commonClass} cursor-default`}>
+                    {item.name}
+                  </span>
+                )
+              }
+              if (isAnchor) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    className={commonClass}
+                  >
+                    {item.name}
+                  </a>
+                )
+              }
+              if (!isHome) {
+                return (
+                  <a
+                    key={item.name}
+                    href={href}
+                    className={commonClass}
+                    onClick={(e) => handleRouteClick(e, href)}
+                  >
+                    {item.name}
+                  </a>
+                )
+              }
+              return (
+                <Link key={item.name} href={href} className={commonClass}>
+                  {item.name}
+                </Link>
+              )
+            })}
+            {cartCount > 0 && (
+              <Link
+                href="/carrinho"
+                className={`relative inline-flex items-center justify-center transition-colors ${
+                  backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-text hover:text-olive'
+                }`}
+                aria-label="Ir para carrinho"
+              >
+                <ShoppingCart size={22} />
+                <span className="absolute -top-2 -right-3 min-w-5 h-5 px-1 rounded-full bg-gold text-dirt text-[11px] font-semibold flex items-center justify-center">
+                  {cartCount}
+                </span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-graphite hover:text-olive-green transition-colors"
+            className={`md:hidden p-2 rounded-lg transition-colors ${
+              backgroundVariant === 'dirt'
+                ? 'text-bg hover:text-olive'
+                : 'text-text hover:text-olive'
+            }`}
             aria-label={navToggleLabel}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -101,18 +231,84 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-off-white border-t border-warm-beige">
+        <div className={`md:hidden ${backgroundVariant === 'dirt' ? 'bg-dirt' : 'bg-bg'} border-t border-border`}>
           <div className="px-6 py-6 space-y-4">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
-                className="block py-3 text-sm font-medium tracking-wide-caps text-graphite hover:text-olive-green transition-colors font-sans uppercase"
+            {!isHome && (
+              <div className="h-0" aria-hidden="true" />
+            )}
+            {navItems.map((item) => {
+              const href = toHomeHref(item.href, item.isRoute)
+              const isAnchor = isHome && item.href.startsWith('#')
+              const commonClass = `block py-3 text-sm font-medium transition-colors font-sans ${
+                item.href === '#contato'
+                  ? 'bg-olive text-bg rounded-md px-3'
+                  : item.isRoute
+                    ? backgroundVariant === 'dirt'
+                      ? 'text-bg bg-dirt rounded-md px-3'
+                      : 'text-text bg-bg rounded-md px-3'
+                    : backgroundVariant === 'dirt'
+                      ? 'text-bg hover:text-olive'
+                      : 'text-text hover:text-olive'
+              }`
+              if (!isHome && isGaleria && item.isRoute && item.href === '/galeria') {
+                return (
+                  <span key={item.name} className={`${commonClass} cursor-default`}>
+                    {item.name}
+                  </span>
+                )
+              }
+              if (isAnchor) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    className={commonClass}
+                  >
+                    {item.name}
+                  </a>
+                )
+              }
+              if (!isHome) {
+                return (
+                  <a
+                    key={item.name}
+                    href={href}
+                    className={commonClass}
+                    onClick={(e) => {
+                      setIsMobileMenuOpen(false)
+                      handleRouteClick(e, href)
+                    }}
+                  >
+                    {item.name}
+                  </a>
+                )
+              }
+              return (
+                <Link
+                  key={item.name}
+                  href={href}
+                  className={commonClass}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              )
+            })}
+            {cartCount > 0 && (
+              <Link
+                href="/carrinho"
+                className={`block py-3 text-sm font-medium transition-colors font-sans ${
+                  backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-text hover:text-olive'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                {item.name}
-              </a>
-            ))}
+                <span className="inline-flex items-center gap-2">
+                  <ShoppingCart size={16} />
+                  Carrinho ({cartCount})
+                </span>
+              </Link>
+            )}
           </div>
         </div>
       )}

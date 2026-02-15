@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400&family=Inter:wght@200;300;400;500&family=Libre+Baskerville:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,15 +14,42 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
-  font-family: 'Montserrat', sans-serif;
-  overflow-x: hidden;
-  background-color: #F6F2ED;
-  color: #2E2E2E;
+:root {
+  /* Base */
+  --bg: 243 239 233;
+  --text: 59 47 38;
+
+  /* Marca */
+  --olive: 114 127 100;
+  --moss: 107 122 94;
+  --dirt: 59 47 38;
+  --darkGreen: 62 95 75;
+
+  /* Acentos */
+  --terracotta: 198 106 61;
+  --mustard: 217 182 94;
+
+  /* Nobres */
+  --burgundy: 90 30 35;
+  --gold: 222 189 118;
+
+  /* UI */
+  --surface: 255 255 255;
+  --border: 59 47 38;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    background-color: var(--bg);
+    color: var(--text);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Libre Baskerville', serif;
+  }
 }
 
 @layer utilities {
@@ -30,29 +57,24 @@ h1, h2, h3, h4, h5, h6 {
     text-wrap: balance;
   }
   
-  /* Paper texture overlay - 8% opacity as per document */
-  .paper-texture {
-    position: relative;
-  }
-  
-  .paper-texture::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: var(--paper-texture-url, url('/background-texture.jpeg'));
-    background-size: auto;
+  .texture-white,
+  .texture-green,
+  .texture-brown {
+    background-repeat: no-repeat;
     background-position: center;
-    opacity: 0.08;
-    pointer-events: none;
-    z-index: 0;
+    background-size: 100% 100%;
   }
-  
-  .paper-texture > * {
-    position: relative;
-    z-index: 1;
+
+  .texture-white {
+    background-image: url('/texture-white.png');
+  }
+
+  .texture-green {
+    background-image: url('/texture-green.png');
+  }
+
+  .texture-brown {
+    background-image: url('/texture-brown.png');
   }
 }
 
@@ -60,11 +82,9 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -79,8 +99,22 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.page-fade-in {
+  animation: pageFadeIn 0.35s ease-out;
+}
+
+body.page-fade-out {
+  opacity: 0;
+  transition: opacity 0.2s ease-in;
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.8s ease-out forwards;
+  animation: fadeIn 1.2s ease-out forwards;
 }
 
 .animate-fade-in-up {

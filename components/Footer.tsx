@@ -1,49 +1,59 @@
 'use client'
 
-import Image from 'next/image'
-import { useBrandAsset } from '@/lib/useBrandAsset'
-import { useSiteText } from '@/lib/siteText'
+import { Mail, Phone, Instagram } from 'lucide-react'
 
-const Footer = () => {
-  const brandAsset = useBrandAsset('footer')
-  const footerCopyright = useSiteText(
-    'footer_copyright',
-    '© {year} Nathalia Malinowski. Todos os direitos reservados.'
-  )
-  const footerTagline = useSiteText('footer_tagline', 'Camadas do Tempo | Clássico Vivo')
-  const logoSize = {
-    width: `${brandAsset?.width_px ?? 64}px`,
-    height: `${brandAsset?.height_px ?? 64}px`,
-  }
-  const year = new Date().getFullYear()
-  const copyright = footerCopyright.replace('{year}', String(year))
-
+type FooterProps = {
+    contactInfo?: boolean
+}
+const Footer = ({contactInfo = true}: FooterProps) => {
   return (
-    <footer className="relative bg-olive-green py-2">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-        <div className="flex flex-col items-center justify-center space-y-3">
-          {/* Logo */}
-          <div className="relative" style={logoSize}>
-            <Image
-              src={brandAsset?.image_url || '/nm-logo.png'}
-              alt={brandAsset?.title || 'NM Logo'}
-              fill
-              className="object-contain brightness-0 invert"
-              priority
-              unoptimized
-            />
+    <footer className="relative bg-[#6b7a5e] text-bg">
+      { contactInfo && (
+
+        <div className="texture-green">
+          <div className="px-6 sm:px-8 lg:px-16">
+            <div className="mx-10 py-8">
+              <div className="text-center mb-6">
+                <p className="text-3xl font-serif">
+                  Vamos criar um espaço que
+                  <br />
+                  faça sentido para você?
+                </p>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-3 md:items-center">
+                <div className="space-y-2 text-sm text-bg/80 min-w-[100px] md:justify-self-start">
+                  <div className="flex items-center gap-2">
+                    <Phone size={16} className="text-gold/80" />
+                    <span>(45) 99802-8130</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Instagram size={16} className="text-gold/80" />
+                    <span>nathalia_malinowski</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-center md:justify-self-center">
+                  <button
+                    type="button"
+                    className="px-6 py-2 rounded-md bg-mustard text-text font-sans text-sm md:text-base shadow-sm"
+                  >
+                    Agendar conversa
+                  </button>
+                </div>
+
+                <div className="text-sm text-bg/80 flex items-center gap-2 md:justify-self-end md:justify-end">
+                  <Mail size={16} className="text-gold/80" />
+                  <span>malinowskinathalia@gmail.com</span>
+                </div>
+              </div>
+            </div>
           </div>
-
-          {/* Copyright */}
-          <p className="text-sm font-sans text-off-white/80 text-center">
-            {copyright}
-          </p>
-
-          {/* Tagline */}
-          <p className="text-sm font-serif italic text-off-white/70 text-center">
-            {footerTagline}
-          </p>
         </div>
+      )}
+
+      <div className="bg-moss/30 py-3 text-center">
+        <img src="/nm-white.png" alt="NM" className="mx-auto h-12 w-auto"/>
       </div>
     </footer>
   )

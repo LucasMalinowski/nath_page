@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import SiteMediaProvider from '@/components/SiteMediaProvider'
-import { SiteTextProvider } from '@/lib/siteText'
+import PageFadeProvider from '@/components/PageFadeProvider'
 
 export const metadata: Metadata = {
   title: 'Nathalia Malinowski | Design de Interiores',
@@ -9,7 +8,7 @@ export const metadata: Metadata = {
   keywords: ['design de interiores', 'arquitetura', 'decoração', 'murais', 'Nathalia Malinowski', 'projetos autorais', 'design atemporal'],
   authors: [{ name: 'Nathalia Malinowski' }],
   viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#5E6F64',
+  themeColor: '#4E5F4A',
   openGraph: {
     title: 'Nathalia Malinowski | Design de Interiores',
     description: 'Design de interiores com história, sensibilidade e identidade',
@@ -26,9 +25,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        <SiteTextProvider>
-          <SiteMediaProvider>{children}</SiteMediaProvider>
-        </SiteTextProvider>
+        <PageFadeProvider>{children}</PageFadeProvider>
       </body>
     </html>
   )
