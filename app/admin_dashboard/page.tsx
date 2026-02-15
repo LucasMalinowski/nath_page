@@ -561,18 +561,22 @@ export default function AdminDashboard() {
                 await removeGalleryFiles(imagesList)
             }
 
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from('gallery_products')
                 .delete()
                 .eq('id', product.id)
+                .select('id')
 
             if (error) throw error
+            if (!data || data.length === 0) {
+                throw new Error('Nenhuma linha foi removida. Verifique políticas RLS de DELETE para gallery_products.')
+            }
 
             await fetchProducts()
             alert('Produto excluido com sucesso!')
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting product:', error)
-            alert('Erro ao excluir produto')
+            alert(`Erro ao excluir produto: ${error?.message || 'Erro desconhecido'}`)
         }
     }
 
@@ -694,18 +698,22 @@ export default function AdminDashboard() {
                 await removeGalleryFiles([exhibitor.avatar_url])
             }
 
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from('gallery_exhibitors')
                 .delete()
                 .eq('id', exhibitor.id)
+                .select('id')
 
             if (error) throw error
+            if (!data || data.length === 0) {
+                throw new Error('Nenhuma linha foi removida. Verifique políticas RLS de DELETE para gallery_exhibitors.')
+            }
 
             await fetchExhibitors()
             alert('Expositor excluido com sucesso!')
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting exhibitor:', error)
-            alert('Erro ao excluir expositor')
+            alert(`Erro ao excluir expositor: ${error?.message || 'Erro desconhecido'}`)
         }
     }
 
