@@ -11,7 +11,7 @@ const About = () => {
       <div className="lg:pl-20">
         <div className="flex flex-col lg:flex-row gap-32">
           <div className="w-full lg:w-1/2 py-20 space-y-10">
-            <h2 className="text-h2-mobile md:text-6xl font-serif font-semibold text-gold">
+            <h2 className="text-h2-mobile md:text-6xl font-serif font-medium text-gold">
               Sobre mim
             </h2>
 
