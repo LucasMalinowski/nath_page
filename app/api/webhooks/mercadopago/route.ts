@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getMercadoPagoPayment } from '@/lib/mercadopago'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { sendPaymentSuccessEmail } from '@/lib/mailer'
 
 export const runtime = 'nodejs'
 
@@ -89,7 +90,7 @@ export async function POST(request: Request) {
     if (payment.status === 'approved' && order.status !== 'paid') {
       const { data: orderItems, error: itemsError } = await supabaseAdmin
         .from('order_items')
-        .select('product_id, quantity')
+        .select('product_id, quantity, product_name')
         .eq('order_id', order.id)
 
       if (itemsError) {
@@ -127,6 +128,25 @@ export async function POST(request: Request) {
       }
 
       await supabaseAdmin.from('cart_items').delete().eq('user_id', order.user_id)
+
+      const { data: authUserData, error: authUserError } = await supabaseAdmin.auth.admin.getUserById(order.user_id)
+      const buyerEmail = authUserData.user?.email
+
+      if (authUserError) {
+        console.warn('Could not load buyer email for payment success notification', authUserError.message)
+      } else if (buyerEmail) {
+        try {
+          await sendPaymentSuccessEmail({
+            to: buyerEmail,
+            orderId: order.id,
+            productNames: (orderItems || [])
+              .map((item) => item.product_name)
+              .filter((name): name is string => !!name)
+          })
+        } catch (mailError) {
+          console.error('Failed to send payment success email', mailError)
+        }
+      }
     }
 
     return NextResponse.json({ received: true, product_ids: approvedProductIds })
