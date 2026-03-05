@@ -113,10 +113,10 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
         isScrolled
           ? backgroundVariant === 'dirt'
             ? 'bg-dirt/70 backdrop-blur-sm shadow-sm'
-            : 'bg-bg/70 backdrop-blur-sm shadow-sm'
+            : 'bg-[#4e5f4a]/70 backdrop-blur-sm shadow-sm'
           : backgroundVariant === 'dirt'
             ? 'bg-dirt/90'
-            : 'bg-bg/90'
+            : 'bg-[#4e5f4a]/90'
       }`}
     >
       <div className="px-6 sm:px-8 ">
@@ -156,10 +156,10 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                   : item.isRoute
                     ? backgroundVariant === 'dirt'
                       ? 'bg-dirt text-bg hover:text-olive'
-                      : 'bg-bg text-text hover:text-olive'
+                      : 'text-bg hover:text-gold'
                     : backgroundVariant === 'dirt'
                       ? 'text-bg hover:text-olive'
-                      : 'text-text hover:text-olive'
+                      : 'text-bg hover:text-gold'
               }`
               if (!isHome && isGaleria && item.isRoute && item.href === '/galeria') {
                 return (
@@ -202,7 +202,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
               <Link
                 href="/carrinho"
                 className={`relative inline-flex items-center justify-center transition-colors ${
-                  backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-text hover:text-olive'
+                  backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-bg hover:text-gold'
                 }`}
                 aria-label="Ir para carrinho"
               >
@@ -220,7 +220,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
             className={`md:hidden p-2 rounded-lg transition-colors ${
               backgroundVariant === 'dirt'
                 ? 'text-bg hover:text-olive'
-                : 'text-text hover:text-olive'
+                : 'text-bg hover:text-gold'
             }`}
             aria-label={navToggleLabel}
           >
@@ -231,7 +231,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className={`md:hidden ${backgroundVariant === 'dirt' ? 'bg-dirt' : 'bg-bg'} border-t border-border`}>
+        <div className={`md:hidden ${backgroundVariant === 'dirt' ? 'bg-dirt' : 'bg-[#4e5f4a]'} border-t border-border`}>
           <div className="px-6 py-6 space-y-4">
             {!isHome && (
               <div className="h-0" aria-hidden="true" />
@@ -245,10 +245,10 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                   : item.isRoute
                     ? backgroundVariant === 'dirt'
                       ? 'text-bg bg-dirt rounded-md px-3'
-                      : 'text-text bg-bg rounded-md px-3'
+                      : 'text-bg rounded-md px-3'
                     : backgroundVariant === 'dirt'
                       ? 'text-bg hover:text-olive'
-                      : 'text-text hover:text-olive'
+                      : 'text-bg hover:text-gold'
               }`
               if (!isHome && isGaleria && item.isRoute && item.href === '/galeria') {
                 return (
@@ -299,7 +299,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
               <Link
                 href="/carrinho"
                 className={`block py-3 text-sm font-medium transition-colors font-sans ${
-                  backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-text hover:text-olive'
+                  backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-bg hover:text-gold'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >

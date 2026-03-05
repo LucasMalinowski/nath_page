@@ -7,10 +7,10 @@ type FooterProps = {
 }
 const Footer = ({contactInfo = true}: FooterProps) => {
   return (
-    <footer className="relative bg-[#6b7a5e] text-bg">
+    <footer className="relative bg-[#f5f1eb] text-text">
       { contactInfo && (
 
-        <div className="texture-green">
+        <div>
           <div className="px-6 sm:px-8 lg:px-16">
             <div className="mx-10 py-8">
               <div className="text-center mb-6">
@@ -22,7 +22,7 @@ const Footer = ({contactInfo = true}: FooterProps) => {
               </div>
 
               <div className="grid gap-6 md:grid-cols-3 md:items-center">
-                <div className="space-y-2 text-sm text-bg/80 min-w-[100px] md:justify-self-start">
+                <div className="space-y-2 text-sm text-text/80 min-w-[100px] md:justify-self-start">
                   <div className="flex items-center gap-2">
                     <Phone size={16} className="text-gold/80" />
                     <span>(45) 99802-8130</span>
@@ -42,7 +42,7 @@ const Footer = ({contactInfo = true}: FooterProps) => {
                   </button>
                 </div>
 
-                <div className="text-sm text-bg/80 flex items-center gap-2 md:justify-self-end md:justify-end">
+                <div className="text-sm text-text/80 flex items-center gap-2 md:justify-self-end md:justify-end">
                   <Mail size={16} className="text-gold/80" />
                   <span>malinowskinathalia@gmail.com</span>
                 </div>
@@ -52,8 +52,8 @@ const Footer = ({contactInfo = true}: FooterProps) => {
         </div>
       )}
 
-      <div className="bg-moss/30 py-3 text-center">
-        <img src="/nm-white.png" alt="NM" className="mx-auto h-12 w-auto"/>
+      <div className="border-t border-[#e3d8c9] py-3 text-center">
+        <img src="/nm-gold.png" alt="NM" className="mx-auto h-12 w-auto"/>
       </div>
     </footer>
   )
