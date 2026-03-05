@@ -9,7 +9,9 @@ export type PortfolioImage = {
     id: string
     title: string
     description: string | null
+    phrase?: string | null
     image_url: string
+    cover_url?: string | null
     images?: string | string[] | null
     display_order: number
     is_visible: boolean
