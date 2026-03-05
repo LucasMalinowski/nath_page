@@ -8,7 +8,9 @@ import AdminProductsTab from '@/components/admin_dashboard/ProductsTab'
 import AdminExhibitorsTab from '@/components/admin_dashboard/ExhibitorsTab'
 import { parseImageList, parseGalleryImages } from '@/components/admin_dashboard/utils'
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024
+const MAX_IMAGE_DIMENSION = 2400
+const TARGET_IMAGE_SIZE_BYTES = 2 * 1024 * 1024
+const MIN_IMAGE_QUALITY = 0.5
 
 const getPortfolioFilePath = (url: string) => {
     const urlParts = url.split('/portfolio/')
@@ -18,6 +20,82 @@ const getPortfolioFilePath = (url: string) => {
 const getGalleryFilePath = (url: string) => {
     const urlParts = url.split('/gallery/')
     return urlParts.length > 1 ? urlParts[1] : null
+}
+
+const readImageDimensions = (file: File): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+        const objectUrl = URL.createObjectURL(file)
+        const image = new Image()
+
+        image.onload = () => {
+            URL.revokeObjectURL(objectUrl)
+            resolve(image)
+        }
+        image.onerror = () => {
+            URL.revokeObjectURL(objectUrl)
+            reject(new Error('Nao foi possivel carregar a imagem'))
+        }
+
+        image.src = objectUrl
+    })
+
+const canvasToBlob = (canvas: HTMLCanvasElement, quality: number): Promise<Blob> =>
+    new Promise((resolve, reject) => {
+        canvas.toBlob(
+            (blob) => {
+                if (!blob) {
+                    reject(new Error('Nao foi possivel otimizar a imagem'))
+                    return
+                }
+                resolve(blob)
+            },
+            'image/webp',
+            quality
+        )
+    })
+
+const optimizeImageFile = async (file: File): Promise<File> => {
+    if (!file.type.startsWith('image/')) return file
+
+    try {
+        const image = await readImageDimensions(file)
+        const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(image.width, image.height))
+        const width = Math.max(1, Math.round(image.width * scale))
+        const height = Math.max(1, Math.round(image.height * scale))
+
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+
+        const context = canvas.getContext('2d')
+        if (!context) return file
+        context.drawImage(image, 0, 0, width, height)
+
+        let quality = 0.88
+        let blob = await canvasToBlob(canvas, quality)
+
+        while (blob.size > TARGET_IMAGE_SIZE_BYTES && quality > MIN_IMAGE_QUALITY) {
+            quality = Math.max(MIN_IMAGE_QUALITY, quality - 0.1)
+            blob = await canvasToBlob(canvas, quality)
+        }
+
+        const fileBaseName = file.name.replace(/\.[^/.]+$/, '')
+        return new File([blob], `${fileBaseName}.webp`, {
+            type: 'image/webp',
+            lastModified: Date.now()
+        })
+    } catch (error) {
+        console.warn('Image optimization failed, uploading original file', error)
+        return file
+    }
+}
+
+const getUploadErrorMessage = (error: any) => {
+    const rawMessage = String(error?.message || '').toLowerCase()
+    if (rawMessage.includes('maximum allowed size') || rawMessage.includes('object exceeded')) {
+        return 'A imagem excede o limite do bucket do Supabase mesmo apos compressao. Tente uma imagem menor.'
+    }
+    return error?.message || 'Erro desconhecido'
 }
 
 export default function AdminDashboard() {
@@ -30,14 +108,19 @@ export default function AdminDashboard() {
     const [uploading, setUploading] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [savingId, setSavingId] = useState<string | null>(null)
-    const [editForm, setEditForm] = useState({ title: '', description: '' })
+    const [editForm, setEditForm] = useState({ title: '', description: '', phrase: '' })
+    const [editCoverUrl, setEditCoverUrl] = useState('')
+    const [editCoverFile, setEditCoverFile] = useState<File | null>(null)
     const [editImages, setEditImages] = useState<string[]>([])
     const [editOriginalImages, setEditOriginalImages] = useState<string[]>([])
     const [editNewFiles, setEditNewFiles] = useState<File[]>([])
     const [editFilesKey, setEditFilesKey] = useState(0)
-    const [newProject, setNewProject] = useState({ title: '', description: '' })
+    const [editCoverKey, setEditCoverKey] = useState(0)
+    const [newProject, setNewProject] = useState({ title: '', description: '', phrase: '' })
+    const [newCoverFile, setNewCoverFile] = useState<File | null>(null)
     const [newFiles, setNewFiles] = useState<File[]>([])
     const [newFilesKey, setNewFilesKey] = useState(0)
+    const [newCoverKey, setNewCoverKey] = useState(0)
     const [products, setProducts] = useState<GalleryProduct[]>([])
     const [productsLoading, setProductsLoading] = useState(true)
     const [productUploading, setProductUploading] = useState(false)
@@ -167,7 +250,6 @@ export default function AdminDashboard() {
         if (files.length === 0) return 'Selecione pelo menos uma imagem'
         for (const file of files) {
             if (!file.type.startsWith('image/')) return 'Envie apenas arquivos de imagem'
-            if (file.size > MAX_FILE_SIZE) return 'Cada arquivo deve ter menos de 10MB'
         }
         return null
     }
@@ -175,12 +257,13 @@ export default function AdminDashboard() {
     const uploadPortfolioFiles = async (files: File[]) => {
         const uploads = await Promise.all(
             files.map(async (file) => {
-                const fileExt = file.name.split('.').pop() || 'bin'
+                const optimizedFile = await optimizeImageFile(file)
+                const fileExt = optimizedFile.name.split('.').pop() || 'bin'
                 const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`
 
                 const { error: uploadError } = await supabase.storage
                     .from('portfolio')
-                    .upload(fileName, file, {
+                    .upload(fileName, optimizedFile, {
                         cacheControl: '3600',
                         upsert: false
                     })
@@ -216,12 +299,13 @@ export default function AdminDashboard() {
     const uploadGalleryFiles = async (files: File[], folder: string) => {
         const uploads = await Promise.all(
             files.map(async (file) => {
-                const fileExt = file.name.split('.').pop() || 'bin'
+                const optimizedFile = await optimizeImageFile(file)
+                const fileExt = optimizedFile.name.split('.').pop() || 'bin'
                 const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`
 
                 const { error: uploadError } = await supabase.storage
                     .from('gallery')
-                    .upload(fileName, file, {
+                    .upload(fileName, optimizedFile, {
                         cacheControl: '3600',
                         upsert: false
                     })
@@ -262,6 +346,17 @@ export default function AdminDashboard() {
             return
         }
 
+        if (!newCoverFile) {
+            alert('Selecione a imagem de capa')
+            return
+        }
+
+        const coverValidation = validateFiles([newCoverFile])
+        if (coverValidation) {
+            alert(coverValidation)
+            return
+        }
+
         const validationError = validateFiles(newFiles)
         if (validationError) {
             alert(validationError)
@@ -270,6 +365,7 @@ export default function AdminDashboard() {
 
         setUploading(true)
         try {
+            const [coverUrl] = await uploadPortfolioFiles([newCoverFile])
             const urls = await uploadPortfolioFiles(newFiles)
 
             const { error: insertError } = await supabase
@@ -277,8 +373,10 @@ export default function AdminDashboard() {
                 .insert({
                     title: newProject.title.trim(),
                     description: newProject.description.trim() || null,
-                    image_url: urls[0],
-                    images: JSON.stringify(urls),
+                    phrase: newProject.phrase.trim() || null,
+                    image_url: coverUrl,
+                    cover_url: coverUrl,
+                    images: urls,
                     display_order: images.length,
                     is_visible: true
                 })
@@ -286,13 +384,15 @@ export default function AdminDashboard() {
             if (insertError) throw insertError
 
             await fetchImages()
-            setNewProject({ title: '', description: '' })
+            setNewProject({ title: '', description: '', phrase: '' })
+            setNewCoverFile(null)
             setNewFiles([])
             setNewFilesKey((prev) => prev + 1)
+            setNewCoverKey((prev) => prev + 1)
             alert('Projeto criado com sucesso!')
         } catch (error: any) {
             console.error('Error uploading:', error)
-            alert(`Erro ao enviar imagens: ${error.message || 'Erro desconhecido'}. Veja o console para mais detalhes.`)
+            alert(`Erro ao enviar imagens: ${getUploadErrorMessage(error)}. Veja o console para mais detalhes.`)
         } finally {
             setUploading(false)
         }
@@ -303,17 +403,23 @@ export default function AdminDashboard() {
         setEditingId(image.id)
         setEditForm({
             title: image.title,
-            description: image.description || ''
+            description: image.description || '',
+            phrase: image.phrase || ''
         })
+        setEditCoverUrl(image.cover_url || image.image_url || imagesList[0] || '')
+        setEditCoverFile(null)
         setEditImages(imagesList)
         setEditOriginalImages(imagesList)
         setEditNewFiles([])
         setEditFilesKey((prev) => prev + 1)
+        setEditCoverKey((prev) => prev + 1)
     }
 
     const cancelEdit = () => {
         setEditingId(null)
-        setEditForm({ title: '', description: '' })
+        setEditForm({ title: '', description: '', phrase: '' })
+        setEditCoverUrl('')
+        setEditCoverFile(null)
         setEditImages([])
         setEditOriginalImages([])
         setEditNewFiles([])
@@ -325,6 +431,12 @@ export default function AdminDashboard() {
             return
         }
 
+        const coverValidation = editCoverFile ? validateFiles([editCoverFile]) : null
+        if (coverValidation) {
+            alert(coverValidation)
+            return
+        }
+
         const validationError = editNewFiles.length ? validateFiles(editNewFiles) : null
         if (validationError) {
             alert(validationError)
@@ -332,11 +444,7 @@ export default function AdminDashboard() {
         }
 
         const finalImages = [...editImages]
-
-        if (finalImages.length === 0 && editNewFiles.length === 0) {
-            alert('Mantenha pelo menos uma imagem no projeto')
-            return
-        }
+        const previousCover = editCoverUrl
 
         setSavingId(id)
         try {
@@ -346,13 +454,26 @@ export default function AdminDashboard() {
                 finalImages.push(...newUploads)
             }
 
+            let finalCoverUrl = editCoverUrl
+            if (editCoverFile) {
+                const [uploadedCover] = await uploadPortfolioFiles([editCoverFile])
+                finalCoverUrl = uploadedCover
+            }
+
+            if (!finalCoverUrl) {
+                alert('Mantenha ou selecione uma imagem de capa')
+                return
+            }
+
             const { error } = await supabase
                 .from('portfolio_images')
                 .update({
                     title: editForm.title.trim(),
                     description: editForm.description.trim() || null,
-                    image_url: finalImages[0],
-                    images: JSON.stringify(finalImages)
+                    phrase: editForm.phrase.trim() || null,
+                    image_url: finalCoverUrl,
+                    cover_url: finalCoverUrl,
+                    images: finalImages
                 })
                 .eq('id', id)
 
@@ -362,13 +483,16 @@ export default function AdminDashboard() {
             if (removedImages.length > 0) {
                 await removePortfolioFiles(removedImages)
             }
+            if (editCoverFile && previousCover && previousCover !== finalCoverUrl && !finalImages.includes(previousCover)) {
+                await removePortfolioFiles([previousCover])
+            }
 
             await fetchImages()
             cancelEdit()
             alert('Projeto atualizado com sucesso!')
         } catch (error) {
             console.error('Error updating:', error)
-            alert('Erro ao atualizar projeto')
+            alert(`Erro ao atualizar projeto: ${getUploadErrorMessage(error)}`)
         } finally {
             setSavingId(null)
         }
@@ -379,8 +503,14 @@ export default function AdminDashboard() {
 
         try {
             const imageList = parseImageList(image)
-            if (imageList.length > 0) {
-                await removePortfolioFiles(imageList)
+            const coverImage = image.cover_url || image.image_url
+            const filesToRemove = [...imageList]
+            if (coverImage && !filesToRemove.includes(coverImage)) {
+                filesToRemove.push(coverImage)
+            }
+
+            if (filesToRemove.length > 0) {
+                await removePortfolioFiles(filesToRemove)
             }
 
             const { error } = await supabase
@@ -470,7 +600,7 @@ export default function AdminDashboard() {
             alert('Produto criado com sucesso!')
         } catch (error: any) {
             console.error('Error uploading product:', error)
-            alert(`Erro ao salvar produto: ${error.message || 'Erro desconhecido'}`)
+            alert(`Erro ao salvar produto: ${getUploadErrorMessage(error)}`)
         } finally {
             setProductUploading(false)
         }
@@ -548,7 +678,7 @@ export default function AdminDashboard() {
             alert('Produto atualizado com sucesso!')
         } catch (error) {
             console.error('Error updating product:', error)
-            alert('Erro ao atualizar produto')
+            alert(`Erro ao atualizar produto: ${getUploadErrorMessage(error)}`)
         }
     }
 
@@ -623,7 +753,7 @@ export default function AdminDashboard() {
             alert('Expositor salvo com sucesso!')
         } catch (error: any) {
             console.error('Error uploading exhibitor:', error)
-            alert(`Erro ao salvar expositor: ${error.message || 'Erro desconhecido'}`)
+            alert(`Erro ao salvar expositor: ${getUploadErrorMessage(error)}`)
         } finally {
             setExhibitorUploading(false)
         }
@@ -686,7 +816,7 @@ export default function AdminDashboard() {
             alert('Expositor atualizado com sucesso!')
         } catch (error) {
             console.error('Error updating exhibitor:', error)
-            alert('Erro ao atualizar expositor')
+            alert(`Erro ao atualizar expositor: ${getUploadErrorMessage(error)}`)
         }
     }
 
@@ -863,6 +993,8 @@ export default function AdminDashboard() {
                         images={images}
                         newProject={newProject}
                         setNewProject={setNewProject}
+                        newCoverKey={newCoverKey}
+                        setNewCoverFile={setNewCoverFile}
                         newFilesKey={newFilesKey}
                         setNewFiles={setNewFiles}
                         uploading={uploading}
@@ -870,6 +1002,9 @@ export default function AdminDashboard() {
                         editingId={editingId}
                         editForm={editForm}
                         setEditForm={setEditForm}
+                        editCoverUrl={editCoverUrl}
+                        editCoverKey={editCoverKey}
+                        setEditCoverFile={setEditCoverFile}
                         editImages={editImages}
                         setEditImages={setEditImages}
                         editFilesKey={editFilesKey}

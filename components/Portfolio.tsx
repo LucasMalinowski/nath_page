@@ -1,101 +1,92 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, X } from 'lucide-react'
 import { supabase, PortfolioImage } from '@/lib/supabase'
-import { MiniCarousel } from './MiniCarousel'
 
-// Extended type to support multiple images (will migrate DB later)
 type PortfolioProject = PortfolioImage & {
-  images?: string[] // Array of images for carousel
+  galleryImages: string[]
+  coverImage: string
+}
+
+const parseImages = (item: PortfolioImage): string[] => {
+  if (item.images) {
+    if (Array.isArray(item.images)) return item.images.filter(Boolean)
+    if (typeof item.images === 'string') {
+      try {
+        const parsed = JSON.parse(item.images)
+        if (Array.isArray(parsed)) {
+          return parsed.filter((url): url is string => typeof url === 'string' && Boolean(url))
+        }
+      } catch (error) {
+        console.warn('Failed to parse portfolio images JSON', error)
+      }
+    }
+  }
+  return item.image_url ? [item.image_url] : []
 }
 
 const Portfolio = () => {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [portfolioImages, setPortfolioImages] = useState<PortfolioProject[]>([])
+  const [projects, setProjects] = useState<PortfolioProject[]>([])
   const [loading, setLoading] = useState(true)
-  const [itemsPerPage, setItemsPerPage] = useState(4)
-  const [pauseUntil, setPauseUntil] = useState(0)
-  const [isPageFading, setIsPageFading] = useState(false)
-  const fadeTimeout = useRef<NodeJS.Timeout | null>(null)
+  const [activeProject, setActiveProject] = useState<PortfolioProject | null>(null)
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   const portfolioTitle = 'Portfólio'
-  const portfolioSubtitle = 'Meus serviços acompanham diferentes momentos, sempre com um olhar autoral, sensível e estruturado.'
+  const portfolioSubtitle = 'Projetos que traduzem histórias, identidades e modos de viver'
   const portfolioLoading = 'Carregando...'
   const portfolioEmpty = 'Em breve, novos projetos serão adicionados'
-  const portfolioPrevLabel = 'Página anterior'
-  const portfolioNextLabel = 'Próxima página'
 
   useEffect(() => {
-    fetchPortfolioImages()
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    void fetchPortfolioImages()
   }, [])
 
   useEffect(() => {
+    if (!activeProject) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setActiveProject(null)
+        setActiveImageIndex(0)
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    document.body.style.overflow = 'hidden'
+
     return () => {
-      if (fadeTimeout.current) clearTimeout(fadeTimeout.current)
+      document.removeEventListener('keydown', onKeyDown)
+      document.body.style.overflow = ''
     }
-  }, [])
-
-  const handleResize = () => {
-    if (window.innerWidth >= 1280) {
-      setItemsPerPage(4)
-    } else if (window.innerWidth >= 1024) {
-      setItemsPerPage(3)
-    } else if (window.innerWidth >= 640) {
-      setItemsPerPage(2)
-    } else {
-      setItemsPerPage(1)
-    }
-  }
+  }, [activeProject])
 
   const fetchPortfolioImages = async () => {
     try {
       const { data, error } = await supabase
-          .from('portfolio_images')
-          .select('*')
-          .eq('is_visible', true)
-          .order('display_order', { ascending: true })
+        .from('portfolio_images')
+        .select('*')
+        .eq('is_visible', true)
+        .order('display_order', { ascending: true })
 
       if (error) throw error
 
-      // Transform data to support multiple images
-      // Handle both array format and JSON string format from Supabase
-      const projects: PortfolioProject[] = (data || []).map((item) => {
-        let imagesArray: string[] = []
+      const mappedProjects: PortfolioProject[] = (data || []).map((item) => {
+        const parsedImages = parseImages(item)
+        const coverImage = item.cover_url || item.image_url || parsedImages[0] || ''
 
-        // Check if images field exists and parse it
-        if (item.images) {
-          if (typeof item.images === 'string') {
-            // It's a JSON string, parse it
-            try {
-              imagesArray = JSON.parse(item.images)
-            } catch (e) {
-              console.error('Error parsing images JSON:', e)
-              imagesArray = [item.image_url]
-            }
-          } else if (Array.isArray(item.images)) {
-            // Already an array
-            imagesArray = item.images
-          } else {
-            // Fallback to single image
-            imagesArray = [item.image_url]
-          }
-        } else {
-          // No images field, use image_url
-          imagesArray = [item.image_url]
-        }
+        const galleryImages = [coverImage, ...parsedImages].filter(
+          (url, index, array) => Boolean(url) && array.indexOf(url) === index
+        )
 
         return {
           ...item,
-          images: imagesArray,
+          coverImage,
+          galleryImages
         }
       })
 
-      setPortfolioImages(projects)
+      setProjects(mappedProjects)
     } catch (error) {
       console.error('Error fetching portfolio images:', error)
     } finally {
@@ -103,198 +94,186 @@ const Portfolio = () => {
     }
   }
 
-  const pauseAuto = () => {
-    setPauseUntil(Date.now() + 20000)
+  const activeImages = useMemo(() => {
+    if (!activeProject) return []
+    return activeProject.galleryImages
+  }, [activeProject])
+
+  const openProjectModal = (project: PortfolioProject) => {
+    setActiveProject(project)
+    setActiveImageIndex(0)
   }
 
-  const setPageWithFade = (nextIndex: number) => {
-    if (nextIndex === currentIndex) return
-    if (fadeTimeout.current) clearTimeout(fadeTimeout.current)
-    setIsPageFading(true)
-    fadeTimeout.current = setTimeout(() => {
-      setCurrentIndex(nextIndex)
-      requestAnimationFrame(() => setIsPageFading(false))
-    }, 200)
-  }
-
-  const advancePage = () => {
-    if (totalPages <= 1) return
-    const nextIndex = currentIndex === totalPages - 1 ? 0 : currentIndex + 1
-    setPageWithFade(nextIndex)
-  }
-
-  const totalPages = Math.ceil(portfolioImages.length / itemsPerPage)
-  const canGoPrev = currentIndex > 0
-  const canGoNext = currentIndex < totalPages - 1
-
-  const nextSlide = () => {
-    pauseAuto()
-    if (canGoNext) {
-      setPageWithFade(currentIndex + 1)
-    }
-  }
-
-  const prevSlide = () => {
-    pauseAuto()
-    if (canGoPrev) {
-      setPageWithFade(currentIndex - 1)
-    }
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (Date.now() < pauseUntil) return
-      advancePage()
-    }, 6000)
-
-    return () => clearInterval(interval)
-  }, [pauseUntil, totalPages, currentIndex])
-
-  const getCurrentItems = () => {
-    const start = currentIndex * itemsPerPage
-    const end = start + itemsPerPage
-    return portfolioImages.slice(start, end)
+  const closeProjectModal = () => {
+    setActiveProject(null)
+    setActiveImageIndex(0)
   }
 
   if (loading) {
     return (
-        <section id="portfolio" className="relative py-16 texture-green">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-            <div className="mb-16">
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-gold mb-4">
-                {portfolioTitle}
-              </h2>
-            </div>
-            <div className="flex items-center justify-center h-96">
-              <p className="text-bg/70 font-sans text-lg">{portfolioLoading}</p>
-            </div>
-          </div>
-        </section>
-    )
-  }
-
-  if (portfolioImages.length === 0) {
-    return (
-        <section id="portfolio" className="relative py-16 texture-green">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-16">
-            <div className="mb-16">
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-gold mb-4">
-                {portfolioTitle}
-              </h2>
-            </div>
-            <div className="text-center py-20">
-              <p className="text-bg/70 text-xl mb-8 font-sans">
-                {portfolioEmpty}
-              </p>
-            </div>
-          </div>
-        </section>
-    )
-  }
-
-  const currentItems = getCurrentItems()
-
-  return (
-      <section id="portfolio" className="relative py-16 texture-green overflow-hidden">
-        <div className="px-20">
-          {/* Section Header - Same as Concept */}
-          <div className="container flex flex-col min-h-[200px] ">
-            <div className="self-start">
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-gold leading-tight">
-                {portfolioTitle}
-              </h2>
-            </div>
-
-            {/* Subtítulo no bottom direito */}
-            <div className="self-end max-w-md mt-8 lg:mt-0">
-              <p className="border-l pl-4 text-lg md:text-xl font-sans font-thin text-bg/60 italic leading-relaxed">
-                {portfolioSubtitle}
-              </p>
-            </div>
-          </div>
-
-          {/* Container for cards and navigation - FIXED POSITIONING */}
-          <div className="relative">
-            {/* Lateral Navigation Buttons - Positioned relative to card grid */}
-            {canGoPrev && (
-                <button
-                    onClick={prevSlide}
-                    className="absolute -left-16 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-bg/95 hover:bg-bg rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-                    aria-label={portfolioPrevLabel}
-                >
-                  <ChevronLeft
-                      size={24}
-                      className="text-olive group-hover:text-gold transition-colors"
-                  />
-                </button>
-            )}
-
-            {canGoNext && (
-                <button
-                    onClick={nextSlide}
-                    className="absolute -right-16 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-bg/95 hover:bg-bg rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-                    aria-label={portfolioNextLabel}
-                >
-                  <ChevronRight
-                      size={24}
-                      className="text-olive group-hover:text-gold transition-colors"
-                  />
-                </button>
-            )}
-
-            {/* Grid of Cards - COMPACT like image 2 */}
-            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 transition-opacity duration-300 ${isPageFading ? 'opacity-0' : 'opacity-100'}`}>
-              {currentItems.map((project) => (
-                  <article
-                      key={project.id}
-                      className="group relative"
-                  >
-                    {/* Card Container - COMPACT */}
-                    <div className="relative bg-olive border-2 border-bg/40 min-h-[500px] rounded-sm overflow-hidden h-full flex flex-col transition-all duration-300 hover:border-gold hover:shadow-2xl">
-                      {/* Text Content at Top - COMPACT */}
-                      <div className="p-4">
-                        <h3 className="text-2xl font-serif font-normal text-bg mb-2 leading-tight line-clamp-2">
-                          {project.title}
-                        </h3>
-                        {project.description && (
-                            <p className="font-sans font-thin text-bg/70 leading-relaxed line-clamp-2">
-                              {project.description}
-                            </p>
-                        )}
-                      </div>
-
-                      {/* Mini Carousel - Takes most of card space */}
-                      <MiniCarousel
-                          images={project.images || [project.image_url]}
-                          alt={project.title}
-                          pauseUntil={pauseUntil}
-                          onUserNavigate={pauseAuto}
-                      />
-                    </div>
-                  </article>
-              ))}
-            </div>
-          </div>
-
-          {/* Page Indicator */}
-          {totalPages > 1 && (
-              <div className="flex justify-center gap-3 mt-12">
-                {Array.from({ length: totalPages }).map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setCurrentIndex(index)}
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                            index === currentIndex
-                                ? 'bg-gold w-12'
-                                : 'bg-bg/40 w-2 hover:bg-bg/70'
-                        }`}
-                        aria-label={`Ir para página ${index + 1}`}
-                    />
-                ))}
-              </div>
-          )}
+      <section id="portfolio" className="bg-[#f5f1eb] py-20">
+        <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-16">
+          <header className="text-center">
+            <h2 className="text-5xl md:text-6xl font-serif font-normal text-[#b89b5e]">{portfolioTitle}</h2>
+            <p className="mt-6 text-lg text-text/70">{portfolioLoading}</p>
+          </header>
         </div>
       </section>
+    )
+  }
+
+  if (projects.length === 0) {
+    return (
+      <section id="portfolio" className="bg-[#f5f1eb] py-20">
+        <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-16">
+          <header className="text-center">
+            <h2 className="text-5xl md:text-6xl font-serif font-normal text-[#b89b5e]">{portfolioTitle}</h2>
+            <p className="mt-6 text-lg text-text/70">{portfolioEmpty}</p>
+          </header>
+        </div>
+      </section>
+    )
+  }
+
+  return (
+    <>
+      <section id="portfolio" className="bg-[#f5f1eb] py-20 border-b border-[#eadfce]">
+        <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-16">
+          <header className="text-center">
+            <h2 className="text-5xl md:text-6xl font-serif font-normal text-[#b89b5e]">{portfolioTitle}</h2>
+            <p className="mt-6 text-lg text-text/70">{portfolioSubtitle}</p>
+            <div className="mt-8 h-px w-full bg-[#e1d4c2]" />
+          </header>
+
+          <div className="mt-14 space-y-16 md:space-y-20">
+            {projects.map((project, index) => {
+              const imageLeft = index % 2 === 0
+              const isTallFrame = index % 2 === 0
+              return (
+                <article
+                  key={project.id}
+                  className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 md:gap-12"
+                >
+                  <div
+                    className={`${imageLeft ? 'order-1 md:order-1' : 'order-2 md:order-2'} ${
+                      imageLeft ? 'md:justify-self-start' : 'md:justify-self-end'
+                    } w-full`}
+                  >
+                    {project.coverImage ? (
+                      <div
+                        className={`relative overflow-hidden border border-[#e3d8c8] bg-[#ede7de] ${
+                          isTallFrame
+                            ? 'aspect-[4/5] max-w-[360px] sm:max-w-[390px] md:max-w-[420px]'
+                            : 'aspect-[16/10] max-w-[460px] sm:max-w-[520px]'
+                        }`}
+                      >
+                        <Image
+                          src={project.coverImage}
+                          alt={project.title}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={`border border-[#e3d8c8] bg-[#ede7de] ${
+                          isTallFrame
+                            ? 'aspect-[4/5] max-w-[360px] sm:max-w-[390px] md:max-w-[420px]'
+                            : 'aspect-[16/10] max-w-[460px] sm:max-w-[520px]'
+                        }`}
+                      />
+                    )}
+                  </div>
+
+                  <div
+                    className={`${imageLeft ? 'order-2 md:order-2' : 'order-1 md:order-1'} flex h-full w-full max-w-[540px] flex-col`}
+                  >
+                    <h3 className="text-3xl font-serif text-text">{project.title}</h3>
+                    {project.description && (
+                      <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-text/75">
+                        {project.description}
+                      </p>
+                    )}
+                    {project.phrase && (
+                      <p className="mt-5 border-l-2 border-[#735746]/40 pl-4 py-2 whitespace-pre-line text-xl font-thin italic leading-snug text-[#9f876c]">
+                        {project.phrase}
+                      </p>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => openProjectModal(project)}
+                      className={`mt-auto inline-flex items-center gap-2 rounded-md bg-[#c3a35a] px-4 py-2 text-sm font-semibold text-[#f5f1eb] transition-colors hover:bg-[#b59347] ${
+                        imageLeft ? 'self-end' : 'self-start'
+                      }`}
+                    >
+                      Ver projeto
+                      <ArrowRight size={16} />
+                    </button>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {activeProject && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#20160f]/70 px-4 py-8">
+          <div className="relative w-full max-w-5xl rounded-md bg-[#f5f1eb] p-5 shadow-2xl md:p-8">
+            <button
+              type="button"
+              onClick={closeProjectModal}
+              className="absolute right-3 top-3 rounded-full border border-[#d8c7ae] p-2 text-text/80 transition-colors hover:bg-[#ece3d8]"
+              aria-label="Fechar modal"
+            >
+              <X size={18} />
+            </button>
+
+            <h3 className="pr-10 text-2xl font-serif text-text md:text-3xl">{activeProject.title}</h3>
+
+            {activeImages.length > 0 && (
+              <>
+                <div className="relative mt-6 h-[300px] overflow-hidden border border-[#e2d5c2] bg-[#ece4d8] md:h-[520px]">
+                  <Image
+                    src={activeImages[activeImageIndex]}
+                    alt={`${activeProject.title} - foto ${activeImageIndex + 1}`}
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
+                </div>
+
+                {activeImages.length > 1 && (
+                  <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
+                    {activeImages.map((image, index) => (
+                      <button
+                        key={`${image}-${index}`}
+                        type="button"
+                        onClick={() => setActiveImageIndex(index)}
+                        className={`relative h-20 w-24 shrink-0 overflow-hidden border transition-colors ${
+                          index === activeImageIndex ? 'border-[#b89b5e]' : 'border-[#d5c5ad]'
+                        }`}
+                        aria-label={`Abrir foto ${index + 1}`}
+                      >
+                        <Image
+                          src={image}
+                          alt={`${activeProject.title} miniatura ${index + 1}`}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

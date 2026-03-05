@@ -9,12 +9,15 @@ import { parseImageList } from '@/components/admin_dashboard/utils'
 type ProjectForm = {
     title: string
     description: string
+    phrase: string
 }
 
 type PortfolioTabProps = {
     images: PortfolioImage[]
     newProject: ProjectForm
     setNewProject: React.Dispatch<React.SetStateAction<ProjectForm>>
+    newCoverKey: number
+    setNewCoverFile: React.Dispatch<React.SetStateAction<File | null>>
     newFilesKey: number
     setNewFiles: React.Dispatch<React.SetStateAction<File[]>>
     uploading: boolean
@@ -22,6 +25,9 @@ type PortfolioTabProps = {
     editingId: string | null
     editForm: ProjectForm
     setEditForm: React.Dispatch<React.SetStateAction<ProjectForm>>
+    editCoverUrl: string
+    editCoverKey: number
+    setEditCoverFile: React.Dispatch<React.SetStateAction<File | null>>
     editImages: string[]
     setEditImages: React.Dispatch<React.SetStateAction<string[]>>
     editFilesKey: number
@@ -39,6 +45,8 @@ export default function PortfolioTab({
     images,
     newProject,
     setNewProject,
+    newCoverKey,
+    setNewCoverFile,
     newFilesKey,
     setNewFiles,
     uploading,
@@ -46,6 +54,9 @@ export default function PortfolioTab({
     editingId,
     editForm,
     setEditForm,
+    editCoverUrl,
+    editCoverKey,
+    setEditCoverFile,
     editImages,
     setEditImages,
     editFilesKey,
@@ -90,6 +101,31 @@ export default function PortfolioTab({
                             maxLength={500}
                         />
                     </div>
+                    <div>
+                        <label className="block text-sm font-medium text-graphite mb-1">Frase (opcional)</label>
+                        <textarea
+                            value={newProject.phrase}
+                            onChange={(e) => setNewProject({ ...newProject, phrase: e.target.value })}
+                            className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white resize-none italic"
+                            placeholder="Ex: O céu não é limite. É começo."
+                            rows={3}
+                            maxLength={300}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-graphite mb-1">Capa do projeto *</label>
+                        <input
+                            key={newCoverKey}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setNewCoverFile(e.target.files?.[0] || null)}
+                            className="w-full text-sm text-graphite/70"
+                        />
+                        <p className="text-xs text-graphite/60 mt-1">
+                            Esta imagem aparece como destaque no card do portfólio.
+                        </p>
+                    </div>
 
                     <div>
                         <label className="block text-sm font-medium text-graphite mb-1">Fotos do projeto *</label>
@@ -102,7 +138,7 @@ export default function PortfolioTab({
                             className="w-full text-sm text-graphite/70"
                         />
                         <p className="text-xs text-graphite/60 mt-1">
-                            Selecione uma ou mais imagens. Maximo 10MB por arquivo.
+                            Selecione uma ou mais imagens para o modal.
                         </p>
                     </div>
 
@@ -129,7 +165,7 @@ export default function PortfolioTab({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {images.map((image) => {
                             const imageList = parseImageList(image)
-                            const coverImage = imageList[0]
+                            const coverImage = image.cover_url || image.image_url || imageList[0]
                             return (
                                 <div
                                     key={image.id}
@@ -190,6 +226,44 @@ export default function PortfolioTab({
                                                         maxLength={500}
                                                     />
                                                 </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-graphite mb-1">Frase (opcional)</label>
+                                                    <textarea
+                                                        value={editForm.phrase}
+                                                        onChange={(e) => setEditForm({ ...editForm, phrase: e.target.value })}
+                                                        className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white resize-none italic"
+                                                        rows={3}
+                                                        maxLength={300}
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <p className="text-sm font-medium text-graphite mb-2">Capa atual</p>
+                                                    {editCoverUrl ? (
+                                                        <div className="relative h-32 rounded-md overflow-hidden border border-warm-beige">
+                                                            <Image
+                                                                src={editCoverUrl}
+                                                                alt="Capa do projeto"
+                                                                fill
+                                                                className="object-cover"
+                                                                unoptimized
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-xs text-graphite/60">Sem capa definida.</p>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-graphite mb-1">Substituir capa</label>
+                                                    <input
+                                                        key={editCoverKey}
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={(e) => setEditCoverFile(e.target.files?.[0] || null)}
+                                                        className="w-full text-sm text-graphite/70"
+                                                    />
+                                                </div>
 
                                                 <div>
                                                     <p className="text-sm font-medium text-graphite mb-2">Fotos atuais</p>
@@ -223,7 +297,7 @@ export default function PortfolioTab({
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-sm font-medium text-graphite mb-1">Adicionar novas fotos</label>
+                                                    <label className="block text-sm font-medium text-graphite mb-1">Adicionar novas fotos do modal</label>
                                                     <input
                                                         key={editFilesKey}
                                                         type="file"
@@ -262,6 +336,11 @@ export default function PortfolioTab({
                                                     <p className="text-graphite/70 text-sm min-h-[2.5rem]">
                                                         {image.description || <span className="text-graphite/40 italic">Sem descricao</span>}
                                                     </p>
+                                                    {image.phrase && (
+                                                        <p className="mt-2 border-l-2 border-[#735746] pl-2 text-sm italic text-graphite/70">
+                                                            {image.phrase}
+                                                        </p>
+                                                    )}
                                                 </div>
 
                                                 <div className="mb-4">
