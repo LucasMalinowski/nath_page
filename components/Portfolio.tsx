@@ -187,7 +187,7 @@ const Portfolio = () => {
                   </div>
 
                   <div
-                    className={`${imageLeft ? 'order-2 md:order-2' : 'order-1 md:order-1'} flex h-full w-full max-w-[540px] flex-col`}
+                    className={`${imageLeft ? 'order-2 md:order-2' : 'order-1 md:order-1'} flex h-full w-full max-w-[540px] flex-col py-10`}
                   >
                     <h3 className="text-3xl font-serif text-text">{project.title}</h3>
                     {project.description && (
@@ -204,7 +204,7 @@ const Portfolio = () => {
                     <button
                       type="button"
                       onClick={() => openProjectModal(project)}
-                      className={`mt-auto inline-flex items-center gap-2 rounded-md bg-[#c3a35a] px-4 py-2 text-sm font-semibold text-[#f5f1eb] transition-colors hover:bg-[#b59347] ${
+                      className={`mt-auto inline-flex items-center gap-2 rounded-md bg-[#c3a35a] px-4 py-2 text-sm text-[#f5f1eb] transition-colors hover:bg-[#b59347] ${
                         imageLeft ? 'self-end' : 'self-start'
                       }`}
                     >
