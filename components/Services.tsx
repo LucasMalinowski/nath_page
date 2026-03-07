@@ -4,37 +4,28 @@ import Link from 'next/link'
 const Services = () => {
   const servicesTitle = 'Meus serviços acompanham diferentes momentos, sempre com um olhar autoral, sensível e estruturado.'
   const servicesSubtitle = 'Um processo sensível, autoral e bem conduzido — do conceito à materialização.'
-  const service1Title = 'Projeto de Interiores Residencial'
-  const service1Desc = 'Desenvolvimento completo de projetos residenciais, do conceito à definição de layout, materiais e acabamentos.'
   const service2Title = 'Consultoria e Curadoria'
-  const service2Desc = 'Atendimento estratégico para orientar escolhas estéticas e funcionais, incluindo curadoria de itens decorativos.'
-  const service3Title = 'Pinturas Murais Autorais'
-  const service3Desc = 'Criação de murais desenvolvidos a partir do espaço e da história de quem o habita.'
-  const service4Title = 'Curadoria e Peças Autorais'
-  const service4Desc = 'Curadoria de objetos e telas autorais, além de peças de artistas independentes, selecionadas com intenção e propósito.'
-  const servicesCta = 'Saber mais'
+  const service2Desc = 'Direcionamento estratégico para decisões mais seguras.'
+  const service3Title = 'Pinturas Murais\nAutorais'
+  const service3Desc = 'Arte integrada ao espaço com identidade e significado.'
+  const service4Title = 'Galeria de Artes\nOnline'
+  const service4Desc = 'Vendas online de objetos e telas autorais.'
 
   const services = [
     {
       number: '01',
-      title: service1Title,
-      description: service1Desc,
-      note: 'Projetos pensados em camadas de tempo, história e vivência.'
-    },
-    {
-      number: '02',
       title: service2Title,
       description: service2Desc,
       note: 'Pequenas escolhas transformam a experiência do espaço.'
     },
     {
-      number: '03',
+      number: '02',
       title: service3Title,
       description: service3Desc,
       note: 'Arte que nasce do espaço.'
     },
     {
-      number: '04',
+      number: '03',
       title: service4Title,
       description: service4Desc,
       note: 'Disponíveis sob curadoria pontual na aba Galeria.'
@@ -58,7 +49,7 @@ const Services = () => {
   return (
     <section
       id="servicos"
-      className="relative bg-bg mb-4"
+      className="relative bg-bg pb-4"
     >
       <div className="flex flex-col lg:flex-row">
         {/* Left: Video */}
@@ -86,32 +77,43 @@ const Services = () => {
           </div>
 
           {/* Services grid on white texture */}
-          <div className="texture-white px-24 py-24">
+          <div className="bg-[#f5f1eb] px-24 py-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-20">
-              {services.map((service, index) => (
-                <div key={index}>
-                  <div className="bg-[#f6f2ed] border border-border/50 p-6 rounded-xl text-[#735746] shadow-sm min-h-[240px]">
-                    <h3 className="text-h3 font-serif font-semibold  mb-6">
+              {services.map((service) => (
+                <div key={service.title}>
+                  <div className="relative bg-[#f6f2ed] border border-[#d5ccb9] p-6 rounded-[22px] text-[#735746] shadow-sm min-h-[240px]">
+                    <h3 className="text-h3 font-serif font-semibold mb-6 text-[#3b2f26] whitespace-pre-line leading-tight">
                       {service.title}
                     </h3>
-                    <p className="text-body-mobile md:text-body font-thin font-sans leading-relaxed">
+                    <p className="text-body-mobile md:text-body font-thin font-sans leading-relaxed text-[#735746]">
                       {service.description}
                     </p>
+                    <a
+                      href="#contato"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        scrollToContact()
+                      }}
+                      className="absolute right-8 bottom-5 text-xl text-[#b89b5e] hover:text-[#a58a51] transition-colors"
+                      aria-label="Ir para contato"
+                    >
+                      →
+                    </a>
                   </div>
-                  <p className="mt-3 text-xl font-poetic italic text-gold text-center px-8">
+                  <p className="mt-3 text-xl font-poetic italic text-[#b89b5e] text-center px-8 leading-tight">
                     {service.note}
                   </p>
                 </div>
               ))}
-            </div>
 
-            <div className="flex justify-center mt-8">
-              <Link
-                  href="/servicos"
-                  className="inline-block btn-primary px-10 py-3 bg-gold/80 text-bg font-sans font-medium rounded-button text-lg tracking-wide hover:bg-gold transition-all duration-300"
-              >
-                {servicesCta}
-              </Link>
+              <div className="flex min-h-[240px] items-center justify-center self-start">
+                <a
+                  href="/galeria#galeria"
+                  className="inline-flex items-center justify-center min-w-[290px] px-8 py-3 rounded-full bg-white border border-[#d5ccb9] text-[#735746] text-xl font-sans font-medium hover:bg-[#f0ebe4] transition-colors"
+                >
+                  Galeria de Artes
+                </a>
+              </div>
             </div>
           </div>
         </div>
