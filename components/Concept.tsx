@@ -18,7 +18,7 @@ const Concept = () => {
   return (
       <section
           id="conceito"
-          className="relative my-4 py-8 bg-[url('/carpet.png')] bg-cover bg-center"
+          className="relative mt-4 py-8 bg-[url('/carpet.png')] bg-cover bg-center"
       >
         <div className="container mx-auto py-8 px-20 md:px-20 flex flex-col justify-between min-h-[200px] md:min-h-[250px]">
           {/* Título no topo esquerdo */}

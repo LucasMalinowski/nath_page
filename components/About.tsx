@@ -6,7 +6,7 @@ const About = () => {
   return (
     <section
       id="sobre"
-      className="relative texture-white"
+      className="relative bg-[#f5f1eb] pt-4"
     >
       <div className="lg:pl-20">
         <div className="flex flex-col lg:flex-row gap-32">
