@@ -137,13 +137,12 @@ const Portfolio = () => {
 
   return (
     <>
-      <section id="portfolio" className="bg-[#f5f1eb] py-20 border-b border-[#eadfce]">
-        <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-16">
-          <header className="text-center">
+      <section id="portfolio" className="bg-[#f5f1eb] py-20">
+          <header className="text-center border-b-[3px] pb-14 border-[#e3d8c8]">
             <h2 className="text-5xl md:text-6xl font-serif font-normal text-[#b89b5e]">{portfolioTitle}</h2>
             <p className="mt-6 text-lg text-text/70">{portfolioSubtitle}</p>
-            <div className="mt-8 h-px w-full bg-[#e1d4c2]" />
           </header>
+        <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-16">
 
           <div className="mt-14 space-y-16 md:space-y-20">
             {projects.map((project, index) => {

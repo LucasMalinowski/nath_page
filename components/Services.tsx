@@ -49,7 +49,7 @@ const Services = () => {
   return (
     <section
       id="servicos"
-      className="relative bg-bg pb-4"
+      className="relative bg-[#f5f1eb] pb-4"
     >
       <div className="flex flex-col lg:flex-row">
         {/* Left: Video */}

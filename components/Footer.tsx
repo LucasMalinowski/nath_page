@@ -1,6 +1,6 @@
 'use client'
 
-import { Mail, Phone, Instagram } from 'lucide-react'
+import { Instagram, Mail, MessageCircle } from 'lucide-react'
 
 type FooterProps = {
     contactInfo?: boolean
@@ -12,39 +12,41 @@ const Footer = ({contactInfo = true}: FooterProps) => {
 
         <div id="contato">
           <div className="px-6 sm:px-8 lg:px-16">
-            <div className="mx-10 py-8">
-              <div className="text-center mb-6">
-                <p className="text-3xl font-serif">
-                  Vamos criar um espaço que
-                  <br />
-                  faça sentido para você?
-                </p>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-3 md:items-center">
-                <div className="space-y-2 text-sm text-text/80 min-w-[100px] md:justify-self-start">
-                  <div className="flex items-center gap-2">
-                    <Phone size={16} className="text-gold/80" />
-                    <span>(45) 99802-8130</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Instagram size={16} className="text-gold/80" />
-                    <span>nathalia_malinowski</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-center md:justify-self-center">
+            <div className="py-10 md:py-12">
+              <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <p className="text-[24px] leading-[1.08] font-serif font-normal text-[#3b2f26] max-w-[560px]">
+                    Vamos criar um espaço que
+                    <br />
+                    faça sentido para você?
+                  </p>
                   <button
                     type="button"
-                    className="px-6 py-2 rounded-md bg-mustard text-text font-sans text-sm md:text-base shadow-sm"
+                    className="mt-6 px-8 py-2 rounded-[12px] bg-[#b89b5e] text-bg font-sans font-normal text-[21px] leading-none"
                   >
                     Agendar conversa
                   </button>
                 </div>
 
-                <div className="text-sm text-text/80 flex items-center gap-2 md:justify-self-end md:justify-end">
-                  <Mail size={16} className="text-gold/80" />
-                  <span>malinowskinathalia@gmail.com</span>
+                <div className="flex flex-col items-center justify-center">
+                  <div className="w-full max-w-[340px] text-left">
+                    <h3 className="text-[16px] font-sans font-normal tracking-wide text-[#3b2f26] pb-5">ATENDIMENTO</h3>
+                    <div className="w-full pt-5 space-y-2 text-[16px] font-extralight tracking-wide leading-none text-[#3b2f26] border-t border-[#6b7a5e]">
+                      <div className="flex items-center gap-3">
+                        <MessageCircle size={16} className="text-[#3b2f26]" />
+                        <span>(45) 99802-8130</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Instagram size={16} className="text-[#3b2f26]" />
+                        <span>nathalia_malinowski</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Mail size={16} className="text-[#3b2f26]" />
+                        <span>malinowskinathalia@gmail.com</span>
+                      </div>
+                      <p className="pt-3 text-[16px] font-extralight text-[#3b2f26]">Seg a Sex das 08h às 17h</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
