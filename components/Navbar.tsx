@@ -116,7 +116,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
             : 'bg-[#4e5f4a]/70 backdrop-blur-sm shadow-sm'
           : backgroundVariant === 'dirt'
             ? 'bg-dirt/90'
-            : 'bg-[#4e5f4a]/90'
+            : 'bg-[#4e5f4a]/70'
       }`}
     >
       <div className="px-6 sm:px-8 ">
@@ -152,7 +152,9 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
               const isAnchor = isHome && item.href.startsWith('#')
               const commonClass = `px-3 py-1 text-[20px] font-thin rounded-lg transition-colors duration-300 ${
                 item.href === '#contato'
-                  ? 'bg-olive text-bg hover:bg-moss'
+                  ? 'bg-[#ebeae0] text-[#c3a35a]'
+                  : item.isRoute && item.href === '/galeria'
+                    ? 'bg-[#6b7a5e] text-bg'
                   : item.isRoute
                     ? backgroundVariant === 'dirt'
                       ? 'bg-dirt text-bg hover:text-olive'
@@ -241,7 +243,9 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
               const isAnchor = isHome && item.href.startsWith('#')
               const commonClass = `block py-3 text-sm font-medium transition-colors font-sans ${
                 item.href === '#contato'
-                  ? 'bg-olive text-bg rounded-md px-3'
+                  ? 'bg-[#ebeae0] text-gold rounded-md px-3'
+                  : item.isRoute && item.href === '/galeria'
+                    ? 'bg-[#6b7a5e] text-bg rounded-md px-3'
                   : item.isRoute
                     ? backgroundVariant === 'dirt'
                       ? 'text-bg bg-dirt rounded-md px-3'

@@ -10,7 +10,7 @@ const Footer = ({contactInfo = true}: FooterProps) => {
     <footer className="relative bg-[#f5f1eb] text-text">
       { contactInfo && (
 
-        <div>
+        <div id="contato">
           <div className="px-6 sm:px-8 lg:px-16">
             <div className="mx-10 py-8">
               <div className="text-center mb-6">

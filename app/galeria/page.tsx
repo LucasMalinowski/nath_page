@@ -171,7 +171,7 @@ export default function GaleriaPage() {
   }
 
   return (
-      <main className="min-h-screen bg-dirt text-bg page-fade-in">
+      <main id="galeria" className="min-h-screen bg-dirt text-bg page-fade-in">
         <Navbar />
 
         {/* Hero */}
