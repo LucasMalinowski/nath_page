@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight, Instagram, ShoppingCart } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Instagram, ShoppingCart } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -23,17 +23,25 @@ const parseImages = (item: { images?: string | string[] | null }): string[] => {
   return []
 }
 
+const formatPriceText = (price?: string | null): string => {
+  if (!price) return '0,00'
+  const value = price.trim()
+  return value.includes(',') ? value : `${value},00`
+}
+
 export default function GaleriaPage() {
   const router = useRouter()
   const [products, setProducts] = useState<GalleryProduct[]>([])
   const [exhibitors, setExhibitors] = useState<GalleryExhibitor[]>([])
   const [loading, setLoading] = useState(true)
+  const [addingToCartProductId, setAddingToCartProductId] = useState<string | null>(null)
   const [checkoutLoadingProductId, setCheckoutLoadingProductId] = useState<string | null>(null)
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
   const [currentExhibitorPage, setCurrentExhibitorPage] = useState(0)
   const [currentProductPage, setCurrentProductPage] = useState(0)
   const [exhibitorsPerPage, setExhibitorsPerPage] = useState(2)
   const productsPerPage = 3 // 2 rows of 3
+  const productsPhrase = 'Uma seleção de peças autorais e obras de artistas independentes, escolhidas com intenção para dialogar com o espaço, o tempo e a identidade de quem habita.'
 
   useEffect(() => {
     const loadData = async () => {
@@ -170,6 +178,63 @@ export default function GaleriaPage() {
     link.remove()
   }
 
+  const addToCart = async (productId: string) => {
+    setAddingToCartProductId(productId)
+    setCheckoutMessage(null)
+
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.user) {
+      setAddingToCartProductId(null)
+      router.push('/login?next=/galeria')
+      return
+    }
+
+    const { data: existingItem, error: existingItemError } = await supabase
+      .from('cart_items')
+      .select('id, quantity')
+      .eq('user_id', session.user.id)
+      .eq('product_id', productId)
+      .maybeSingle()
+
+    if (existingItemError) {
+      setAddingToCartProductId(null)
+      setCheckoutMessage(existingItemError.message)
+      return
+    }
+
+    if (existingItem?.id) {
+      const { error: updateError } = await supabase
+        .from('cart_items')
+        .update({ quantity: existingItem.quantity + 1 })
+        .eq('id', existingItem.id)
+
+      setAddingToCartProductId(null)
+      if (updateError) {
+        setCheckoutMessage(updateError.message)
+        return
+      }
+
+      setCheckoutMessage('Produto adicionado ao carrinho.')
+      return
+    }
+
+    const { error: insertError } = await supabase
+      .from('cart_items')
+      .insert({
+        user_id: session.user.id,
+        product_id: productId,
+        quantity: 1
+      })
+
+    setAddingToCartProductId(null)
+    if (insertError) {
+      setCheckoutMessage(insertError.message)
+      return
+    }
+
+    setCheckoutMessage('Produto adicionado ao carrinho.')
+  }
+
   return (
       <main id="galeria" className="min-h-screen bg-dirt text-bg page-fade-in">
         <Navbar />
@@ -212,7 +277,7 @@ export default function GaleriaPage() {
         </section>
 
         {/* Products - WITH CAROUSEL */}
-        <section className="texture-brown py-16 lg:py-20 relative">
+        <section className="bg-[#f5f1eb] py-16 lg:py-20 relative">
           {/* Lateral Chevrons for Products */}
           {productsCarouselEnabled && currentProductPage > 0 && (
               <button
@@ -235,6 +300,9 @@ export default function GaleriaPage() {
           )}
 
           <div className="px-8">
+            <p className="mb-10 mx-auto max-w-4xl text-center text-base sm:text-lg font-serif italic text-[#735746]">
+              {productsPhrase}
+            </p>
             {loading && <p className="text-bg/70 font-sans">Carregando...</p>}
             {!loading && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -243,8 +311,8 @@ export default function GaleriaPage() {
                     const hasImages = images.length > 0
                     return (
                         <div key={product.id} className="text-left">
-                          <div className="border border-[#B89B5E] p-3 md:p-4 bg-[#4B4038]/40 flex flex-col w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
-                            <div className="relative aspect-[3/4] border border-bg/30 bg-bg/5">
+                          <div className="border border-[#d8cdbf] p-3 md:p-4 bg-[#f5f1eb] flex flex-col w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
+                            <div className="relative aspect-[4/5] border border-[#e4dbcf] bg-[#efe9df]">
                               {hasImages && (
                                   <MiniCarousel
                                       images={images}
@@ -253,34 +321,44 @@ export default function GaleriaPage() {
                                   />
                               )}
                             </div>
-                            {product.author && (
-                                <p className="mt-2 text-xs italic text-bg/70 font-sans text-right">
-                                  {product.author}
-                                </p>
-                            )}
-                            <button
-                                type="button"
-                                onClick={() => checkoutProduct(product.id)}
-                                disabled={checkoutLoadingProductId === product.id}
-                                className="mt-3 w-full flex items-center justify-between bg-[#3b2f26] hover:bg-[#48372c] px-3 py-2 rounded-sm text-bg/90 transition-colors disabled:opacity-60"
-                            >
-                              <span className="inline-flex items-center gap-2 font-sans text-sm">
-                                <ShoppingCart size={20} />
-                                {checkoutLoadingProductId === product.id ? '...' : 'Comprar'}
-                              </span>
-                              <span className="font-sans tracking-wide text-lg">
-                          {product.price_text ? `R$ ${product.price_text}` : 'R$ 0,00'}
-                        </span>
-                            </button>
+                            <div className="mt-3 flex items-end justify-between">
+                              <p className="flex items-center font-sans leading-none">
+                                <span className="mr-2 text-[13px] text-[#735746]">R$</span>
+                                <span className="text-[26px] text-[#3b2f26]">{formatPriceText(product.price_text)}</span>
+                              </p>
+                              <p className="text-[13px] tracking-[0.08em] text-[#735746] font-thin font-sans pb-1">
+                                Exclusivo
+                              </p>
+                            </div>
+                            <div className="mt-4 flex items-center gap-4">
+                              <button
+                                  type="button"
+                                  onClick={() => addToCart(product.id)}
+                                  disabled={addingToCartProductId === product.id}
+                                  className="shrink-0 text-[#735746] transition-colors hover:text-[#644435] disabled:opacity-60"
+                                  aria-label="Adicionar ao carrinho"
+                              >
+                                <ShoppingCart size={20} className="text-[#735746]" />
+                              </button>
+                              <button
+                                  type="button"
+                                  onClick={() => checkoutProduct(product.id)}
+                                  disabled={checkoutLoadingProductId === product.id}
+                                  className="flex-1 bg-[#735746] hover:bg-[#644435] px-3 py-2 rounded-sm text-[#f5f1eb] transition-colors disabled:opacity-60"
+                              >
+                                <span className="flex items-center justify-center font-sans text-[21px] leading-none">
+                                  {checkoutLoadingProductId === product.id ? '...' : 'Compre agora'}
+                                </span>
+                              </button>
+                            </div>
                           </div>
-                          <div className="mt-4 w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
-                            <h3 className="flex justify-center text-2xl font-serif text-bg/80 text-left">
-                              "{product.name}"
+                          <div className="mt-8 w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
+                            <h3 className="flex justify-center text-[22px] font-serif text-[#3b2f26] text-center">
+                              “{product.name}”
                             </h3>
-                            <br />
-                            <p className="text-[0.80rem] text-bg/75 font-sans mt-2 leading-relaxed text-center italic">
-                              {product.description}
-                            </p>
+                            <div className="mt-1 flex justify-center text-[#9f8a74]">
+                              <ChevronDown size={16} />
+                            </div>
                           </div>
                         </div>
                     )
@@ -312,76 +390,72 @@ export default function GaleriaPage() {
         </section>
 
         {/* Exhibitors - Chevrons only on hover, positioned at exhibitors */}
-        <section className="texture-green py-16 group/exhibitors">
+        <section className="bg-[#f5f1eb] pb-16 group/exhibitors">
           <div className="px-24">
             <div className="mb-12">
-              <h2 className="text-6xl font-serif text-gold/80">
+              <h2 className="text-[41px] font-serif text-[#b89b5e]">
                 Expositores
               </h2>
+              <p className="mt-3 text-[17px] font-serif text-[#735746]">
+                Nossa arte tem o propósito de trazer vida para o que chamamos de lar.
+              </p>
             </div>
 
-            <div className="flex gap-32 items-start justify-between">
-              {/* Quote on left */}
-              <div className="flex-shrink-0 w-80 border-l-2 border-bg/40 pl-6 text-base text-bg/65 font-serif">
-                "Nossa arte tem o propósito de trazer vida para o que chamamos de lar..."
-              </div>
+            {/* Exhibitors with chevrons */}
+            <div className="relative px-40">
+              {/* Chevrons - show only on section hover, positioned at exhibitors */}
+              {exhibitorsCarouselEnabled && (
+                  <>
+                    <button
+                        onClick={prevExhibitorPage}
+                        className="absolute -left-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100"
+                        aria-label="Expositores anteriores"
+                    >
+                      <ChevronLeft size={22} className="text-olive" />
+                    </button>
+                    <button
+                        onClick={nextExhibitorPage}
+                        className="absolute -right-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100"
+                        aria-label="Próximos expositores"
+                    >
+                      <ChevronRight size={22} className="text-olive" />
+                    </button>
+                  </>
+              )}
 
-              {/* Exhibitors with chevrons */}
-              <div className="relative flex-1">
-                {/* Chevrons - show only on section hover, positioned at exhibitors */}
-                {exhibitorsCarouselEnabled && (
-                    <>
-                      <button
-                          onClick={prevExhibitorPage}
-                          className="absolute -left-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100"
-                          aria-label="Expositores anteriores"
-                      >
-                        <ChevronLeft size={22} className="text-olive" />
-                      </button>
-                      <button
-                          onClick={nextExhibitorPage}
-                          className="absolute -right-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100"
-                          aria-label="Próximos expositores"
-                      >
-                        <ChevronRight size={22} className="text-olive" />
-                      </button>
-                    </>
-                )}
-
-                <div className="flex gap-8 flex-1">
-                  {visibleExhibitors.map((exhibitor) => (
-                      <article key={exhibitor.id} className="flex gap-4 items-start flex-1 min-w-0">
-                        <div className="relative w-24 h-24 rounded-md overflow-hidden shrink-0">
-                          {exhibitor.avatar_url && (
-                              <Image
-                                  src={exhibitor.avatar_url}
-                                  alt={exhibitor.name}
-                                  fill
-                                  className="object-cover"
-                              />
-                          )}
-                        </div>
-                        <div className="text-bg/90 min-w-0">
-                          <h3 className="font-serif text-xl leading-tight mb-2">
-                            {exhibitor.name.split('\n').map((line, i) => (
-                                <span key={i} className="block">{line}</span>
-                            ))}
-                          </h3>
-                          <p className="text-sm text-bg/75 font-sans leading-relaxed">
-                            {(exhibitor.title || '').split('\n').map((line, i) => (
-                                <span key={i} className="block">{line}</span>
-                            ))}
-                          </p>
-                          {exhibitor.instagram_path && (
-                              <p className="text-xs text-bg/70 mt-2 font-sans inline-flex items-center gap-1">
-                                <Instagram size={14} />
-                                {exhibitor.instagram_path.startsWith('@') ? exhibitor.instagram_path : `@${exhibitor.instagram_path}`}
-                              </p>
-                          )}
-                        </div>
-                      </article>
-                  ))}
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
+                {visibleExhibitors.map((exhibitor) => (
+                    <article key={exhibitor.id} className="flex gap-6 items-start min-w-0">
+                      <div className="relative w-[132px] h-[132px] rounded-[6px] overflow-hidden shrink-0">
+                        {exhibitor.avatar_url && (
+                            <Image
+                                src={exhibitor.avatar_url}
+                                alt={exhibitor.name}
+                                fill
+                                className="object-cover"
+                            />
+                        )}
+                      </div>
+                      <div className="min-w-0 pt-1">
+                        <h3 className="font-serif text-[15px] text-[#3b2f26] leading-tight mb-2">
+                          {exhibitor.name.split('\n').map((line, i) => (
+                              <span key={i} className="block">{line}</span>
+                          ))}
+                        </h3>
+                        <p className="text-[13px] text-[#3b2f26] font-serif font-thin leading-relaxed">
+                          {(exhibitor.title || '').split('\n').map((line, i) => (
+                              <span key={i} className="block">{line}</span>
+                          ))}
+                        </p>
+                        {exhibitor.instagram_path && (
+                            <p className="text-[12px] text-[#3b2f26] mt-6 font-serif font-thin inline-flex items-center gap-1">
+                              <Instagram size={12} className="text-[#d5ccb9]" />
+                              {exhibitor.instagram_path}
+                            </p>
+                        )}
+                      </div>
+                    </article>
+                ))}
               </div>
             </div>
 
@@ -405,7 +479,7 @@ export default function GaleriaPage() {
           </div>
         </section>
 
-        <Footer contactInfo={false} />
+        <Footer paymentInfo />
       </main>
   )
 }
