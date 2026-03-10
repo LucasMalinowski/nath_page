@@ -32,20 +32,6 @@ const Services = () => {
     }
   ]
 
-  const scrollToContact = () => {
-    const element = document.querySelector('#contato')
-    if (element) {
-      const offset = 80
-      const elementPosition = element.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - offset
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      })
-    }
-  }
-
   return (
     <section
       id="servicos"
@@ -88,17 +74,13 @@ const Services = () => {
                     <p className="text-body-mobile md:text-body font-thin font-sans leading-relaxed text-[#735746]">
                       {service.description}
                     </p>
-                    <a
-                      href="#contato"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        scrollToContact()
-                      }}
+                    <Link
+                      href="/servicos"
                       className="absolute right-8 bottom-5 text-xl text-[#b89b5e] hover:text-[#a58a51] transition-colors"
-                      aria-label="Ir para contato"
+                      aria-label="Ir para servicos"
                     >
                       →
-                    </a>
+                    </Link>
                   </div>
                   <p className="mt-3 text-xl font-poetic italic text-[#b89b5e] text-center px-8 leading-tight">
                     {service.note}
