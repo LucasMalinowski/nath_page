@@ -214,6 +214,7 @@ export default function GaleriaPage() {
         return
       }
 
+      window.dispatchEvent(new Event('cart-updated'))
       setCheckoutMessage('Produto adicionado ao carrinho.')
       return
     }
@@ -232,6 +233,7 @@ export default function GaleriaPage() {
       return
     }
 
+    window.dispatchEvent(new Event('cart-updated'))
     setCheckoutMessage('Produto adicionado ao carrinho.')
   }
 

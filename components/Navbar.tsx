@@ -57,8 +57,15 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
       void loadCartCount()
     })
 
+    const handleCartUpdated = () => {
+      void loadCartCount()
+    }
+
+    window.addEventListener('cart-updated', handleCartUpdated)
+
     return () => {
       authSubscription.subscription.unsubscribe()
+      window.removeEventListener('cart-updated', handleCartUpdated)
     }
   }, [pathname])
 

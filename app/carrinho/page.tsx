@@ -133,35 +133,35 @@ export default function CarrinhoPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-dirt text-bg page-fade-in">
+      <main className="min-h-screen bg-[#f5f1eb] text-[#3b2f26] page-fade-in">
         <Navbar />
-        <section className="texture-brown min-h-screen pt-28 px-6 sm:px-8 lg:px-16">
-          <p className="text-bg/70 font-sans">Carregando carrinho...</p>
+        <section className="min-h-screen pt-28 px-6 sm:px-8 lg:px-16">
+          <p className="text-[#735746] font-sans">Carregando carrinho...</p>
         </section>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-dirt text-bg page-fade-in">
-      <Navbar backgroundVariant="dirt" />
+    <main className="min-h-screen bg-[#f5f1eb] text-[#3b2f26] page-fade-in">
+      <Navbar />
 
-      <section className="texture-brown pt-28 pb-16 px-6 sm:px-8 lg:px-16 min-h-screen">
+      <section className="pt-28 pb-16 px-6 sm:px-8 lg:px-16 min-h-screen">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-end justify-between gap-4 mb-10">
             <div>
-              <h1 className="text-4xl sm:text-5xl font-serif text-gold/90">Carrinho</h1>
-              <p className="mt-2 text-bg/70 font-sans">Finalize suas obras com pagamento via Mercado Pago.</p>
+              <h1 className="text-4xl sm:text-5xl font-serif text-[#b89b5e]">Carrinho</h1>
+              <p className="mt-2 text-[#735746] font-sans">Finalize suas obras com pagamento via Mercado Pago.</p>
             </div>
-            <a href="/galeria" className="text-sm text-bg/80 hover:text-gold transition-colors">
+            <a href="/galeria" className="text-sm text-[#735746] hover:text-[#b89b5e] transition-colors">
               Voltar para galeria
             </a>
           </div>
 
           {!items.length && (
-            <div className="border border-gold/40 bg-[#4B4038]/45 p-8 text-center">
-              <ShoppingCart className="mx-auto mb-3 text-gold/80" />
-              <p className="font-sans text-bg/80">Seu carrinho está vazio.</p>
+            <div className="border border-[#d8cdbf] bg-[#f6f2ed] p-8 text-center">
+              <ShoppingCart className="mx-auto mb-3 text-[#b89b5e]" />
+              <p className="font-sans text-[#735746]">Seu carrinho está vazio.</p>
             </div>
           )}
 
@@ -169,18 +169,18 @@ export default function CarrinhoPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-8">
               <div className="space-y-4">
                 {items.map((item) => (
-                  <article key={item.id} className="border border-gold/45 bg-[#4B4038]/45 p-4 sm:p-5">
+                  <article key={item.id} className="border border-[#d8cdbf] bg-[#f6f2ed] p-4 sm:p-5">
                     <div className="flex items-center justify-between gap-4">
                       <div>
-                        <p className="text-xl font-serif text-bg/90">"{item.product?.name || 'Obra'}"</p>
-                        <p className="text-sm text-bg/70 font-sans mt-1">
+                        <p className="text-xl font-serif text-[#3b2f26]">"{item.product?.name || 'Obra'}"</p>
+                        <p className="text-sm text-[#735746] font-sans mt-1">
                           {item.product?.price_text ? `R$ ${item.product.price_text}` : 'R$ 0,00'}
                         </p>
                       </div>
                       <button
                         type="button"
                         onClick={() => removeItem(item.id)}
-                        className="text-bg/60 hover:text-red-300 transition-colors"
+                        className="text-[#9a7e6f] hover:text-[#7d6153] transition-colors"
                         aria-label="Remover item"
                       >
                         <Trash2 size={18} />
@@ -192,20 +192,20 @@ export default function CarrinhoPage() {
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="border border-gold/50 text-bg px-3 py-1 hover:bg-gold/20 transition-colors"
+                          className="border border-[#d5ccb9] text-[#735746] px-3 py-1 hover:bg-[#efe7dc] transition-colors"
                         >
                           -
                         </button>
-                        <span className="min-w-8 text-center">{item.quantity}</span>
+                        <span className="min-w-8 text-center text-[#3b2f26]">{item.quantity}</span>
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="border border-gold/50 text-bg px-3 py-1 hover:bg-gold/20 transition-colors"
+                          className="border border-[#d5ccb9] text-[#735746] px-3 py-1 hover:bg-[#efe7dc] transition-colors"
                         >
                           +
                         </button>
                       </div>
-                      <p className="font-sans text-bg/85">
+                      <p className="font-sans text-[#3b2f26]">
                         {formatCentsToBRL(parseBrazilianPriceToCents(item.product?.price_text) * item.quantity)}
                       </p>
                     </div>
@@ -213,9 +213,9 @@ export default function CarrinhoPage() {
                 ))}
               </div>
 
-              <aside className="border border-gold/45 bg-[#3b2f26]/70 p-5 h-fit">
-                <label className="text-sm text-bg/80 mb-2 flex items-center gap-2">
-                  <TicketPercent size={16} className="text-gold/80" />
+              <aside className="border border-[#d8cdbf] bg-[#f6f2ed] p-5 h-fit">
+                <label className="text-sm text-[#735746] mb-2 flex items-center gap-2">
+                  <TicketPercent size={16} className="text-[#b89b5e]" />
                   Cupom
                 </label>
                 <input
@@ -223,13 +223,13 @@ export default function CarrinhoPage() {
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                   placeholder="EXEMPLO10"
-                  className="w-full border border-gold/40 bg-transparent rounded px-3 py-2 mb-5 text-bg"
+                  className="w-full border border-[#d5ccb9] bg-white rounded px-3 py-2 mb-5 text-[#3b2f26] placeholder:text-[#b0907a]"
                 />
 
-                <div className="space-y-2 text-sm text-bg/80 font-sans">
+                <div className="space-y-2 text-sm text-[#735746] font-sans">
                   <div className="flex items-center justify-between">
                     <span>Subtotal</span>
-                    <span>{formatCentsToBRL(subtotalCents)}</span>
+                    <span className="text-[#3b2f26]">{formatCentsToBRL(subtotalCents)}</span>
                   </div>
                 </div>
 
@@ -237,7 +237,7 @@ export default function CarrinhoPage() {
                   type="button"
                   onClick={checkout}
                   disabled={checkingOut}
-                  className="mt-6 w-full bg-gold text-[#3b2f26] rounded-sm px-4 py-3 font-medium hover:bg-[#e6c98a] transition-colors disabled:opacity-60"
+                  className="mt-6 w-full bg-[#735746] text-[#f5f1eb] rounded-sm px-4 py-3 font-medium hover:bg-[#644435] transition-colors disabled:opacity-60"
                 >
                   {checkingOut ? 'Redirecionando...' : 'Finalizar com Mercado Pago'}
                 </button>
@@ -245,7 +245,7 @@ export default function CarrinhoPage() {
             </div>
           )}
 
-          {error && <p className="mt-6 text-sm text-red-200">{error}</p>}
+          {error && <p className="mt-6 text-sm text-[#a16060]">{error}</p>}
         </div>
       </section>
 
