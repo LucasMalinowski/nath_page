@@ -91,7 +91,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                   </p>
                   <button
                     type="button"
-                    className="mt-6 px-8 py-2 rounded-[12px] bg-[#b89b5e] text-[#6b7a5e] font-sans font-normal text-[21px] leading-none"
+                    className="mt-6 px-8 py-2 rounded-[12px] bg-[#b89b5e] text-[#ebeae0] font-sans font-normal text-[21px] leading-none"
                   >
                     Agendar conversa
                   </button>
