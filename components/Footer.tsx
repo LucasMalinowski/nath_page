@@ -7,6 +7,11 @@ type FooterProps = {
   paymentInfo?: boolean
 }
 const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
+  const whatsappHref = 'https://wa.me/5545998028130?text=Ola%20Nathalia%2C%20gostaria%20de%20falar%20sobre%20um%20projeto.'
+  const phoneHref = 'tel:+5545998028130'
+  const instagramHref = 'https://instagram.com/nathalia_malinowski'
+  const emailHref = 'mailto:malinowskinathalia@gmail.com?subject=Projeto%20de%20Interiores'
+
   return (
     <footer className="relative bg-[#f5f1eb] text-[#6b7a5e]">
       {paymentInfo ? (
@@ -18,18 +23,18 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                   <div className="w-full max-w-[340px] text-left">
                     <h3 className="text-[16px] font-sans font-normal tracking-wide text-[#6b7a5e] pb-5">ATENDIMENTO</h3>
                     <div className="w-full pt-5 space-y-2 text-[16px] font-extralight tracking-wide leading-none text-[#6b7a5e] border-t border-[#6b7a5e]">
-                      <div className="flex items-center gap-3">
+                      <a href={phoneHref} className="flex items-center gap-3 transition-opacity hover:opacity-80">
                         <MessageCircle size={16} className="text-[#6b7a5e]" />
                         <span>(45) 99802-8130</span>
-                      </div>
-                      <div className="flex items-center gap-3">
+                      </a>
+                      <a href={instagramHref} target="_blank" rel="noreferrer" className="flex items-center gap-3 transition-opacity hover:opacity-80">
                         <Instagram size={16} className="text-[#6b7a5e]" />
                         <span>nathalia_malinowski</span>
-                      </div>
-                      <div className="flex items-center gap-3">
+                      </a>
+                      <a href={emailHref} className="flex items-center gap-3 transition-opacity hover:opacity-80">
                         <Mail size={16} className="text-[#6b7a5e]" />
                         <span>malinowskinathalia@gmail.com</span>
-                      </div>
+                      </a>
                       <p className="pt-3 text-[16px] font-extralight text-[#6b7a5e]">Seg a Sex das 08h às 17h</p>
                     </div>
                   </div>
@@ -89,30 +94,32 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                     <br />
                     faça sentido para você?
                   </p>
-                  <button
-                    type="button"
+                  <a
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noreferrer"
                     className="mt-6 px-8 py-2 rounded-[12px] bg-[#b89b5e] text-[#ebeae0] font-sans font-normal text-[21px] leading-none"
                   >
                     Agendar conversa
-                  </button>
+                  </a>
                 </div>
 
                 <div className="flex flex-col items-center justify-center">
                   <div className="w-full max-w-[340px] text-left">
                     <h3 className="text-[16px] font-sans font-normal tracking-wide text-[#6b7a5e] pb-5">ATENDIMENTO</h3>
                     <div className="w-full pt-5 space-y-2 text-[14px] font-normal leading-none text-[#6b7a5e] border-t border-[#6b7a5e]">
-                      <div className="flex items-center gap-3">
+                      <a href={phoneHref} className="flex items-center gap-3 transition-opacity hover:opacity-80">
                         <MessageCircle size={16} className="text-[#6b7a5e]" />
                         <span>(45) 99802-8130</span>
-                      </div>
-                      <div className="flex items-center gap-3">
+                      </a>
+                      <a href={instagramHref} target="_blank" rel="noreferrer" className="flex items-center gap-3 transition-opacity hover:opacity-80">
                         <Instagram size={16} className="text-[#6b7a5e]" />
                         <span>nathalia_malinowski</span>
-                      </div>
-                      <div className="flex items-center gap-3">
+                      </a>
+                      <a href={emailHref} className="flex items-center gap-3 transition-opacity hover:opacity-80">
                         <Mail size={16} className="text-[#6b7a5e]" />
                         <span>malinowskinathalia@gmail.com</span>
-                      </div>
+                      </a>
                       <p className="pt-3 text-[14px] font-normal text-[#6b7a5e]">Seg a Sex das 08h às 17h</p>
                     </div>
                   </div>
@@ -123,7 +130,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
         </div>
       ) : null}
 
-      <div className="border-t border-[#e3d8c9] py-3 text-center">
+      <div className="border-t border-[#6b7a5e] py-3 text-center">
         <img src="/nm-gold.png" alt="NM" className="mx-auto h-12 w-auto"/>
       </div>
     </footer>
