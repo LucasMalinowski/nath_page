@@ -1,7 +1,6 @@
 'use client'
 
 import {useEffect, useMemo, useState} from 'react'
-import {className} from "postcss-selector-parser";
 
 type TypewriterProps = {
   text: string,
@@ -22,28 +21,18 @@ const Typewriter = ({text, speedMs = 35, classes}: TypewriterProps) => {
       return
     }
 
-    let isActive = true
-    let intervalId: NodeJS.Timeout | null = null
-    let restartId: NodeJS.Timeout | null = null
-
-    const startTyping = () => {
-      setIndex(0)
-      if (intervalId) clearInterval(intervalId)
-      intervalId = setInterval(() => {
-        setIndex((current) => Math.min(current + 1, text.length))
-      }, speedMs)
-    }
-
-    startTyping()
-    restartId = setInterval(() => {
-      if (!isActive) return
-      startTyping()
-    }, 10000)
+    const intervalId = setInterval(() => {
+      setIndex((current) => {
+        if (current >= text.length) {
+          clearInterval(intervalId)
+          return current
+        }
+        return current + 1
+      })
+    }, speedMs)
 
     return () => {
-      isActive = false
-      if (intervalId) clearInterval(intervalId)
-      if (restartId) clearInterval(restartId)
+      clearInterval(intervalId)
     }
   }, [text, speedMs, reducedMotion])
 
@@ -65,6 +54,7 @@ const Typewriter = ({text, speedMs = 35, classes}: TypewriterProps) => {
         </span>
       ))}
       <span className="typewriter-cursor" aria-hidden="true">▍</span>
+      <noscript>{text}</noscript>
       <style jsx>{`
           .typewriter-cursor {
               animation: blink 1s steps(2, start) infinite;
