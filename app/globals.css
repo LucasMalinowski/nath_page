@@ -16,11 +16,11 @@ html {
 
 :root {
   /* Base */
-  --bg: 243 239 233;
+  --bg: 245 241 235;
   --text: 59 47 38;
 
   /* Marca */
-  --olive: 114 127 100;
+  --olive: 78 95 74;
   --moss: 107 122 94;
   --dirt: 59 47 38;
   --darkGreen: 62 95 75;
@@ -31,7 +31,7 @@ html {
 
   /* Nobres */
   --burgundy: 90 30 35;
-  --gold: 222 189 118;
+  --gold: 184 155 94;
 
   /* UI */
   --surface: 255 255 255;
@@ -43,8 +43,8 @@ html {
   body {
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
-    background-color: var(--bg);
-    color: var(--text);
+    background-color: rgb(var(--bg));
+    color: rgb(var(--text));
   }
 
   h1, h2, h3, h4, h5, h6 {
