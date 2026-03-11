@@ -128,6 +128,21 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
     >
       <div className="px-6 sm:px-8 ">
         <div className="flex items-center h-16">
+          {cartCount > 0 && (
+            <Link
+              href="/carrinho"
+              className={`md:hidden relative mr-2 inline-flex items-center justify-center transition-colors ${
+                backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-bg hover:text-gold'
+              }`}
+              aria-label="Ir para carrinho"
+            >
+              <ShoppingCart size={20} />
+              <span className="absolute -top-2 -right-3 min-w-5 h-5 px-1 rounded-full bg-gold text-dirt text-[11px] font-semibold flex items-center justify-center">
+                {cartCount}
+              </span>
+            </Link>
+          )}
+
           <div className="hidden md:flex flex-1 items-center justify-center justify-between pr-20 pl-2">
             {isHome ? (
               <a href="#hero" className="flex items-center">

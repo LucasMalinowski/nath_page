@@ -301,7 +301,7 @@ export default function GaleriaPage() {
               </button>
           )}
 
-          <div className="px-8">
+          <div className="px-6 sm:px-8">
             <p className="mb-10 mx-auto max-w-4xl text-center text-base sm:text-lg font-serif italic text-[#735746]">
               {productsPhrase}
             </p>
@@ -393,7 +393,7 @@ export default function GaleriaPage() {
 
         {/* Exhibitors - Chevrons only on hover, positioned at exhibitors */}
         <section className="bg-[#f5f1eb] pb-16 group/exhibitors">
-          <div className="px-24">
+          <div className="px-6 sm:px-8 lg:px-24">
             <div className="mb-12">
               <h2 className="text-[41px] font-serif text-[#b89b5e]">
                 Expositores
@@ -404,20 +404,20 @@ export default function GaleriaPage() {
             </div>
 
             {/* Exhibitors with chevrons */}
-            <div className="relative px-40">
+            <div className="relative px-0 lg:px-40">
               {/* Chevrons - show only on section hover, positioned at exhibitors */}
               {exhibitorsCarouselEnabled && (
                   <>
                     <button
                         onClick={prevExhibitorPage}
-                        className="absolute -left-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100 lg:-left-14"
                         aria-label="Expositores anteriores"
                     >
                       <ChevronLeft size={22} className="text-olive" />
                     </button>
                     <button
                         onClick={nextExhibitorPage}
-                        className="absolute -right-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100 lg:-right-14"
                         aria-label="Próximos expositores"
                     >
                       <ChevronRight size={22} className="text-olive" />
@@ -427,8 +427,8 @@ export default function GaleriaPage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
                 {visibleExhibitors.map((exhibitor) => (
-                    <article key={exhibitor.id} className="flex gap-6 items-start min-w-0">
-                      <div className="relative w-[132px] h-[132px] rounded-[6px] overflow-hidden shrink-0">
+                    <article key={exhibitor.id} className="flex gap-4 sm:gap-6 items-start min-w-0">
+                      <div className="relative w-24 h-24 sm:w-[132px] sm:h-[132px] rounded-[6px] overflow-hidden shrink-0">
                         {exhibitor.avatar_url && (
                             <Image
                                 src={exhibitor.avatar_url}

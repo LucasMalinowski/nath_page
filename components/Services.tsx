@@ -55,16 +55,16 @@ const Services = () => {
         <div className="flex flex-col lg:w-2/3 mt-4">
           {/* Title block with brown texture */}
           <div className="texture-brown px-6 sm:px-10 py-8">
-            <div className="flex gap-6 items-start pl-8">
-              <h2 className="text-3xl-mobile md:text-3xl py-4 font-serif text-bg border-l-[3px] border-bg/30  pl-16 pr-12">
+            <div className="flex gap-6 items-start sm:pl-8">
+              <h2 className="text-3xl-mobile md:text-3xl py-4 font-serif text-bg border-l-[3px] border-bg/30 pl-6 pr-0 sm:pl-16 sm:pr-12">
                 {servicesTitle}
               </h2>
             </div>
           </div>
 
           {/* Services grid on white texture */}
-          <div className="bg-[#f5f1eb] px-24 py-24">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-20">
+          <div className="bg-[#f5f1eb] px-6 py-12 sm:px-8 lg:px-24 lg:py-24">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 lg:gap-20">
               {services.map((service) => (
                 <div key={service.title}>
                   <div className="relative bg-[#f6f2ed] border border-[#d5ccb9] p-6 rounded-[22px] text-[#735746] shadow-sm min-h-[240px]">
@@ -82,7 +82,7 @@ const Services = () => {
                       →
                     </Link>
                   </div>
-                  <p className="mt-3 text-xl font-poetic italic text-[#b89b5e] text-center px-8 leading-tight">
+                  <p className="mt-3 text-xl font-poetic italic text-[#b89b5e] text-center px-4 sm:px-8 leading-tight">
                     {service.note}
                   </p>
                 </div>
@@ -91,7 +91,7 @@ const Services = () => {
               <div className="flex min-h-[240px] items-center justify-center self-start">
                 <a
                   href="/galeria#galeria"
-                  className="inline-flex items-center justify-center min-w-[290px] px-8 py-3 rounded-full bg-white border border-[#d5ccb9] text-[#735746] text-xl font-sans font-medium hover:bg-[#f0ebe4] transition-colors"
+                  className="inline-flex w-full max-w-[290px] items-center justify-center px-8 py-3 rounded-full bg-white border border-[#d5ccb9] text-[#735746] text-xl font-sans font-medium hover:bg-[#f0ebe4] transition-colors"
                 >
                   Galeria de Artes
                 </a>

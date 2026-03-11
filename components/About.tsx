@@ -8,9 +8,9 @@ const About = () => {
       id="sobre"
       className="relative bg-[#f5f1eb] pt-4"
     >
-      <div className="lg:pl-20">
-        <div className="flex flex-col lg:flex-row gap-32">
-          <div className="w-full lg:w-1/2 py-20 space-y-10">
+      <div className="px-6 sm:px-8 lg:pl-20 lg:pr-8">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-32">
+          <div className="w-full lg:w-1/2 py-12 lg:py-20 space-y-8 lg:space-y-10">
             <h2 className="text-h2-mobile md:text-6xl font-serif font-medium text-gold">
               Sobre mim
             </h2>
@@ -25,12 +25,12 @@ const About = () => {
               </p>
             </div>
 
-            <blockquote className="text-2xl md:text-3xl font-poetic italic text-olive leading-snug pt-14">
+            <blockquote className="text-2xl md:text-3xl font-poetic italic text-olive leading-snug pt-6 lg:pt-14">
               Projetar é dar forma ao que faz sentido.
             </blockquote>
           </div>
           {/* Profile Photo */}
-          <div className="w-full lg:w-1/2 mr-4 mb-4">
+          <div className="w-full lg:w-1/2 mb-4 lg:mr-4">
             <div className="relative w-full aspect-square overflow-hidden shadow-2xl">
               <Image
                 src="/profile-photo.jpeg"

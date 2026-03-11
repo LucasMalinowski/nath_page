@@ -20,7 +20,7 @@ const Concept = () => {
           id="conceito"
           className="relative mt-4 py-8 bg-[url('/carpet.png')] bg-cover bg-center"
       >
-        <div className="container mx-auto py-8 px-20 md:px-20 flex flex-col justify-between min-h-[200px] md:min-h-[250px]">
+        <div className="container mx-auto py-8 px-6 sm:px-8 md:px-20 flex flex-col justify-between min-h-[200px] md:min-h-[250px]">
           {/* Título no topo esquerdo */}
           <div className="self-start">
             <h2 className="text-xl md:text-6xl font-serif font-normal text-gold/85 tracking-wide">

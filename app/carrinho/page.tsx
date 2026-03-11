@@ -148,7 +148,7 @@ export default function CarrinhoPage() {
 
       <section className="pt-28 pb-16 px-6 sm:px-8 lg:px-16 min-h-screen">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-end justify-between gap-4 mb-10">
+          <div className="flex flex-col gap-4 mb-10 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h1 className="text-4xl sm:text-5xl font-serif text-[#b89b5e]">Carrinho</h1>
               <p className="mt-2 text-[#735746] font-sans">Finalize suas obras com pagamento via Mercado Pago.</p>

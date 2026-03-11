@@ -64,7 +64,7 @@ export default function ServicosPage() {
 
       <section className="pt-24">
         <header className="border-b border-[#d9cdb8] px-6 pb-8 sm:px-10 lg:px-16">
-          <h1 className="text-center text-[52px] font-serif text-[#b89b5e] sm:text-[64px]">
+          <h1 className="text-center text-4xl font-serif text-[#b89b5e] sm:text-[52px] lg:text-[64px]">
             Serviços
           </h1>
         </header>
@@ -89,7 +89,7 @@ export default function ServicosPage() {
                   </div>
                 </div>
 
-                <div className="border-l border-[#ece3d5] lg:pl-16">
+                <div className="lg:border-l lg:border-[#ece3d5] lg:pl-16">
                   <h3 className="font-sans text-[16px] font-medium text-[#3b2f26]">Inclui</h3>
                   <ul className="mt-6 space-y-1 text-[16px] font-sans leading-[1.05] text-[#735746] sm:text-[17px]">
                     {service.includes.map((item) => (
