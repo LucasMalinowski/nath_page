@@ -242,7 +242,7 @@ export default function GaleriaPage() {
         <Navbar />
 
         {/* Hero */}
-        <section className="relative mt-16">
+        <section className="relative pt-16">
           <div className="relative h-[360px] sm:h-[420px] lg:h-[520px]">
             <Image
                 src="/frame.png"
