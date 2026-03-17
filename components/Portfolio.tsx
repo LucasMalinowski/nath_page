@@ -137,8 +137,8 @@ const Portfolio = () => {
 
   return (
     <>
-      <section id="portfolio" className="bg-[#f5f1eb] py-20">
-          <header className="text-center border-b-[3px] pb-14 border-[#e3d8c8]">
+      <section id="portfolio" className="bg-[#f5f1eb] py-20 border-b-2 border-[#d9cdb8]/20">
+          <header className="text-center border-b-[4px] pb-14 border-[#e3d8c8]">
             <h2 className="text-5xl md:text-6xl font-serif font-normal text-[#b89b5e]">{portfolioTitle}</h2>
             <p className="mt-6 text-lg text-text/70">{portfolioSubtitle}</p>
           </header>
@@ -203,7 +203,7 @@ const Portfolio = () => {
                     <button
                       type="button"
                       onClick={() => openProjectModal(project)}
-                      className={`mt-auto inline-flex items-center gap-2 rounded-md bg-[#c3a35a] px-4 py-2 text-sm text-[#f5f1eb] transition-colors hover:bg-[#b59347] ${
+                      className={`mt-auto inline-flex items-center gap-2 rounded-md bg-[#c3a35a] px-12 py-1.5 text-sm text-[#f5f1eb] transition-colors hover:bg-[#b59347] ${
                         imageLeft ? 'self-end' : 'self-start'
                       }`}
                     >
