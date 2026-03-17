@@ -22,7 +22,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                 <div className="flex flex-col items-center justify-center">
                   <div className="w-full max-w-[340px] text-left">
                     <h3 className="text-[16px] font-sans font-normal tracking-wide text-[#6b7a5e] pb-5">ATENDIMENTO</h3>
-                    <div className="w-full pt-5 space-y-2 text-[16px] font-extralight tracking-wide leading-none text-[#6b7a5e] border-t border-[#6b7a5e]">
+                    <div className="w-full pt-5 space-y-2 text-[16px] font-extralight tracking-wide leading-none text-[#6b7a5e] border-t-2 border-[#d9cdb8]/40">
                       <a href={phoneHref} className="flex items-center gap-3 transition-opacity hover:opacity-80">
                         <MessageCircle size={16} className="text-[#6b7a5e]" />
                         <span>(45) 99802-8130</span>
@@ -43,7 +43,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                 <div className="flex flex-col items-center ">
                   <div className="w-full max-w-[440px] text-left">
                     <h3 className="text-[16px] font-sans font-normal tracking-wide text-[#6b7a5e] pb-5">PAGAMENTO</h3>
-                    <div className="w-full pt-10 border-t border-[#6b7a5e]">
+                    <div className="w-full pt-10 border-t-2 border-[#d9cdb8]/40">
                       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
                         <img
                           src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Visa_Inc._logo_%282021%E2%80%93present%29.svg/960px-Visa_Inc._logo_%282021%E2%80%93present%29.svg.png"
@@ -107,7 +107,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                 <div className="flex flex-col items-center justify-center">
                   <div className="w-full max-w-[340px] text-left">
                     <h3 className="text-[16px] font-sans font-normal tracking-wide text-[#6b7a5e] pb-5">ATENDIMENTO</h3>
-                    <div className="w-full pt-5 space-y-2 text-[14px] font-normal leading-none text-[#6b7a5e] border-t border-[#6b7a5e]">
+                    <div className="w-full pt-5 space-y-2 text-[14px] font-normal leading-none text-[#6b7a5e] border-t-2 border-[#d9cdb8]/40">
                       <a href={phoneHref} className="flex items-center gap-3 transition-opacity hover:opacity-80">
                         <MessageCircle size={16} className="text-[#6b7a5e]" />
                         <span>(45) 99802-8130</span>
@@ -130,7 +130,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
         </div>
       ) : null}
 
-      <div className="border-t border-[#6b7a5e] py-3 text-center">
+      <div className="border-t-2 border-[#d9cdb8]/40 py-3 text-center">
         <img src="/nm-gold.png" alt="NM" className="mx-auto h-12 w-auto"/>
       </div>
     </footer>
