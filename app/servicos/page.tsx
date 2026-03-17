@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
@@ -58,23 +60,44 @@ const services = [
 ]
 
 export default function ServicosPage() {
+  const router = useRouter()
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      router.back()
+      return
+    }
+
+    router.push('/')
+  }
+
   return (
     <main className="min-h-screen bg-[#f5f1eb] page-fade-in">
       <Navbar />
 
       <section className="pt-24">
-        <header className="border-b border-[#d9cdb8] px-6 pb-8 sm:px-10 lg:px-16">
-          <h1 className="text-center text-4xl font-serif text-[#b89b5e] sm:text-[52px] lg:text-[64px]">
-            Serviços
-          </h1>
+        <header className="border-b-[4px] border-[#d9cdb8] px-6 pb-8 sm:px-10 lg:px-16">
+          <div className="relative flex items-center justify-center">
+            <button
+              type="button"
+              onClick={handleBack}
+              aria-label="Voltar"
+              className="absolute left-0 inline-flex h-11 w-11 items-center justify-center rounded-full text-[#b89b5e] transition-colors hover:bg-[#ece3d5]"
+            >
+              <ArrowLeft size={24} strokeWidth={1.75} />
+            </button>
+            <h1 className="text-center text-4xl font-serif text-[#b89b5e] sm:text-[52px] lg:text-[64px]">
+              Serviços
+            </h1>
+          </div>
         </header>
 
-        <div className="px-6 py-12 sm:px-10 lg:px-16 lg:py-16">
-          <div className="mx-auto max-w-6xl space-y-20">
+        <div className="px-24 py-12 lg:py-16">
+          <div className="space-y-20">
             {services.map((service) => (
               <article
                 key={service.title}
-                className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-0"
+                className="grid grid-cols-1 gap-10 lg:min-h-[24rem] lg:grid-cols-2 lg:items-center lg:gap-0"
               >
                 <div className="lg:pr-16">
                   <h2 className="whitespace-pre-line font-serif text-[28px] leading-[1.02] text-[#6b7a5e] sm:text-[34px]">
@@ -82,14 +105,14 @@ export default function ServicosPage() {
                   </h2>
                   <div className="mt-10 space-y-6 text-[18px] font-sans leading-[1.02] text-[#735746] sm:text-[19px]">
                     {service.description.map((paragraph) => (
-                      <p key={paragraph} className="max-w-[28rem]">
+                      <p key={paragraph}>
                         {paragraph}
                       </p>
                     ))}
                   </div>
                 </div>
 
-                <div className="lg:border-l lg:border-[#ece3d5] lg:pl-16">
+                <div className="lg:border-l lg:border-[#ece3d5] lg:pl-24">
                   <h3 className="font-sans text-[16px] font-medium text-[#3b2f26]">Inclui</h3>
                   <ul className="mt-6 space-y-1 text-[16px] font-sans leading-[1.05] text-[#735746] sm:text-[17px]">
                     {service.includes.map((item) => (
@@ -101,10 +124,10 @@ export default function ServicosPage() {
                   </ul>
 
                   {service.cta && (
-                    <div className="mt-10 flex justify-center lg:justify-end">
+                    <div className="mt-10 flex">
                       <Link
                         href={service.cta.href}
-                        className="inline-flex items-center justify-center rounded-full border border-[#e3dbd0] bg-white px-8 py-3 text-[16px] font-medium text-[#b0907a] transition-colors hover:bg-[#f0ebe4]"
+                        className="inline-flex items-center justify-center rounded-lg bg-[#4e5f4a] px-8 py-1 text-[16px] text-[#f6f2ed] transition-colors hover:bg-[#f0ebe4]"
                       >
                         {service.cta.label}
                       </Link>
