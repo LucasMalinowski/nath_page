@@ -117,13 +117,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? backgroundVariant === 'dirt'
-            ? 'bg-dirt/70 backdrop-blur-sm shadow-sm'
-            : 'bg-[#4e5f4a]/70 backdrop-blur-sm shadow-sm'
-          : backgroundVariant === 'dirt'
-            ? 'bg-dirt/90'
-            : 'bg-[#4e5f4a]/70'
+        isScrolled ? 'bg-[#3e5f4b]/70 backdrop-blur-sm shadow-sm' : 'bg-[#3e5f4b]/70'
       }`}
     >
       <div className="px-6 sm:px-8 ">
@@ -172,11 +166,11 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
             {navItems.map((item) => {
               const href = toHomeHref(item.href, item.isRoute)
               const isAnchor = isHome && item.href.startsWith('#')
-              const commonClass = `px-3 py-1 text-[20px] font-thin rounded-lg transition-colors duration-300 ${
+              const commonClass = `px-3 text-[20px] font-thin rounded-lg transition-colors duration-300 ${
                 item.href === '#contato'
-                  ? 'bg-[#ebeae0] text-[#c3a35a]'
+                  ? 'bg-[#ebeae0] text-[#3b2f26] px-12'
                   : item.isRoute && item.href === '/galeria'
-                    ? 'bg-[#6b7a5e] text-bg'
+                    ? 'bg-[#6b7a5e] text-bg px-12'
                   : item.isRoute
                     ? backgroundVariant === 'dirt'
                       ? 'bg-dirt text-bg hover:text-olive'
