@@ -37,7 +37,7 @@ const Services = () => {
       id="servicos"
       className="relative bg-[#f5f1eb] pb-4"
     >
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-col lg:flex-row  border-b-2 border-[#d9cdb8]/20">
         {/* Left: Video */}
         <div className="relative min-h-[420px] lg:min-h-[760px] lg:w-1/3">
           <video
