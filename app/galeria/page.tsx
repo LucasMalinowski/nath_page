@@ -307,12 +307,12 @@ export default function GaleriaPage() {
             </p>
             {loading && <p className="text-bg/70 font-sans">Carregando...</p>}
             {!loading && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div className="flex flex-wrap justify-center gap-10">
                   {visibleProducts.map((product) => {
                     const images = parseImages(product)
                     const hasImages = images.length > 0
                     return (
-                        <div key={product.id} className="text-left">
+                        <div key={product.id} className="w-full max-w-[286px] text-left sm:max-w-[308px] lg:max-w-[330px]">
                           <div className="border border-[#d8cdbf] p-3 md:p-4 bg-[#f5f1eb] flex flex-col w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
                             <div className="relative aspect-[4/5] border border-[#e4dbcf] bg-[#efe9df]">
                               {hasImages && (
