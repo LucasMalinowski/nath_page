@@ -105,7 +105,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                 </div>
 
                 <div className="flex flex-col items-center justify-center">
-                  <div className="w-full max-w-[340px] text-left">
+                  <div className="w-full max-w-[340px] text-left pr-20">
                     <h3 className="text-[16px] font-sans font-normal tracking-wide text-[#6b7a5e] pb-5">ATENDIMENTO</h3>
                     <div className="w-full pt-5 space-y-2 text-[14px] font-normal leading-none text-[#6b7a5e] border-t-2 border-[#d9cdb8]/40">
                       <a href={phoneHref} className="flex items-center gap-3 transition-opacity hover:opacity-80">
