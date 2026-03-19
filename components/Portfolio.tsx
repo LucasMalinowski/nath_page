@@ -219,8 +219,9 @@ const Portfolio = () => {
       </section>
 
       {activeProject && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#20160f]/70 px-4 py-8">
-          <div className="relative w-full max-w-5xl rounded-md bg-[#f5f1eb] p-5 shadow-2xl md:p-8">
+        <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#20160f]/70 px-4 py-4 md:py-8">
+          <div className="flex min-h-full items-start justify-center">
+            <div className="relative my-auto flex w-full max-w-5xl max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-md bg-[#f5f1eb] p-5 shadow-2xl md:max-h-[calc(100vh-4rem)] md:p-8">
             <button
               type="button"
               onClick={closeProjectModal}
@@ -232,43 +233,46 @@ const Portfolio = () => {
 
             <h3 className="pr-10 text-2xl font-serif text-text md:text-3xl">{activeProject.title}</h3>
 
-            {activeImages.length > 0 && (
-              <>
-                <div className="relative mt-6 h-[300px] overflow-hidden border border-[#e2d5c2] bg-[#ece4d8] md:h-[520px]">
-                  <Image
-                    src={activeImages[activeImageIndex]}
-                    alt={`${activeProject.title} - foto ${activeImageIndex + 1}`}
-                    fill
-                    className="object-contain"
-                    unoptimized
-                  />
-                </div>
+              <div className="mt-6 flex-1 overflow-y-auto pr-1">
+                {activeImages.length > 0 && (
+                  <>
+                    <div className="relative h-[300px] overflow-hidden border border-[#e2d5c2] bg-[#ece4d8] md:h-[520px]">
+                      <Image
+                        src={activeImages[activeImageIndex]}
+                        alt={`${activeProject.title} - foto ${activeImageIndex + 1}`}
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
 
-                {activeImages.length > 1 && (
-                  <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
-                    {activeImages.map((image, index) => (
-                      <button
-                        key={`${image}-${index}`}
-                        type="button"
-                        onClick={() => setActiveImageIndex(index)}
-                        className={`relative h-20 w-24 shrink-0 overflow-hidden border transition-colors ${
-                          index === activeImageIndex ? 'border-[#b89b5e]' : 'border-[#d5c5ad]'
-                        }`}
-                        aria-label={`Abrir foto ${index + 1}`}
-                      >
-                        <Image
-                          src={image}
-                          alt={`${activeProject.title} miniatura ${index + 1}`}
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </button>
-                    ))}
-                  </div>
+                    {activeImages.length > 1 && (
+                      <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
+                        {activeImages.map((image, index) => (
+                          <button
+                            key={`${image}-${index}`}
+                            type="button"
+                            onClick={() => setActiveImageIndex(index)}
+                            className={`relative h-20 w-24 shrink-0 overflow-hidden border transition-colors ${
+                              index === activeImageIndex ? 'border-[#b89b5e]' : 'border-[#d5c5ad]'
+                            }`}
+                            aria-label={`Abrir foto ${index + 1}`}
+                          >
+                            <Image
+                              src={image}
+                              alt={`${activeProject.title} miniatura ${index + 1}`}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
-              </>
-            )}
+              </div>
+            </div>
           </div>
         </div>
       )}
