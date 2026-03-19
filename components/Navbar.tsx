@@ -137,7 +137,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
             </Link>
           )}
 
-          <div className="hidden md:flex flex-1 items-center justify-center justify-between pr-20 pl-2">
+          <div className="hidden md:flex flex-1 items-center justify-center justify-between pr-12 pl-2">
             {isHome ? (
               <a href="#hero" className="flex items-center">
                 <Image
@@ -166,11 +166,11 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
             {navItems.map((item) => {
               const href = toHomeHref(item.href, item.isRoute)
               const isAnchor = isHome && item.href.startsWith('#')
-              const commonClass = `px-3 text-[20px] font-thin rounded-lg transition-colors duration-300 ${
+              const commonClass = `px-12 text-[20px] font-thin rounded-lg transition-colors duration-300 ${
                 item.href === '#contato'
-                  ? 'bg-[#ebeae0] text-[#3b2f26] px-12'
+                  ? 'bg-[#ebeae0] text-[#3b2f26]'
                   : item.isRoute && item.href === '/galeria'
-                    ? 'bg-[#6b7a5e] text-bg px-12'
+                    ? 'bg-[#6b7a5e] text-bg'
                   : item.isRoute
                     ? backgroundVariant === 'dirt'
                       ? 'bg-dirt text-bg hover:text-olive'
