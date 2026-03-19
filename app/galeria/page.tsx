@@ -279,7 +279,7 @@ export default function GaleriaPage() {
         </section>
 
         {/* Products - WITH CAROUSEL */}
-        <section className="bg-[#f5f1eb] py-16 lg:py-20 relative">
+        <section className="bg-[#f5f1eb] pt-16 lg:pt-20 pb-8 relative border-b-2 border-[#d9cdb8]/20">
           {/* Lateral Chevrons for Products */}
           {productsCarouselEnabled && currentProductPage > 0 && (
               <button
@@ -392,7 +392,7 @@ export default function GaleriaPage() {
         </section>
 
         {/* Exhibitors - Chevrons only on hover, positioned at exhibitors */}
-        <section className="bg-[#f5f1eb] pb-16 group/exhibitors">
+        <section className="bg-[#f5f1eb] pt-8 pb-16 group/exhibitors border-b-2 border-[#d9cdb8]/20">
           <div className="px-6 sm:px-8 lg:px-24">
             <div className="mb-12">
               <h2 className="text-[41px] font-serif text-[#b89b5e]">
