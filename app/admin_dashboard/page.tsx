@@ -152,6 +152,7 @@ export default function AdminDashboard() {
     const [exhibitorEditForm, setExhibitorEditForm] = useState({
         name: '',
         title: '',
+        description: '',
         instagram_path: ''
     })
     const [exhibitorEditFile, setExhibitorEditFile] = useState<File | null>(null)
@@ -159,6 +160,7 @@ export default function AdminDashboard() {
     const [newExhibitor, setNewExhibitor] = useState({
         name: '',
         title: '',
+        description: '',
         instagram_path: ''
     })
     const [newExhibitorFile, setNewExhibitorFile] = useState<File | null>(null)
@@ -738,6 +740,7 @@ export default function AdminDashboard() {
                 .insert({
                     name: newExhibitor.name.trim(),
                     title: newExhibitor.title.trim() || null,
+                    description: newExhibitor.description.trim() || null,
                     instagram_path: newExhibitor.instagram_path.trim() || null,
                     avatar_url: avatarUrl,
                     display_order: exhibitors.length,
@@ -747,7 +750,7 @@ export default function AdminDashboard() {
             if (error) throw error
 
             await fetchExhibitors()
-            setNewExhibitor({ name: '', title: '', instagram_path: '' })
+            setNewExhibitor({ name: '', title: '', description: '', instagram_path: '' })
             setNewExhibitorFile(null)
             setNewExhibitorFileKey((prev) => prev + 1)
             alert('Expositor salvo com sucesso!')
@@ -764,6 +767,7 @@ export default function AdminDashboard() {
         setExhibitorEditForm({
             name: exhibitor.name,
             title: exhibitor.title || '',
+            description: exhibitor.description || '',
             instagram_path: exhibitor.instagram_path || ''
         })
         setExhibitorEditFile(null)
@@ -772,7 +776,7 @@ export default function AdminDashboard() {
 
     const cancelExhibitorEdit = () => {
         setEditingExhibitorId(null)
-        setExhibitorEditForm({ name: '', title: '', instagram_path: '' })
+        setExhibitorEditForm({ name: '', title: '', description: '', instagram_path: '' })
         setExhibitorEditFile(null)
     }
 
@@ -797,6 +801,7 @@ export default function AdminDashboard() {
             const updates: Record<string, any> = {
                 name: exhibitorEditForm.name.trim(),
                 title: exhibitorEditForm.title.trim() || null,
+                description: exhibitorEditForm.description.trim() || null,
                 instagram_path: exhibitorEditForm.instagram_path.trim() || null
             }
 

@@ -8,6 +8,7 @@ import { GalleryExhibitor } from '@/lib/supabase'
 type ExhibitorForm = {
     name: string
     title: string
+    description: string
     instagram_path: string
 }
 
@@ -84,6 +85,17 @@ export default function ExhibitorsTab({
                                 className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
                             />
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-graphite mb-1">Descricao</label>
+                        <textarea
+                            value={newExhibitor.description}
+                            onChange={(e) => setNewExhibitor({ ...newExhibitor, description: e.target.value })}
+                            rows={4}
+                            className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white resize-y"
+                            placeholder="Texto exibido no card da tela inicial"
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -173,6 +185,15 @@ export default function ExhibitorsTab({
                                                     />
                                                 </div>
                                                 <div>
+                                                    <label className="block text-sm font-medium text-graphite mb-1">Descricao</label>
+                                                    <textarea
+                                                        value={exhibitorEditForm.description}
+                                                        onChange={(e) => setExhibitorEditForm({ ...exhibitorEditForm, description: e.target.value })}
+                                                        rows={4}
+                                                        className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white resize-y"
+                                                    />
+                                                </div>
+                                                <div>
                                                     <label className="block text-sm font-medium text-graphite mb-1">Instagram</label>
                                                     <input
                                                         type="text"
@@ -213,6 +234,11 @@ export default function ExhibitorsTab({
                                             <>
                                                 <h3 className="font-semibold text-lg text-graphite">{exhibitor.name}</h3>
                                                 <p className="text-sm text-graphite/70 mt-1">{exhibitor.title}</p>
+                                                {exhibitor.description && (
+                                                    <p className="text-sm text-graphite/75 mt-2 whitespace-pre-line">
+                                                        {exhibitor.description}
+                                                    </p>
+                                                )}
                                                 {exhibitor.instagram_path && (
                                                     <p className="text-xs text-graphite/60 mt-2">@{exhibitor.instagram_path}</p>
                                                 )}

@@ -37,6 +37,7 @@ export type GalleryExhibitor = {
     id: string
     name: string
     title: string | null
+    description: string | null
     instagram_path: string | null
     avatar_url: string | null
     display_order: number | null
