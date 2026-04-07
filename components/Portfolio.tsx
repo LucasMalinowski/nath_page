@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { ArrowRight, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, X } from 'lucide-react'
 import { supabase, PortfolioImage } from '@/lib/supabase'
 
 type PortfolioProject = PortfolioImage & {
@@ -49,6 +49,20 @@ const Portfolio = () => {
       if (event.key === 'Escape') {
         setActiveProject(null)
         setActiveImageIndex(0)
+        return
+      }
+
+      if (event.key === 'ArrowLeft') {
+        setActiveImageIndex((currentIndex) =>
+          currentIndex === 0 ? activeProject.galleryImages.length - 1 : currentIndex - 1
+        )
+        return
+      }
+
+      if (event.key === 'ArrowRight') {
+        setActiveImageIndex((currentIndex) =>
+          currentIndex === activeProject.galleryImages.length - 1 ? 0 : currentIndex + 1
+        )
       }
     }
 
@@ -109,6 +123,18 @@ const Portfolio = () => {
     setActiveImageIndex(0)
   }
 
+  const showPreviousImage = () => {
+    setActiveImageIndex((currentIndex) =>
+      currentIndex === 0 ? activeImages.length - 1 : currentIndex - 1
+    )
+  }
+
+  const showNextImage = () => {
+    setActiveImageIndex((currentIndex) =>
+      currentIndex === activeImages.length - 1 ? 0 : currentIndex + 1
+    )
+  }
+
   if (loading) {
     return (
       <section id="portfolio" className="bg-[#f5f1eb] py-20">
@@ -137,12 +163,12 @@ const Portfolio = () => {
 
   return (
     <>
-      <section id="portfolio" className="bg-[#f5f1eb] py-20 border-b-2 border-[#d9cdb8]/20">
-          <header className="text-center border-b-[4px] pb-14 border-[#e3d8c8]">
+      <section id="portfolio" className="bg-[#f5f1eb] pb-20 border-b-2 border-[#d9cdb8]/20 mt-4">
+          <header className="bg-[#eee9e2] text-center border-b-[1.5px] py-14 mb-2 border-[#DDB980]">
             <h2 className="text-5xl md:text-6xl font-serif font-normal text-[#b89b5e]">{portfolioTitle}</h2>
             <p className="mt-6 text-lg text-text/70">{portfolioSubtitle}</p>
           </header>
-        <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-16">
+        <div className="px-6 sm:px-8 md:px-20">
 
           <div className="mt-14 space-y-16 md:space-y-20">
             {projects.map((project, index) => {
@@ -151,7 +177,15 @@ const Portfolio = () => {
               return (
                 <article
                   key={project.id}
-                  className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-2 md:gap-12"
+                  className={`grid grid-cols-1 items-stretch gap-8 md:gap-12 ${
+                    imageLeft
+                      ? isTallFrame
+                        ? 'md:grid-cols-[minmax(0,420px)_minmax(0,1fr)]'
+                        : 'md:grid-cols-[minmax(0,520px)_minmax(0,1fr)]'
+                      : isTallFrame
+                        ? 'md:grid-cols-[minmax(0,1fr)_minmax(0,420px)]'
+                        : 'md:grid-cols-[minmax(0,1fr)_minmax(0,520px)]'
+                  }`}
                 >
                   <div
                     className={`${imageLeft ? 'order-1 md:order-1' : 'order-2 md:order-2'} ${
@@ -186,24 +220,28 @@ const Portfolio = () => {
                   </div>
 
                   <div
-                    className={`${imageLeft ? 'order-2 md:order-2' : 'order-1 md:order-1'} flex h-full w-full max-w-[540px] flex-col py-10`}
+                    className={`${imageLeft ? 'order-2 md:order-2' : 'order-1 md:order-1'} flex h-full w-full flex-col py-10`}
                   >
-                    <h3 className="text-3xl font-serif text-text">{project.title}</h3>
-                    {project.description && (
-                      <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-text/75">
-                        {project.description}
-                      </p>
-                    )}
-                    {project.phrase && (
-                      <p className="mt-5 border-l-2 border-[#735746]/40 pl-4 py-2 whitespace-pre-line text-xl font-thin italic leading-snug text-[#9f876c]">
-                        {project.phrase}
-                      </p>
-                    )}
+                    <div
+                      className="max-w-[540px]"
+                    >
+                      <h3 className="text-3xl font-serif font-bold text-text">{project.title}</h3>
+                      {project.description && (
+                        <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-[#735746]">
+                          {project.description}
+                        </p>
+                      )}
+                      {project.phrase && (
+                        <p className="mt-5 border-l-2 border-[#735746]/40 pl-4 py-2 whitespace-pre-line text-xl font-thin italic leading-snug text-[#9f876c]">
+                          {project.phrase}
+                        </p>
+                      )}
+                    </div>
 
                     <button
                       type="button"
                       onClick={() => openProjectModal(project)}
-                      className={`mt-auto inline-flex items-center gap-2 rounded-md bg-[#c3a35a] px-12 py-1.5 text-sm text-[#f5f1eb] transition-colors hover:bg-[#b59347] ${
+                      className={`mt-auto inline-flex items-center gap-2 rounded-md bg-[#c3a35a] px-12 py-1 text-sm text-[#f5f1eb] transition-colors hover:bg-[#b59347] ${
                         imageLeft ? 'self-end' : 'self-start'
                       }`}
                     >
@@ -244,6 +282,32 @@ const Portfolio = () => {
                         className="object-contain"
                         unoptimized
                       />
+
+                      {activeImages.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={showPreviousImage}
+                            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#f5f1eb]/90 text-[#735746] shadow-md transition-colors hover:bg-[#f5f1eb]"
+                            aria-label="Imagem anterior"
+                          >
+                            <ArrowLeft size={18} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={showNextImage}
+                            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#f5f1eb]/90 text-[#735746] shadow-md transition-colors hover:bg-[#f5f1eb]"
+                            aria-label="Próxima imagem"
+                          >
+                            <ArrowRight size={18} />
+                          </button>
+
+                          <div className="absolute bottom-3 right-3 rounded-full bg-[#f5f1eb]/90 px-3 py-1 text-sm text-[#735746] shadow-sm">
+                            {activeImageIndex + 1}/{activeImages.length}
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {activeImages.length > 1 && (
