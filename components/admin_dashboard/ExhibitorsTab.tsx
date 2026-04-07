@@ -10,6 +10,7 @@ type ExhibitorForm = {
     title: string
     description: string
     instagram_path: string
+    brand_member: boolean
 }
 
 type ExhibitorsTabProps = {
@@ -109,16 +110,29 @@ export default function ExhibitorsTab({
                                 placeholder="ex: nathalia_malinowski"
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-graphite mb-1">Foto *</label>
+                        <div className="flex items-center gap-3 rounded-md border border-warm-beige bg-off-white px-3 py-2 md:self-end">
                             <input
-                                key={newExhibitorFileKey}
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => setNewExhibitorFile(e.target.files?.[0] || null)}
-                                className="w-full text-sm text-graphite/70"
+                                id="new-brand-member"
+                                type="checkbox"
+                                checked={newExhibitor.brand_member}
+                                onChange={(e) => setNewExhibitor({ ...newExhibitor, brand_member: e.target.checked })}
+                                className="h-4 w-4 rounded border-warm-beige text-olive-green focus:ring-olive-green/60"
                             />
+                            <label htmlFor="new-brand-member" className="text-sm font-medium text-graphite">
+                                Membro da marca
+                            </label>
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-graphite mb-1">Foto *</label>
+                        <input
+                            key={newExhibitorFileKey}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setNewExhibitorFile(e.target.files?.[0] || null)}
+                            className="w-full text-sm text-graphite/70"
+                        />
                     </div>
 
                     <button
@@ -202,6 +216,15 @@ export default function ExhibitorsTab({
                                                         className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
                                                     />
                                                 </div>
+                                                <label className="flex items-center gap-3 rounded-md border border-warm-beige bg-off-white px-3 py-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={exhibitorEditForm.brand_member}
+                                                        onChange={(e) => setExhibitorEditForm({ ...exhibitorEditForm, brand_member: e.target.checked })}
+                                                        className="h-4 w-4 rounded border-warm-beige text-olive-green focus:ring-olive-green/60"
+                                                    />
+                                                    <span className="text-sm font-medium text-graphite">Membro da marca</span>
+                                                </label>
                                                 <div>
                                                     <label className="block text-sm font-medium text-graphite mb-1">Nova foto</label>
                                                     <input
@@ -242,6 +265,9 @@ export default function ExhibitorsTab({
                                                 {exhibitor.instagram_path && (
                                                     <p className="text-xs text-graphite/60 mt-2">@{exhibitor.instagram_path}</p>
                                                 )}
+                                                <p className="text-xs text-graphite/60 mt-2">
+                                                    Membro da marca: {exhibitor.brand_member ? 'Sim' : 'Nao'}
+                                                </p>
                                                 <div className="flex gap-2 mt-3">
                                                     <button
                                                         type="button"

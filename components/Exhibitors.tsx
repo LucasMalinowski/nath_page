@@ -23,6 +23,7 @@ const Exhibitors = () => {
         .from('gallery_exhibitors')
         .select('*')
         .eq('is_visible', true)
+        .eq('brand_member', true)
         .order('display_order', { ascending: true })
 
       if (error) throw error
@@ -45,7 +46,7 @@ const Exhibitors = () => {
           <h2 className="text-5xl md:text-6xl font-serif font-normal text-[#c8aa6a]">
             {sectionTitle}
           </h2>
-          <p className="mt-5 text-base italic text-text/60 md:text-xl">
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl mt-5 italic font-poetic text-text/60">
             {sectionSubtitle}
           </p>
         </header>
@@ -86,18 +87,18 @@ const Exhibitors = () => {
                     </div>
 
                     <div className="flex flex-col justify-center px-6 py-7 md:px-10 md:py-8 lg:px-12">
-                      <h3 className="text-2xl font-serif font-normal text-text md:text-[2rem]">
+                      <h3 className="text-2xl font-serif font-normal text-text">
                         {exhibitor.name}
                       </h3>
 
                       {exhibitor.title && (
-                        <p className="mt-4 text-base font-normal text-text/70 md:text-lg">
+                        <p className="mt-4 text-base font-normal text-[#735746] md:text-lg">
                           {exhibitor.title}
                         </p>
                       )}
 
                       {exhibitor.description && (
-                        <p className="mt-2 max-w-3xl whitespace-pre-line text-base leading-snug text-text/70 md:text-[1.05rem]">
+                        <p className="mt-2 max-w-3xl whitespace-pre-line text-base leading-snug text-[#735746] md:text-[1.05rem]">
                           {exhibitor.description}
                         </p>
                       )}
@@ -107,9 +108,9 @@ const Exhibitors = () => {
                           href={instagramHref}
                           target="_blank"
                           rel="noreferrer"
-                          className="mt-5 inline-flex items-center gap-2 text-sm text-[#b89b5e] transition-colors hover:text-[#9f8450] md:text-base"
+                          className="mt-5 inline-flex items-center gap-2 text-sm text-[#735746]/80 transition-colors hover:text-[#9f8450] md:text-base"
                         >
-                          <Instagram size={16} />
+                          <Instagram size={16} className="text-[#b89b5e]"/>
                           {exhibitor.instagram_path}
                         </Link>
                       )}
