@@ -15,14 +15,15 @@ const About = () => {
               Sobre mim
             </h2>
 
-            <div className="space-y-6 text-xl-mobile md:text-xl font-thin font-sans text-text leading-relaxed">
+            <div className="space-y-6 text-base md:text-xl font-thin font-sans text-text leading-relaxed">
               <p>
-                Sou Nathalia Malinowski, designer de interiores e artista. Meu trabalho nasce da escuta atenta e da observação sensível dos espaços e das pessoas.
+                Sou Nathalia Malinowski, designer de interiores e artista plástica. Fundadora e direção criativa da marca, conduzo cada projeto a partir da escuta sensível e da construção de narrativas que unem estética, funcionalidade e significado.
               </p>
 
               <p>
-                Acredito em o design que vai além da estética: ele organiza, acolhe e traduz identidade. Cada projeto é pensado como uma construção cuidadosa, respeitando o tempo, a história e o modo de viver de quem habita o espaço.
-              </p>
+                Acredito que o design vai além da estética.
+                Ele organiza, acolhe e traduz identidade.
+                Cada projeto é construído com cuidado, respeitando o tempo e o modo de viver de quem o habita.              </p>
             </div>
 
             <blockquote className="text-2xl md:text-3xl font-poetic italic text-olive leading-snug pt-6 lg:pt-14">
@@ -30,8 +31,8 @@ const About = () => {
             </blockquote>
           </div>
           {/* Profile Photo */}
-          <div className="w-full max-w-[560px] justify-self-end">
-            <div className="relative w-full aspect-square overflow-hidden shadow-2xl">
+          <div className="w-full max-w-[580px] max-h-[680px] justify-self-end">
+            <div className="relative w-full aspect-[4/5] overflow-hidden shadow-2xl">
               <Image
                 src="/profile-photo.jpeg"
                 alt="Nathalia Malinowski"
