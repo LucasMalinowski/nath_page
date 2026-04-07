@@ -233,9 +233,10 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
           </div>
 
           {/* Mobile Menu Button */}
+          {/* Hamburger: min 44×44px touch target */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`md:hidden p-2 rounded-lg transition-colors ${
+            className={`md:hidden p-3 rounded-lg transition-colors ${
               backgroundVariant === 'dirt'
                 ? 'text-bg hover:text-olive'
                 : 'text-bg hover:text-gold'
@@ -257,7 +258,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
             {navItems.map((item) => {
               const href = toHomeHref(item.href, item.isRoute)
               const isAnchor = isHome && item.href.startsWith('#')
-              const commonClass = `block py-3 text-sm font-medium transition-colors font-sans ${
+              const commonClass = `flex items-center py-3 min-h-[44px] text-sm font-medium transition-colors font-sans ${
                 item.href === '#contato'
                   ? 'bg-[#ebeae0] text-gold rounded-md px-3'
                   : item.isRoute && item.href === '/galeria'
@@ -318,7 +319,7 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
             {cartCount > 0 && (
               <Link
                 href="/carrinho"
-                className={`block py-3 text-sm font-medium transition-colors font-sans ${
+                className={`flex items-center py-3 min-h-[44px] text-sm font-medium transition-colors font-sans ${
                   backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-bg hover:text-gold'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
