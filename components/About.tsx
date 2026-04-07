@@ -37,6 +37,7 @@ const About = () => {
                 src="/profile-photo.jpeg"
                 alt="Nathalia Malinowski"
                 fill
+                sizes="(min-width: 1280px) 560px, (min-width: 1024px) 520px, 100vw"
                 className="object-cover object-center"
                 priority
               />
