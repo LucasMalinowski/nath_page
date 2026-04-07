@@ -23,14 +23,14 @@ const Concept = () => {
         <div className="container py-8 px-6 sm:px-8 md:px-20 flex flex-col justify-between min-h-[200px] md:min-h-[250px]">
           {/* Título no topo esquerdo */}
           <div className="self-start">
-            <h2 className="text-xl md:text-6xl font-serif font-normal text-gold/85 tracking-wide">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-normal text-gold/85 tracking-wide">
               {renderTextWithBreaks(conceptTitle)}
             </h2>
           </div>
 
           {/* Texto no bottom direito */}
           <div className="self-end max-w-lg mt-8 md:mt-0">
-            <p className="text-sm md:text-base lg:text-xl font-sans text-bg/80 text-left leading-relaxed">
+            <p className="text-base md:text-base lg:text-xl font-sans font-light text-bg/80 text-left leading-relaxed">
               {renderTextWithBreaks(`${conceptPoetic}\n${conceptParagraph}`)}
             </p>
           </div>
