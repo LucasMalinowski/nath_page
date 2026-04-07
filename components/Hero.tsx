@@ -23,7 +23,7 @@ const Hero = () => {
       {/* Typewriter text (bottom-left) */}
       <div className="relative z-10 h-full max-w-7xl px-6 sm:px-8 lg:px-16">
         <div className="h-full flex items-end pb-12 sm:pb-16">
-          <h1 className="sm:text-xl md:text-2xl lg:text-2xl font-poetic italic animate-fade-in delay-100 leading-relaxed">
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-2xl font-poetic italic animate-fade-in delay-100 leading-relaxed">
             <Typewriter text={heroHeadline}
                         classes={"text-[#F5F1EB]/90"} />
           </h1>
