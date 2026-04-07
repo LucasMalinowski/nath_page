@@ -2,14 +2,16 @@
 import Link from 'next/link'
 
 const Services = () => {
-  const servicesTitle = 'Meus serviços acompanham diferentes momentos, sempre com um olhar autoral, sensível e estruturado.'
+  const servicesTitle = 'Meus serviços acompanham diferentes momentos,\nsempre com um olhar autoral, sensível e\nestruturado.'
   const servicesSubtitle = 'Um processo sensível, autoral e bem conduzido — do conceito à materialização.'
-  const service2Title = 'Consultoria e Curadoria'
-  const service2Desc = 'Direcionamento estratégico para decisões mais seguras.'
+  const service2Title = 'Consultoria e \n Curadoria'
+  const service2Desc = 'Direcionamento estratégico para decisões mais seguras e coerentes com o seu espaço.'
   const service3Title = 'Pinturas Murais\nAutorais'
-  const service3Desc = 'Arte integrada ao espaço com identidade e significado.'
+  const service3Desc = 'Intervenções artísticas que integram o espaço com identidade, presença e significado.'
   const service4Title = 'Galeria de Artes\nOnline'
-  const service4Desc = 'Vendas online de objetos e telas autorais.'
+  const service4Desc = 'Obras autorais e peças selecionadas para compor espaços com identidade e intenção.'
+  const service5Title = 'Projeto \n Residencial'
+  const service5Desc = 'Desenvolvimento completo do conceito à definição estética e funcional do espaço.'
 
   const services = [
     {
@@ -29,13 +31,19 @@ const Services = () => {
       title: service4Title,
       description: service4Desc,
       note: 'Disponíveis sob curadoria pontual na aba Galeria.'
+    },
+    {
+      number: '04',
+      title: service5Title,
+      description: service5Desc,
+      note: 'Projeto que se encaixa no seu espaço.'
     }
   ]
 
   return (
     <section
       id="servicos"
-      className="relative bg-[#f5f1eb] pb-4"
+      className="relative bg-[#f6f2ed] pb-4"
     >
       <div className="flex flex-col lg:flex-row  border-b-2 border-[#d9cdb8]/20">
         {/* Left: Video */}
@@ -54,20 +62,20 @@ const Services = () => {
         {/* Right: Content */}
         <div className="flex flex-col lg:w-2/3 mt-4">
           {/* Title block with brown texture */}
-          <div className="texture-brown px-6 sm:px-10 py-8">
+          <div className="bg-[#3b2f26] px-6 sm:px-10 py-8">
             <div className="flex gap-6 items-start sm:pl-8">
-              <h2 className="text-3xl-mobile md:text-3xl py-4 font-serif text-bg border-l-[3px] border-bg/30 pl-6 pr-0 sm:pl-16 sm:pr-12">
+              <h2 className="whitespace-pre-line text-xl font-light not-italic sm:text-2xl md:text-3xl py-4 font-poetic text-[#ebe0e0] border-l-[3px] border-bg/30 pl-6 pr-0 sm:pl-16 sm:pr-12">
                 {servicesTitle}
               </h2>
             </div>
           </div>
 
           {/* Services grid on white texture */}
-          <div className="bg-[#f5f1eb] px-6 py-12 sm:px-8 lg:px-24 lg:py-24">
+          <div className="bg-[#f6f2ed] px-6 py-12 sm:px-8 lg:px-24 lg:py-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 lg:gap-20">
               {services.map((service) => (
                 <div key={service.title}>
-                  <div className="relative bg-[#f6f2ed] border border-[#d5ccb9] p-6 rounded-[22px] text-[#735746] shadow-sm min-h-[240px]">
+                  <div className="relative bg-[#eee9e2] p-6 rounded-[22px] text-[#735746] shadow-sm min-h-[240px]">
                     <h3 className="text-h3 font-serif font-semibold mb-6 text-[#3b2f26] whitespace-pre-line leading-tight">
                       {service.title}
                     </h3>
@@ -87,15 +95,6 @@ const Services = () => {
                   </p>
                 </div>
               ))}
-
-              <div className="flex min-h-[240px] items-center justify-center self-start">
-                <a
-                  href="/galeria#galeria"
-                  className="inline-flex w-full max-w-[290px] items-center justify-center px-8 py-3 rounded-full bg-white border border-[#d5ccb9] text-[#735746] text-xl font-sans font-medium hover:bg-[#f0ebe4] transition-colors"
-                >
-                  Galeria de Artes
-                </a>
-              </div>
             </div>
           </div>
         </div>
