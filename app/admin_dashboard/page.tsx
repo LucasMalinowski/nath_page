@@ -153,7 +153,8 @@ export default function AdminDashboard() {
         name: '',
         title: '',
         description: '',
-        instagram_path: ''
+        instagram_path: '',
+        brand_member: false
     })
     const [exhibitorEditFile, setExhibitorEditFile] = useState<File | null>(null)
     const [exhibitorEditFileKey, setExhibitorEditFileKey] = useState(0)
@@ -161,7 +162,8 @@ export default function AdminDashboard() {
         name: '',
         title: '',
         description: '',
-        instagram_path: ''
+        instagram_path: '',
+        brand_member: false
     })
     const [newExhibitorFile, setNewExhibitorFile] = useState<File | null>(null)
     const [newExhibitorFileKey, setNewExhibitorFileKey] = useState(0)
@@ -741,6 +743,7 @@ export default function AdminDashboard() {
                     name: newExhibitor.name.trim(),
                     title: newExhibitor.title.trim() || null,
                     description: newExhibitor.description.trim() || null,
+                    brand_member: newExhibitor.brand_member,
                     instagram_path: newExhibitor.instagram_path.trim() || null,
                     avatar_url: avatarUrl,
                     display_order: exhibitors.length,
@@ -750,7 +753,7 @@ export default function AdminDashboard() {
             if (error) throw error
 
             await fetchExhibitors()
-            setNewExhibitor({ name: '', title: '', description: '', instagram_path: '' })
+            setNewExhibitor({ name: '', title: '', description: '', instagram_path: '', brand_member: false })
             setNewExhibitorFile(null)
             setNewExhibitorFileKey((prev) => prev + 1)
             alert('Expositor salvo com sucesso!')
@@ -768,7 +771,8 @@ export default function AdminDashboard() {
             name: exhibitor.name,
             title: exhibitor.title || '',
             description: exhibitor.description || '',
-            instagram_path: exhibitor.instagram_path || ''
+            instagram_path: exhibitor.instagram_path || '',
+            brand_member: Boolean(exhibitor.brand_member)
         })
         setExhibitorEditFile(null)
         setExhibitorEditFileKey((prev) => prev + 1)
@@ -776,7 +780,7 @@ export default function AdminDashboard() {
 
     const cancelExhibitorEdit = () => {
         setEditingExhibitorId(null)
-        setExhibitorEditForm({ name: '', title: '', description: '', instagram_path: '' })
+        setExhibitorEditForm({ name: '', title: '', description: '', instagram_path: '', brand_member: false })
         setExhibitorEditFile(null)
     }
 
@@ -802,6 +806,7 @@ export default function AdminDashboard() {
                 name: exhibitorEditForm.name.trim(),
                 title: exhibitorEditForm.title.trim() || null,
                 description: exhibitorEditForm.description.trim() || null,
+                brand_member: exhibitorEditForm.brand_member,
                 instagram_path: exhibitorEditForm.instagram_path.trim() || null
             }
 
