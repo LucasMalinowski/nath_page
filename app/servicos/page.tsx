@@ -56,6 +56,25 @@ const services = [
       href: '/galeria',
       label: 'Galeria de Artes'
     }
+  },
+  {
+    title: 'Projeto de Interiores Residencial',
+    description: [
+      'Desenvolvimento completo do conceito à definição estética e funcional do espaço.',
+      'Cada projeto nasce da escuta atenta e da interpretação da identidade de quem o habita.',
+      'É um processo construído em camadas, respeitando contexto, arquitetura e modo de viver.'
+    ],
+    includes: [
+      'Briefing e alinhamento inicial',
+      'Conceito e narrativa do projeto',
+      'Layout e organização espacial',
+      'Estudo de materiais e acabamentos',
+      'Paleta de cores',
+      'Modelagem 3D para visualização',
+      'Ajustes por etapa (conforme contrato)',
+      'Direcionamento final para execução',
+
+    ]
   }
 ]
 
@@ -75,8 +94,8 @@ export default function ServicosPage() {
     <main className="min-h-screen bg-[#f5f1eb] page-fade-in">
       <Navbar />
 
-      <section className="pt-24">
-        <header className="border-b-[4px] border-[#d9cdb8] px-6 pb-8 sm:px-10 lg:px-16">
+      <section className="pt-24 border-b-2 border-[#d9cdb8]/20">
+        <header className="border-b-[2px] border-[#DDB980] px-6 pb-8 sm:px-10 lg:px-16">
           <div className="relative flex items-center justify-center">
             <button
               type="button"
@@ -92,15 +111,15 @@ export default function ServicosPage() {
           </div>
         </header>
 
-        <div className="px-24 py-12 lg:py-16">
-          <div className="space-y-20">
+        <div className="px-6 sm:px-10 lg:px-24 py-12 lg:py-16">
+          <div className="">
             {services.map((service) => (
               <article
                 key={service.title}
                 className="grid grid-cols-1 gap-10 lg:min-h-[24rem] lg:grid-cols-2 lg:items-center lg:gap-0"
               >
-                <div className="lg:pr-16">
-                  <h2 className="whitespace-pre-line font-serif text-[28px] leading-[1.02] text-[#6b7a5e] sm:text-[34px]">
+                <div className="lg:pl-10 pr-24">
+                  <h2 className="whitespace-pre-line font-serif text-[24px] leading-[1.02] text-[#6b7a5e] sm:text-[30px]">
                     {service.title}
                   </h2>
                   <div className="mt-10 space-y-6 text-[18px] font-sans leading-[1.02] text-[#735746] sm:text-[19px]">
