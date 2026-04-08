@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ShoppingCart, TicketPercent, Trash2 } from 'lucide-react'
@@ -14,8 +15,23 @@ type CartItem = {
   product: {
     id: string
     name: string
+    description: string | null
+    author: string | null
     price_text: string | null
+    images: string[] | string | null
   } | null
+}
+
+const parseImages = (item: { images?: string | string[] | null }): string[] => {
+  if (!item.images) return []
+  if (Array.isArray(item.images)) return item.images
+
+  try {
+    const parsed = JSON.parse(item.images)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
 }
 
 export default function CarrinhoPage() {
@@ -41,7 +57,7 @@ export default function CarrinhoPage() {
 
     const { data, error: cartError } = await supabase
       .from('cart_items')
-      .select('id, quantity, product:gallery_products(id, name, price_text)')
+      .select('id, quantity, product:gallery_products(id, name, description, author, price_text, images)')
       .eq('user_id', session.user.id)
       .order('created_at', { ascending: false })
 
@@ -168,49 +184,95 @@ export default function CarrinhoPage() {
           {!!items.length && (
             <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-8">
               <div className="space-y-4">
-                {items.map((item) => (
-                  <article key={item.id} className="border border-[#d8cdbf] bg-[#f6f2ed] p-4 sm:p-5">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-xl font-serif text-[#3b2f26]">"{item.product?.name || 'Obra'}"</p>
-                        <p className="text-sm text-[#735746] font-sans mt-1">
-                          {item.product?.price_text ? `R$ ${item.product.price_text}` : 'R$ 0,00'}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeItem(item.id)}
-                        className="text-[#9a7e6f] hover:text-[#7d6153] transition-colors"
-                        aria-label="Remover item"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
+                {items.map((item) => {
+                  const productImages = parseImages(item.product || {})
+                  const coverImage = productImages[0]
 
-                    <div className="mt-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="border border-[#d5ccb9] text-[#735746] px-3 py-1 hover:bg-[#efe7dc] transition-colors"
-                        >
-                          -
-                        </button>
-                        <span className="min-w-8 text-center text-[#3b2f26]">{item.quantity}</span>
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="border border-[#d5ccb9] text-[#735746] px-3 py-1 hover:bg-[#efe7dc] transition-colors"
-                        >
-                          +
-                        </button>
+                  return (
+                    <article key={item.id} className="border border-[#d8cdbf] bg-[#f6f2ed] p-4 sm:p-5">
+                      <div className="flex flex-col gap-4 sm:flex-row">
+                        <div className="relative h-40 overflow-hidden border border-[#ddd2c4] bg-[#ede4d9] sm:h-auto sm:w-36 sm:shrink-0">
+                          {coverImage ? (
+                            <Image
+                              src={coverImage}
+                              alt={item.product?.name || 'Obra'}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 640px) 100vw, 144px"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center px-4 text-center text-sm text-[#8b7567]">
+                              Imagem indisponivel
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <p className="text-xl font-serif text-[#3b2f26]">{item.product?.name || 'Obra'}</p>
+                              {item.product?.author && (
+                                <p className="mt-1 text-sm font-sans uppercase tracking-[0.12em] text-[#8a6f5f]">
+                                  {item.product.author}
+                                </p>
+                              )}
+                              {item.product?.description && (
+                                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#735746] font-sans">
+                                  {item.product.description}
+                                </p>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeItem(item.id)}
+                              className="text-[#9a7e6f] hover:text-[#7d6153] transition-colors"
+                              aria-label="Remover item"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+
+                          <div className="mt-4 grid gap-4 border-t border-[#ddd2c4] pt-4 sm:grid-cols-[auto_1fr_auto] sm:items-end">
+                            <div>
+                              <p className="text-xs uppercase tracking-[0.14em] text-[#8a6f5f]">Preco unitario</p>
+                              <p className="mt-1 text-base font-sans text-[#3b2f26]">
+                                {item.product?.price_text ? `R$ ${item.product.price_text}` : 'R$ 0,00'}
+                              </p>
+                            </div>
+
+                            <div className="justify-self-start sm:justify-self-center">
+                              <p className="mb-2 text-xs uppercase tracking-[0.14em] text-[#8a6f5f]">Quantidade</p>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                  className="border border-[#d5ccb9] text-[#735746] px-3 py-1 hover:bg-[#efe7dc] transition-colors"
+                                >
+                                  -
+                                </button>
+                                <span className="min-w-8 text-center text-[#3b2f26]">{item.quantity}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                  className="border border-[#d5ccb9] text-[#735746] px-3 py-1 hover:bg-[#efe7dc] transition-colors"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="sm:text-right">
+                              <p className="text-xs uppercase tracking-[0.14em] text-[#8a6f5f]">Total do item</p>
+                              <p className="mt-1 text-lg font-sans text-[#3b2f26]">
+                                {formatCentsToBRL(parseBrazilianPriceToCents(item.product?.price_text) * item.quantity)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <p className="font-sans text-[#3b2f26]">
-                        {formatCentsToBRL(parseBrazilianPriceToCents(item.product?.price_text) * item.quantity)}
-                      </p>
-                    </div>
                   </article>
-                ))}
+                  )
+                })}
               </div>
 
               <aside className="border border-[#d8cdbf] bg-[#f6f2ed] p-5 h-fit">
