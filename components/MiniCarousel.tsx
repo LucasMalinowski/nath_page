@@ -153,7 +153,7 @@ export function MiniCarousel({ images, alt, pauseUntil = 0, onUserNavigate, clas
                             onUserNavigate?.()
                             prevImage()
                         }}
-                        className="w-7 h-7 bg-bg/90 hover:bg-bg rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
+                        className="w-7 h-7 bg-bg/90 hover:bg-bg rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 opacity-100 pointer-events-auto md:opacity-0 md:pointer-events-none md:group-hover/carousel:opacity-100 md:group-hover/carousel:pointer-events-auto"
                         aria-label="Imagem anterior"
                     >
                         <ChevronLeft size={16} className="text-olive" />
@@ -165,7 +165,7 @@ export function MiniCarousel({ images, alt, pauseUntil = 0, onUserNavigate, clas
                             onUserNavigate?.()
                             nextImage()
                         }}
-                        className="w-7 h-7 bg-bg/90 hover:bg-bg rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
+                        className="w-7 h-7 bg-bg/90 hover:bg-bg rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 opacity-100 pointer-events-auto md:opacity-0 md:pointer-events-none md:group-hover/carousel:opacity-100 md:group-hover/carousel:pointer-events-auto"
                         aria-label="Próxima imagem"
                     >
                         <ChevronRight size={16} className="text-olive" />

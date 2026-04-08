@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { ChevronDown, ChevronLeft, ChevronRight, Instagram, ShoppingCart } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Instagram, ShoppingCart, SquareArrowUpRight, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -40,6 +40,7 @@ export default function GaleriaPage() {
   const [currentExhibitorPage, setCurrentExhibitorPage] = useState(0)
   const [currentProductPage, setCurrentProductPage] = useState(0)
   const [exhibitorsPerPage, setExhibitorsPerPage] = useState(2)
+  const [selectedProduct, setSelectedProduct] = useState<GalleryProduct | null>(null)
   const productsPerPage = 3 // 2 rows of 3
   const productsPhrase = 'Uma seleção de peças autorais e obras de artistas independentes, escolhidas com intenção para dialogar com o espaço, o tempo e a identidade de quem habita.'
 
@@ -84,6 +85,24 @@ export default function GaleriaPage() {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  useEffect(() => {
+    if (!selectedProduct) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedProduct(null)
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.body.style.overflow = ''
+    }
+  }, [selectedProduct])
 
   const exhibitorsCarouselEnabled = exhibitors.length > 2
   const totalExhibitorPages = exhibitorsCarouselEnabled
@@ -237,7 +256,10 @@ export default function GaleriaPage() {
     setCheckoutMessage('Produto adicionado ao carrinho.')
   }
 
+  const selectedProductImage = selectedProduct ? parseImages(selectedProduct)[0] || null : null
+
   return (
+      <>
       <main id="galeria" className="min-h-screen bg-dirt text-bg page-fade-in">
         <Navbar />
 
@@ -255,23 +277,17 @@ export default function GaleriaPage() {
             <div className="relative z-10 h-full px-6 sm:px-8 lg:px-16 flex items-end pb-10 lg:pb-14">
               <div className="grid w-full grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-10">
                 <div className="flex flex-col">
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#b89b5e] leading-tight mb-10">
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#c2a46f] leading-tight mb-10">
                     Galeria e
                     <br />
                     Curadoria
                   </h1>
-                  <div className="mt-24 mb-8 border-l border-bg/40 pl-5 text-lg sm:text-xl font-serif text-bg/70">
+                  {/* Reduce top margin on mobile to avoid dead whitespace */}
+                  <div className="mt-6 lg:mt-16 mb-8 border-l border-[#F6F2ED]/40 pl-5 text-lg sm:text-xl font-serif text-[#d5ccb9]">
                     A arte não decora.
                     <br />
                     Ela dialoga.
                   </div>
-                </div>
-                <div className="flex justify-end items-end pb-8">
-                  <p className="text-lg text-bg/55 font-serif leading-relaxed max-w-2xl">
-                    Uma seleção de peças autorais e obras de artistas independentes,
-                    escolhidas com intenção para dialogar com o espaço, o tempo e a
-                    identidade de quem habita.
-                  </p>
                 </div>
               </div>
             </div>
@@ -313,7 +329,7 @@ export default function GaleriaPage() {
                     const hasImages = images.length > 0
                     return (
                         <div key={product.id} className="w-full max-w-[286px] text-left sm:max-w-[308px] lg:max-w-[330px]">
-                          <div className="border border-[#d8cdbf] p-3 md:p-4 bg-[#f5f1eb] flex flex-col w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
+                          <div className="p-3 md:p-4 bg-[#eee9e2] flex flex-col w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
                             <div className="relative aspect-[4/5] border border-[#e4dbcf] bg-[#efe9df]">
                               {hasImages && (
                                   <MiniCarousel
@@ -325,10 +341,10 @@ export default function GaleriaPage() {
                             </div>
                             <div className="mt-3 flex items-end justify-between">
                               <p className="flex items-center font-sans leading-none">
-                                <span className="mr-2 text-[13px] text-[#735746]">R$</span>
-                                <span className="text-[26px] text-[#3b2f26]">{formatPriceText(product.price_text)}</span>
+                                <span className="mr-2 text-[13px] text-[#3b2f26]">R$</span>
+                                <span className="text-[26px] font-normal text-[#3b2f26]">{formatPriceText(product.price_text)}</span>
                               </p>
-                              <p className="text-[13px] tracking-[0.08em] text-[#735746] font-thin font-sans pb-1">
+                              <p className="text-[13px] tracking-[0.08em] text-[#3b2f26] font-thin font-sans pb-1">
                                 Exclusivo
                               </p>
                             </div>
@@ -337,30 +353,37 @@ export default function GaleriaPage() {
                                   type="button"
                                   onClick={() => addToCart(product.id)}
                                   disabled={addingToCartProductId === product.id}
-                                  className="shrink-0 text-[#735746] transition-colors hover:text-[#644435] disabled:opacity-60"
+                                  className="shrink-0 text-[#3b2f26] transition-colors hover:text-[#644435] disabled:opacity-60"
                                   aria-label="Adicionar ao carrinho"
                               >
-                                <ShoppingCart size={20} className="text-[#735746]" />
+                                <ShoppingCart size={20} className="text-[#3b2f26]" />
                               </button>
                               <button
                                   type="button"
                                   onClick={() => checkoutProduct(product.id)}
                                   disabled={checkoutLoadingProductId === product.id}
-                                  className="flex-1 bg-[#735746] hover:bg-[#644435] px-3 py-2 rounded-sm text-[#f5f1eb] transition-colors disabled:opacity-60"
+                                  className="flex-1 bg-[#735746] hover:bg-[#644435] px-3 py-1 rounded-sm text-[#f5f1eb] transition-colors disabled:opacity-60"
                               >
-                                <span className="flex items-center justify-center font-sans text-[21px] leading-none">
+                                <span className="flex items-center font-thin justify-center font-sans text-[21px] leading-none">
                                   {checkoutLoadingProductId === product.id ? '...' : 'Compre agora'}
                                 </span>
                               </button>
                             </div>
                           </div>
                           <div className="mt-8 w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
-                            <h3 className="flex justify-center text-[22px] font-serif text-[#3b2f26] text-center">
-                              “{product.name}”
+                            <h3 className="flex justify-center text-[18px] text-[#735746] font-thin text-center gap-4">
+                              <span>
+                                {product.name} | {product.author}
+                              </span>
+                              <button
+                                  type="button"
+                                  onClick={() => setSelectedProduct(product)}
+                                  className="transition-colors hover:text-[#735746]"
+                                  aria-label={`Abrir detalhes de ${product.name}`}
+                              >
+                                <SquareArrowUpRight size={20} />
+                              </button>
                             </h3>
-                            <div className="mt-1 flex justify-center text-[#9f8a74]">
-                              <ChevronDown size={16} />
-                            </div>
                           </div>
                         </div>
                     )
@@ -404,20 +427,21 @@ export default function GaleriaPage() {
             </div>
 
             {/* Exhibitors with chevrons */}
-            <div className="relative px-0 lg:px-40">
+            <div className="relative px-0">
               {/* Chevrons - show only on section hover, positioned at exhibitors */}
               {exhibitorsCarouselEnabled && (
                   <>
+                    {/* Always visible on touch devices; hover-only on desktop */}
                     <button
                         onClick={prevExhibitorPage}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100 lg:-left-14"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-100 lg:opacity-0 lg:group-hover/exhibitors:opacity-100 lg:-left-14"
                         aria-label="Expositores anteriores"
                     >
                       <ChevronLeft size={22} className="text-olive" />
                     </button>
                     <button
                         onClick={nextExhibitorPage}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-0 group-hover/exhibitors:opacity-100 lg:-right-14"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-100 lg:opacity-0 lg:group-hover/exhibitors:opacity-100 lg:-right-14"
                         aria-label="Próximos expositores"
                     >
                       <ChevronRight size={22} className="text-olive" />
@@ -439,7 +463,7 @@ export default function GaleriaPage() {
                         )}
                       </div>
                       <div className="min-w-0 pt-1">
-                        <h3 className="font-serif text-[15px] text-[#3b2f26] leading-tight mb-2">
+                        <h3 className="font-serif text-[18px] text-[#3b2f26] leading-tight mb-2">
                           {exhibitor.name.split('\n').map((line, i) => (
                               <span key={i} className="block">{line}</span>
                           ))}
@@ -451,7 +475,7 @@ export default function GaleriaPage() {
                         </p>
                         {exhibitor.instagram_path && (
                             <p className="text-[12px] text-[#3b2f26] mt-6 font-serif font-thin inline-flex items-center gap-1">
-                              <Instagram size={12} className="text-[#d5ccb9]" />
+                              <Instagram size={12} className="text-[#b89b5e]" />
                               {exhibitor.instagram_path}
                             </p>
                         )}
@@ -483,5 +507,58 @@ export default function GaleriaPage() {
 
         <Footer paymentInfo />
       </main>
+      {selectedProduct && (
+          <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-[#2a1f18]/70 px-4 py-8"
+              onClick={() => setSelectedProduct(null)}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="product-modal-title"
+          >
+            <div
+                className="relative w-full max-w-4xl overflow-hidden rounded-sm bg-[#f5f1eb] text-[#3b2f26] shadow-2xl"
+                onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                  type="button"
+                  onClick={() => setSelectedProduct(null)}
+                  className="absolute right-4 top-4 z-10 rounded-full bg-[#f5f1eb]/90 p-2 text-[#3b2f26] transition-colors hover:text-[#735746]"
+                  aria-label="Fechar modal"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+                <div className="relative aspect-[4/5] bg-[#ebe4d9]">
+                  {selectedProductImage ? (
+                      <Image
+                          src={selectedProductImage}
+                          alt={selectedProduct.name}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                      />
+                  ) : (
+                      <div className="h-full w-full bg-[#ebe4d9]" />
+                  )}
+                </div>
+
+                <div className="flex flex-col justify-center px-6 py-8 sm:px-8 md:px-10">
+                  <p className="text-[12px] uppercase tracking-[0.22em] text-[#9f8a74]">Produto</p>
+                  <h2 id="product-modal-title" className="mt-3 font-serif text-3xl leading-tight sm:text-4xl">
+                    {selectedProduct.name}
+                  </h2>
+                  <p className="mt-4 text-[13px] uppercase tracking-[0.18em] text-[#8c755f]">
+                    {selectedProduct.author?.trim() ? `Por ${selectedProduct.author}` : 'Autor não informado'}
+                  </p>
+                  <p className="mt-6 text-sm leading-relaxed text-[#5e493a] sm:text-[15px]">
+                    {selectedProduct.description?.trim() || 'Descrição indisponível no momento.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+      )}
+      </>
   )
 }
