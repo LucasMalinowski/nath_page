@@ -62,32 +62,32 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                         <img
                           src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Visa_Inc._logo_%282021%E2%80%93present%29.svg/960px-Visa_Inc._logo_%282021%E2%80%93present%29.svg.png"
                           alt="Visa"
-                          className="h-5 w-auto object-contain"
+                          className="h-4 md:h-5 w-auto object-contain"
                         />
                         <img
                           src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Mastercard_2019_logo.svg/330px-Mastercard_2019_logo.svg.png"
                           alt="Mastercard"
-                          className="h-5 w-auto object-contain"
+                          className="h-4 md:h-5 w-auto object-contain"
                         />
                         <img
                           src="https://upload.wikimedia.org/wikipedia/commons/5/51/Elo_logo.png"
                           alt="Elo"
-                          className="h-6 w-auto object-contain"
+                          className="h-4 md:h-6 w-auto object-contain"
                         />
                         <img
                           src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Mercado_Pago.svg/960px-Mercado_Pago.svg.png"
                           alt="Mercado Pago"
-                          className="h-7 w-auto object-contain"
+                          className="h-4 md:h-7 w-auto object-contain"
                         />
                         <img
                           src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Pix_%28Brazil%29_logo.svg/330px-Pix_%28Brazil%29_logo.svg.png"
                           alt="Pix"
-                          className="h-6 w-auto object-contain opacity-70"
+                          className="h-4 md:h-6 w-auto object-contain opacity-70"
                         />
                         <img
                           src="https://cdn.worldvectorlogo.com/logos/picpay-1.svg"
                           alt="PicPay"
-                          className="h-5 w-auto object-contain"
+                          className="h-4 md:h-5 w-auto object-contain"
                         />
                       </div>
                     </div>
