@@ -18,18 +18,20 @@ const Concept = () => {
   return (
       <section
           id="conceito"
-          className="relative mt-4 py-8 bg-[url('/carpet.png')] bg-cover bg-center"
+          className="relative mt-4 py-8 bg-[url('/carpet.png')] md:bg-cover bg-center"
       >
-        <div className="container py-8 px-6 sm:px-8 md:px-20 flex flex-col justify-between min-h-[200px] md:min-h-[250px]">
+        {/* Mobile: gap-10 lets content flow naturally (no clipping from justify-between).
+            md+: justify-between pushes description to bottom-right corner — original desktop layout. */}
+        <div className="container py-8 px-6 sm:px-8 md:px-20 flex flex-col gap-10 md:gap-0 md:justify-between md:min-h-[250px]">
           {/* Título no topo esquerdo */}
           <div className="self-start">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-normal text-gold/85 tracking-wide">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-serif font-normal text-gold/85 tracking-wide">
               {renderTextWithBreaks(conceptTitle)}
             </h2>
           </div>
 
-          {/* Texto no bottom direito */}
-          <div className="self-end max-w-lg mt-8 md:mt-0">
+          {/* Texto no bottom direito — md:self-end keeps desktop right-aligned; mobile flows left */}
+          <div className="md:self-end max-w-lg">
             <p className="text-base md:text-base lg:text-xl font-sans font-light text-bg/80 text-left leading-relaxed">
               {renderTextWithBreaks(`${conceptPoetic}\n${conceptParagraph}`)}
             </p>
