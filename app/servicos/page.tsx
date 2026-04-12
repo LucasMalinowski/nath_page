@@ -112,17 +112,21 @@ export default function ServicosPage() {
         </header>
 
         <div className="px-6 sm:px-10 lg:px-24 py-12 lg:py-16">
-          <div className="">
+          {/* divide-y adds a separator line between each service — critical on mobile
+              where the two-column grid collapses and services would otherwise run together */}
+          <div className="divide-y divide-[#ece3d5]">
             {services.map((service) => (
               <article
                 key={service.title}
-                className="grid grid-cols-1 gap-10 lg:min-h-[24rem] lg:grid-cols-2 lg:items-center lg:gap-0"
+                className="grid grid-cols-1 gap-10 py-12 first:pt-0 last:pb-0 lg:min-h-[24rem] lg:grid-cols-2 lg:items-center lg:gap-0"
               >
-                <div className="lg:pl-10 pr-24">
+                {/* pr-24 only on lg — on mobile it was collapsing text to ~250px wide */}
+                <div className="lg:pl-10 lg:pr-24">
                   <h2 className="whitespace-pre-line font-serif text-[24px] leading-[1.02] text-[#6b7a5e] sm:text-[30px]">
                     {service.title}
                   </h2>
-                  <div className="mt-10 space-y-6 text-[18px] font-sans leading-[1.02] text-[#735746] sm:text-[19px]">
+                  {/* leading-relaxed on mobile for readability; desktop retains the tighter leading-[1.02] */}
+                  <div className="mt-10 space-y-6 text-[18px] font-sans leading-relaxed lg:leading-[1.02] text-[#735746] sm:text-[19px]">
                     {service.description.map((paragraph) => (
                       <p key={paragraph}>
                         {paragraph}
@@ -146,7 +150,7 @@ export default function ServicosPage() {
                     <div className="mt-10 flex">
                       <Link
                         href={service.cta.href}
-                        className="inline-flex items-center justify-center rounded-lg bg-[#4e5f4a] px-8 py-1 text-[16px] text-[#f6f2ed] transition-colors hover:bg-[#f0ebe4]"
+                        className="inline-flex items-center justify-center rounded-lg bg-[#4e5f4a] px-8 py-3 text-[16px] text-[#f6f2ed] transition-colors hover:bg-[#f0ebe4]"
                       >
                         {service.cta.label}
                       </Link>
