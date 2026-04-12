@@ -31,7 +31,7 @@ const About = () => {
             </blockquote>
           </div>
           {/* Profile Photo */}
-          <div className="w-full max-w-[580px] max-h-[680px] justify-self-end">
+          <div className="w-full max-w-[580px] max-h-[680px] justify-self-end mb-4 md:mb-0">
             <div className="relative w-full aspect-[4/5] overflow-hidden shadow-2xl">
               <Image
                 src="/profile-photo.jpeg"
