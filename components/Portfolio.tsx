@@ -188,9 +188,7 @@ const Portfolio = () => {
                   }`}
                 >
                   <div
-                    className={`${imageLeft ? 'order-1 md:order-1' : 'order-2 md:order-2'} ${
-                      imageLeft ? 'md:justify-self-start' : 'md:justify-self-end'
-                    } w-full`}
+                    className={`order-1 ${imageLeft ? 'md:order-1 md:justify-self-start' : 'md:order-2 md:justify-self-end'} w-full`}
                   >
                     {project.coverImage ? (
                       <div
@@ -220,7 +218,7 @@ const Portfolio = () => {
                   </div>
 
                   <div
-                    className={`${imageLeft ? 'order-2 md:order-2' : 'order-1 md:order-1'} flex h-full w-full flex-col py-10`}
+                    className={`order-2 ${imageLeft ? 'md:order-2' : 'md:order-1'} flex h-full w-full flex-col py-10`}
                   >
                     <div
                       className="max-w-[540px] mb-4"
