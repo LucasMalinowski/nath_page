@@ -45,9 +45,9 @@ const Services = () => {
       id="servicos"
       className="relative bg-[#f6f2ed] pb-4"
     >
-      <div className="flex flex-col lg:flex-row  border-b-2 border-[#d9cdb8]/20">
-        {/* Left: Video */}
-        <div className="relative min-h-[420px] lg:min-h-[760px] lg:w-1/3">
+      <div className="flex flex-col lg:flex-row mt-2 md:mt-0 sm:border-t-2 md:border-t-0 border-b-2 border-[#d9cdb8]/40">
+        {/* Left: Video — reduce height on mobile so it doesn't dominate before the service cards */}
+        <div className="relative min-h-[220px] sm:min-h-[320px] lg:min-h-[760px] lg:w-1/3">
           <video
             autoPlay
             loop
