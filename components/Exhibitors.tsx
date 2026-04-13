@@ -42,11 +42,11 @@ const Exhibitors = () => {
   return (
     <section id="expositores" className="relative bg-[#f5f1eb] py-16 md:py-24 border-b-2 border-[#d9cdb8]/20">
       <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-16">
-        <header className="text-center">
-          <h2 className="text-5xl md:text-6xl font-serif font-normal text-[#c8aa6a]">
+        <header className="md:text-center">
+          <h2 className="text-h2-mobile md:text-5xl  font-serif font-normal text-[#c8aa6a]">
             {sectionTitle}
           </h2>
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl mt-5 italic font-poetic text-text/60">
+          <p className="text-xl sm:text-xl md:text-2xl lg:text-3xl mt-5 italic font-poetic text-text/60">
             {sectionSubtitle}
           </p>
         </header>
@@ -92,13 +92,13 @@ const Exhibitors = () => {
                       </h3>
 
                       {exhibitor.title && (
-                        <p className="mt-4 text-base font-normal text-[#735746] md:text-lg">
+                        <p className="mt-4 text-base font-light text-[#735746] md:text-lg">
                           {exhibitor.title}
                         </p>
                       )}
 
                       {exhibitor.description && (
-                        <p className="mt-2 max-w-3xl whitespace-pre-line text-base leading-snug text-[#735746] md:text-[1.05rem]">
+                        <p className="mt-2 max-w-3xl whitespace-pre-line font-light text-base leading-snug text-[#735746] md:text-[1.05rem]">
                           {exhibitor.description}
                         </p>
                       )}
@@ -108,7 +108,7 @@ const Exhibitors = () => {
                           href={instagramHref}
                           target="_blank"
                           rel="noreferrer"
-                          className="mt-5 inline-flex items-center gap-2 text-sm text-[#735746]/80 transition-colors hover:text-[#9f8450] md:text-base"
+                          className="mt-5 inline-flex items-center font-light gap-2 text-sm text-[#735746]/80 transition-colors hover:text-[#9f8450] md:text-base"
                         >
                           <Instagram size={16} className="text-[#b89b5e]"/>
                           {exhibitor.instagram_path}
