@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const nextPath = requestUrl.searchParams.get('next')
-  const next = nextPath && nextPath.startsWith('/') ? nextPath : '/carrinho'
+  const next = nextPath && nextPath.startsWith('/') ? nextPath : '/conta'
 
   if (code) {
     const supabase = createServerSupabaseClient()

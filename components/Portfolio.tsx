@@ -164,10 +164,10 @@ const Portfolio = () => {
   return (
     <>
       <section id="portfolio" className="bg-[#f5f1eb] pb-20 border-b-2 border-[#d9cdb8]/20 mt-4">
-          <header className="bg-[#eee9e2] text-center border-b-[1.5px] py-14 mb-2 border-[#DDB980]">
-            <h2 className="text-5xl md:text-6xl font-serif font-normal text-[#b89b5e]">{portfolioTitle}</h2>
-            <p className="mt-6 text-lg text-text/70">{portfolioSubtitle}</p>
-          </header>
+        <header className="md:text-center border-b-[1.5px] py-14 mb-2 border-[#DDB980] px-6 sm:px-8 md:px-20">
+          <h2 className="text-h2-mobile md:text-5xl  font-serif font-normal text-[#c8aa6a]">{portfolioTitle}</h2>
+          <p className="text-xl sm:text-xl md:text-2xl lg:text-3xl mt-5 italic font-poetic text-text/60">{portfolioSubtitle}</p>
+        </header>
         <div className="px-6 sm:px-8 md:px-20">
 
           <div className="mt-14 space-y-16 md:space-y-20">
@@ -225,12 +225,12 @@ const Portfolio = () => {
                     >
                       <h3 className="text-3xl font-serif font-bold text-text">{project.title}</h3>
                       {project.description && (
-                        <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-[#735746]">
+                        <p className="mt-6 whitespace-pre-line text-lg leading-relaxed font-sans font-light text-[#735746]">
                           {project.description}
                         </p>
                       )}
                       {project.phrase && (
-                        <p className="mt-5 border-l-2 border-[#735746]/40 pl-4 py-2 whitespace-pre-line text-xl font-thin italic leading-snug text-[#9f876c]">
+                        <p className="mt-5 border-l-2 border-[#735746]/40 pl-4 py-2 whitespace-pre-line text-xl font-sans font-light italic leading-snug text-[#9f876c]">
                           {project.phrase}
                         </p>
                       )}
@@ -257,7 +257,7 @@ const Portfolio = () => {
       {activeProject && (
         <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#20160f]/70 px-4 py-4 md:py-8">
           <div className="flex min-h-full items-start justify-center">
-            <div className="relative my-auto flex w-full max-w-5xl max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-md bg-[#f5f1eb] p-5 shadow-2xl md:max-h-[calc(100vh-4rem)] md:p-8">
+            <div className="relative my-4 flex w-full max-w-2xl flex-col overflow-y-auto rounded-md bg-[#f5f1eb] p-4 shadow-2xl max-h-[calc(100vh-2rem)] md:my-auto md:max-w-5xl md:max-h-[calc(100vh-4rem)] md:p-8">
             <button
               type="button"
               onClick={closeProjectModal}
@@ -267,12 +267,12 @@ const Portfolio = () => {
               <X size={18} />
             </button>
 
-            <h3 className="pr-10 text-2xl font-serif text-text md:text-3xl">{activeProject.title}</h3>
+            <h3 className="pr-10 text-xl font-serif text-text md:text-3xl">{activeProject.title}</h3>
 
-              <div className="mt-6 flex-1 overflow-y-auto pr-1">
+              <div className="mt-4 md:mt-6 md:flex-1 md:overflow-y-auto pr-1">
                 {activeImages.length > 0 && (
                   <>
-                    <div className="relative h-[300px] overflow-hidden border border-[#e2d5c2] bg-[#ece4d8] md:h-[520px]">
+                    <div className="relative h-[220px] overflow-hidden border border-[#e2d5c2] bg-[#ece4d8] md:h-[520px]">
                       <Image
                         src={activeImages[activeImageIndex]}
                         alt={`${activeProject.title} - foto ${activeImageIndex + 1}`}

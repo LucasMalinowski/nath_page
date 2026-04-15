@@ -26,11 +26,31 @@ export type GalleryProduct = {
     author: string | null
     price_text: string | null
     quantity: number | null
+    package_weight_grams: number | null
+    package_height_cm: number | null
+    package_width_cm: number | null
+    package_length_cm: number | null
     images: string[] | string | null
     display_order: number | null
     is_visible: boolean | null
     created_at: string
     updated_at: string | null
+}
+
+export type UserProfile = {
+    id: string
+    full_name: string | null
+    phone: string | null
+    document: string | null
+    address_line1: string | null
+    address_line2: string | null
+    address_number: string | null
+    district: string | null
+    city: string | null
+    state: string | null
+    postal_code: string | null
+    country: string | null
+    created_at: string | null
 }
 
 export type GalleryExhibitor = {

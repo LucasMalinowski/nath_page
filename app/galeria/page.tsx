@@ -29,6 +29,11 @@ const formatPriceText = (price?: string | null): string => {
   return value.includes(',') ? value : `${value},00`
 }
 
+const formatPackageMetric = (value?: number | null): string | null => {
+  if (value === null || value === undefined || Number.isNaN(value)) return null
+  return Number(value).toLocaleString('pt-BR', { maximumFractionDigits: 2 })
+}
+
 export default function GaleriaPage() {
   const router = useRouter()
   const [products, setProducts] = useState<GalleryProduct[]>([])
@@ -158,52 +163,28 @@ export default function GaleriaPage() {
 
   const checkoutProduct = async (productId: string) => {
     setCheckoutLoadingProductId(productId)
-    setCheckoutMessage(null)
-
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user) {
-      setCheckoutLoadingProductId(null)
-      router.push('/login?next=/galeria')
-      return
-    }
-
-    const response = await fetch('/api/checkout/product', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`
-      },
-      body: JSON.stringify({ productId, quantity: 1 })
+    await addToCart(productId, {
+      successMessage: 'Produto adicionado. Escolha o frete no carrinho para finalizar a compra.',
+      skipLoadingState: true
     })
-    const data = await response.json()
     setCheckoutLoadingProductId(null)
-
-    if (!response.ok) {
-      setCheckoutMessage(data.error || 'Não foi possível iniciar o checkout.')
-      return
-    }
-
-    if (!data.init_point) {
-      setCheckoutMessage('URL de checkout indisponível.')
-      return
-    }
-
-    const link = document.createElement('a')
-    link.href = data.init_point
-    link.target = '_blank'
-    link.rel = 'noopener noreferrer'
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
+    router.push('/carrinho')
   }
 
-  const addToCart = async (productId: string) => {
-    setAddingToCartProductId(productId)
+  const addToCart = async (
+    productId: string,
+    options?: { successMessage?: string; skipLoadingState?: boolean }
+  ) => {
+    if (!options?.skipLoadingState) {
+      setAddingToCartProductId(productId)
+    }
     setCheckoutMessage(null)
 
     const { data: { session } } = await supabase.auth.getSession()
     if (!session?.user) {
-      setAddingToCartProductId(null)
+      if (!options?.skipLoadingState) {
+        setAddingToCartProductId(null)
+      }
       router.push('/login?next=/galeria')
       return
     }
@@ -216,7 +197,9 @@ export default function GaleriaPage() {
       .maybeSingle()
 
     if (existingItemError) {
-      setAddingToCartProductId(null)
+      if (!options?.skipLoadingState) {
+        setAddingToCartProductId(null)
+      }
       setCheckoutMessage(existingItemError.message)
       return
     }
@@ -227,14 +210,16 @@ export default function GaleriaPage() {
         .update({ quantity: existingItem.quantity + 1 })
         .eq('id', existingItem.id)
 
-      setAddingToCartProductId(null)
+      if (!options?.skipLoadingState) {
+        setAddingToCartProductId(null)
+      }
       if (updateError) {
         setCheckoutMessage(updateError.message)
         return
       }
 
       window.dispatchEvent(new Event('cart-updated'))
-      setCheckoutMessage('Produto adicionado ao carrinho.')
+      setCheckoutMessage(options?.successMessage || 'Produto adicionado ao carrinho.')
       return
     }
 
@@ -246,14 +231,16 @@ export default function GaleriaPage() {
         quantity: 1
       })
 
-    setAddingToCartProductId(null)
+    if (!options?.skipLoadingState) {
+      setAddingToCartProductId(null)
+    }
     if (insertError) {
       setCheckoutMessage(insertError.message)
       return
     }
 
     window.dispatchEvent(new Event('cart-updated'))
-    setCheckoutMessage('Produto adicionado ao carrinho.')
+    setCheckoutMessage(options?.successMessage || 'Produto adicionado ao carrinho.')
   }
 
   const selectedProductImage = selectedProduct ? parseImages(selectedProduct)[0] || null : null
@@ -263,31 +250,23 @@ export default function GaleriaPage() {
       <main id="galeria" className="min-h-screen bg-dirt text-bg page-fade-in">
         <Navbar />
 
-        {/* Hero */}
-        <section className="relative pt-16">
-          <div className="relative h-[360px] sm:h-[420px] lg:h-[520px]">
-            <Image
-                src="/frame.png"
-                alt="Galeria e Curadoria"
-                fill
-                className="object-cover object-right"
-                priority
-            />
-            <div className="absolute inset-0 bg-black/35" />
-            <div className="relative z-10 h-full px-6 sm:px-8 lg:px-16 flex items-end pb-10 lg:pb-14">
-              <div className="grid w-full grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-10">
-                <div className="flex flex-col">
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#c2a46f] leading-tight mb-10">
-                    Galeria e
-                    <br />
-                    Curadoria
-                  </h1>
-                  {/* Reduce top margin on mobile to avoid dead whitespace */}
-                  <div className="mt-6 lg:mt-16 mb-8 border-l border-[#F6F2ED]/40 pl-5 text-lg sm:text-xl font-serif text-[#d5ccb9]">
-                    A arte não decora.
-                    <br />
-                    Ela dialoga.
-                  </div>
+        {/* Hero — CSS background like Concept section; starts at y=0 so the fixed navbar
+            (z-50) covers the top 64px naturally, no bg-dirt gap. pt-16 clears the navbar. */}
+        <section
+          className="relative bg-[url('/frame.png')] md:bg-cover bg-center "
+        >
+          <div className="relative z-10 px-6 sm:px-8 lg:px-16 pt-16 flex items-end pb-10 lg:pb-14">
+            <div className="grid w-full grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-10 mt-16">
+              <div className="flex flex-col">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#c2a46f] leading-tight mb-10">
+                  Galeria e
+                  <br />
+                  Curadoria
+                </h1>
+                <div className="mt-6 lg:mt-16 mb-8 border-l border-[#F6F2ED]/40 pl-5 text-lg sm:text-xl font-serif text-[#d5ccb9]">
+                  A arte não decora.
+                  <br />
+                  Ela dialoga.
                 </div>
               </div>
             </div>
@@ -342,7 +321,7 @@ export default function GaleriaPage() {
                             <div className="mt-3 flex items-end justify-between">
                               <p className="flex items-center font-sans leading-none">
                                 <span className="mr-2 text-[13px] text-[#3b2f26]">R$</span>
-                                <span className="text-[26px] font-normal text-[#3b2f26]">{formatPriceText(product.price_text)}</span>
+                                <span className="text-[20px] md:text-[26px] font-normal text-[#3b2f26]">{formatPriceText(product.price_text)}</span>
                               </p>
                               <p className="text-[13px] tracking-[0.08em] text-[#3b2f26] font-thin font-sans pb-1">
                                 Exclusivo
@@ -371,7 +350,7 @@ export default function GaleriaPage() {
                             </div>
                           </div>
                           <div className="mt-8 w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
-                            <h3 className="flex justify-center text-[18px] text-[#735746] font-thin text-center gap-4">
+                            <h3 className="flex justify-center text-[14px] md:text-[18px] text-[#735746] font-thin text-center gap-4">
                               <span>
                                 {product.name} | {product.author}
                               </span>
@@ -509,14 +488,14 @@ export default function GaleriaPage() {
       </main>
       {selectedProduct && (
           <div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-[#2a1f18]/70 px-4 py-8"
+              className="fixed inset-0 z-50 overflow-y-auto bg-[#2a1f18]/70 px-4 py-6 flex items-start justify-center"
               onClick={() => setSelectedProduct(null)}
               role="dialog"
               aria-modal="true"
               aria-labelledby="product-modal-title"
           >
             <div
-                className="relative w-full max-w-4xl overflow-hidden rounded-sm bg-[#f5f1eb] text-[#3b2f26] shadow-2xl"
+                className="relative w-full max-w-4xl overflow-hidden rounded-sm bg-[#f5f1eb] text-[#3b2f26] shadow-2xl my-auto"
                 onClick={(event) => event.stopPropagation()}
             >
               <button
@@ -529,7 +508,8 @@ export default function GaleriaPage() {
               </button>
 
               <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-                <div className="relative aspect-[4/5] bg-[#ebe4d9]">
+                {/* Image constrained on mobile so content below is reachable without endless scroll */}
+                <div className="relative h-[260px] sm:h-[320px] md:h-auto md:aspect-[4/5] bg-[#ebe4d9]">
                   {selectedProductImage ? (
                       <Image
                           src={selectedProductImage}
@@ -543,7 +523,7 @@ export default function GaleriaPage() {
                   )}
                 </div>
 
-                <div className="flex flex-col justify-center px-6 py-8 sm:px-8 md:px-10">
+                <div className="flex min-h-full flex-col px-6 py-8 sm:px-8 md:px-10">
                   <p className="text-[12px] uppercase tracking-[0.22em] text-[#9f8a74]">Produto</p>
                   <h2 id="product-modal-title" className="mt-3 font-serif text-3xl leading-tight sm:text-4xl">
                     {selectedProduct.name}
@@ -554,6 +534,30 @@ export default function GaleriaPage() {
                   <p className="mt-6 text-sm leading-relaxed text-[#5e493a] sm:text-[15px]">
                     {selectedProduct.description?.trim() || 'Descrição indisponível no momento.'}
                   </p>
+
+                  <div className="mt-auto pt-8">
+                    <div className="w-full max-w-[14.5rem] rounded-[16px] border border-[#ddd3c6] bg-[#f8f4ed] px-4 py-3 md:w-[38%] md:min-w-[13rem]">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-[#ab9884]">Dimensões do item</p>
+                    <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] uppercase tracking-[0.14em] text-[#b29f8c]">Peso</p>
+                        <p className="text-[13px] text-[#6d5847]">{selectedProduct.package_weight_grams ? `${selectedProduct.package_weight_grams} g` : 'Não informado'}</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] uppercase tracking-[0.14em] text-[#b29f8c]">Altura</p>
+                        <p className="text-[13px] text-[#6d5847]">{formatPackageMetric(selectedProduct.package_height_cm) ? `${formatPackageMetric(selectedProduct.package_height_cm)} cm` : 'Não informado'}</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] uppercase tracking-[0.14em] text-[#b29f8c]">Largura</p>
+                        <p className="text-[13px] text-[#6d5847]">{formatPackageMetric(selectedProduct.package_width_cm) ? `${formatPackageMetric(selectedProduct.package_width_cm)} cm` : 'Não informado'}</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] uppercase tracking-[0.14em] text-[#b29f8c]">Comprimento</p>
+                        <p className="text-[13px] text-[#6d5847]">{formatPackageMetric(selectedProduct.package_length_cm) ? `${formatPackageMetric(selectedProduct.package_length_cm)} cm` : 'Não informado'}</p>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

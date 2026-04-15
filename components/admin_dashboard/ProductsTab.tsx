@@ -12,6 +12,10 @@ type ProductForm = {
     description: string
     price_text: string
     quantity: string
+    package_weight_grams: string
+    package_height_cm: string
+    package_width_cm: string
+    package_length_cm: string
 }
 
 type ProductsTabProps = {
@@ -72,7 +76,7 @@ export default function ProductsTab({
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
+                        <div className="min-w-0">
                             <label className="block text-sm font-medium text-graphite mb-1">Nome *</label>
                             <input
                                 type="text"
@@ -83,7 +87,7 @@ export default function ProductsTab({
                                 maxLength={120}
                             />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <label className="block text-sm font-medium text-graphite mb-1">Autor</label>
                             <input
                                 type="text"
@@ -107,7 +111,7 @@ export default function ProductsTab({
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
+                        <div className="min-w-0">
                             <label className="block text-sm font-medium text-graphite mb-1">Valor (ex: 249,99)</label>
                             <input
                                 type="text"
@@ -117,7 +121,7 @@ export default function ProductsTab({
                                 placeholder="250,00"
                             />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <label className="block text-sm font-medium text-graphite mb-1">Quantidade</label>
                             <input
                                 type="number"
@@ -125,6 +129,52 @@ export default function ProductsTab({
                                 onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })}
                                 className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
                                 min="0"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        <div className="min-w-0">
+                            <label className="block text-sm font-medium text-graphite mb-1">Peso (g)</label>
+                            <input
+                                type="number"
+                                value={newProduct.package_weight_grams}
+                                onChange={(e) => setNewProduct({ ...newProduct, package_weight_grams: e.target.value })}
+                                className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
+                                min="1"
+                            />
+                        </div>
+                        <div className="min-w-0">
+                            <label className="block text-sm font-medium text-graphite mb-1">Altura (cm)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={newProduct.package_height_cm}
+                                onChange={(e) => setNewProduct({ ...newProduct, package_height_cm: e.target.value })}
+                                className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
+                                min="0.1"
+                            />
+                        </div>
+                        <div className="min-w-0">
+                            <label className="block text-sm font-medium text-graphite mb-1">Largura (cm)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={newProduct.package_width_cm}
+                                onChange={(e) => setNewProduct({ ...newProduct, package_width_cm: e.target.value })}
+                                className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
+                                min="0.1"
+                            />
+                        </div>
+                        <div className="min-w-0">
+                            <label className="block text-sm font-medium text-graphite mb-1">Comprimento (cm)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={newProduct.package_length_cm}
+                                onChange={(e) => setNewProduct({ ...newProduct, package_length_cm: e.target.value })}
+                                className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
+                                min="0.1"
                             />
                         </div>
                     </div>
@@ -137,7 +187,7 @@ export default function ProductsTab({
                             accept="image/*"
                             multiple
                             onChange={(e) => setNewProductFiles(Array.from(e.target.files || []))}
-                            className="w-full text-sm text-graphite/70"
+                            className="block w-full min-w-0 rounded-md border border-warm-beige bg-off-white text-sm text-graphite/70 file:mr-3 file:border-0 file:bg-olive-green/10 file:px-3 file:py-2 file:text-sm file:font-medium file:text-graphite"
                         />
                         <p className="text-xs text-graphite/60 mt-1">
                             Selecione uma ou mais imagens. Maximo 10MB por arquivo.
@@ -174,7 +224,7 @@ export default function ProductsTab({
                                 <div
                                     key={product.id}
                                     className={`bg-white rounded-2xl border border-warm-beige/80 overflow-hidden transition-all duration-200 shadow-sm ${
-                                        editingProductId === product.id ? 'ring-2 ring-olive-green' : ''
+                                        editingProductId === product.id ? 'ring-2 ring-olive-green md:col-span-2 lg:col-span-3' : ''
                                     }`}
                                 >
                                     <div className="relative h-56 bg-off-white">
@@ -228,8 +278,8 @@ export default function ProductsTab({
                                                         rows={3}
                                                     />
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-3">
-                                                    <div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    <div className="min-w-0">
                                                         <label className="block text-sm font-medium text-graphite mb-1">Valor</label>
                                                         <input
                                                             type="text"
@@ -238,7 +288,7 @@ export default function ProductsTab({
                                                             className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
                                                         />
                                                     </div>
-                                                    <div>
+                                                    <div className="min-w-0">
                                                         <label className="block text-sm font-medium text-graphite mb-1">Quantidade</label>
                                                         <input
                                                             type="number"
@@ -246,6 +296,52 @@ export default function ProductsTab({
                                                             onChange={(e) => setProductEditForm({ ...productEditForm, quantity: e.target.value })}
                                                             className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
                                                             min="0"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                                                    <div className="min-w-0">
+                                                        <label className="block text-sm font-medium text-graphite mb-1">Peso (g)</label>
+                                                        <input
+                                                            type="number"
+                                                            value={productEditForm.package_weight_grams}
+                                                            onChange={(e) => setProductEditForm({ ...productEditForm, package_weight_grams: e.target.value })}
+                                                            className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
+                                                            min="1"
+                                                        />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <label className="block text-sm font-medium text-graphite mb-1">Altura (cm)</label>
+                                                        <input
+                                                            type="number"
+                                                            step="0.01"
+                                                            value={productEditForm.package_height_cm}
+                                                            onChange={(e) => setProductEditForm({ ...productEditForm, package_height_cm: e.target.value })}
+                                                            className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
+                                                            min="0.1"
+                                                        />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <label className="block text-sm font-medium text-graphite mb-1">Largura (cm)</label>
+                                                        <input
+                                                            type="number"
+                                                            step="0.01"
+                                                            value={productEditForm.package_width_cm}
+                                                            onChange={(e) => setProductEditForm({ ...productEditForm, package_width_cm: e.target.value })}
+                                                            className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
+                                                            min="0.1"
+                                                        />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <label className="block text-sm font-medium text-graphite mb-1">Comprimento (cm)</label>
+                                                        <input
+                                                            type="number"
+                                                            step="0.01"
+                                                            value={productEditForm.package_length_cm}
+                                                            onChange={(e) => setProductEditForm({ ...productEditForm, package_length_cm: e.target.value })}
+                                                            className="w-full px-3 py-2 border border-warm-beige rounded-md focus:outline-none focus:ring-2 focus:ring-olive-green/60 bg-off-white"
+                                                            min="0.1"
                                                         />
                                                     </div>
                                                 </div>
@@ -289,11 +385,11 @@ export default function ProductsTab({
                                                         accept="image/*"
                                                         multiple
                                                         onChange={(e) => setProductEditNewFiles(Array.from(e.target.files || []))}
-                                                        className="w-full text-sm text-graphite/70"
+                                                        className="block w-full min-w-0 rounded-md border border-warm-beige bg-off-white text-sm text-graphite/70 file:mr-3 file:border-0 file:bg-olive-green/10 file:px-3 file:py-2 file:text-sm file:font-medium file:text-graphite"
                                                     />
                                                 </div>
 
-                                                <div className="flex gap-2 pt-2">
+                                                <div className="flex flex-col gap-2 pt-2 sm:flex-row">
                                                     <button
                                                         type="button"
                                                         onClick={() => saveProductEdit(product.id)}

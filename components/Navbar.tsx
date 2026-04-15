@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { Menu, ShoppingCart, X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { CircleUserRound, Menu, ShoppingCart, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -15,6 +15,8 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const navRef = useRef<HTMLElement | null>(null)
   const pathname = usePathname()
 
   const navSobre = 'Sobre'
@@ -39,9 +41,12 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
       } = await supabase.auth.getSession()
 
       if (!session?.user) {
+        setIsLoggedIn(false)
         setCartCount(0)
         return
       }
+
+      setIsLoggedIn(true)
 
       const { count } = await supabase
         .from('cart_items')
@@ -53,7 +58,8 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
 
     void loadCartCount()
 
-    const { data: authSubscription } = supabase.auth.onAuthStateChange(() => {
+    const { data: authSubscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(Boolean(session?.user))
       void loadCartCount()
     })
 
@@ -68,6 +74,22 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
       window.removeEventListener('cart-updated', handleCartUpdated)
     }
   }, [pathname])
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!navRef.current?.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+    }
+  }, [isMobileMenuOpen])
 
   const navItems = useMemo(() => ([
     { name: navSobre, href: '#sobre' },
@@ -95,6 +117,8 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
     }
   }
 
+  const accountHref = isLoggedIn ? '/conta' : '/login?next=/conta'
+
   const isHome = pathname === '/'
   const isGaleria = pathname === '/galeria'
   const toHomeHref = (href: string, isRoute?: boolean) => {
@@ -116,27 +140,66 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
 
   return (
     <nav
+      ref={navRef}
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isScrolled ? 'bg-[#3e5f4b]/70 backdrop-blur-sm shadow-sm' : 'bg-[#3e5f4b]/70'
       }`}
     >
-      <div className="px-6 sm:px-8 ">
-        <div className="flex items-center h-16">
-          {cartCount > 0 && (
+      <div className="px-6 sm:px-8">
+        <div className="flex items-center h-16 relative">
+
+          {/* ── Mobile layout: hamburger | centered logo | cart + account ── */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className={`md:hidden p-3 rounded-lg transition-colors ${
+              backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-bg hover:text-gold'
+            }`}
+            aria-label={navToggleLabel}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {/* Centered logo — absolute so it doesn't shift the side items */}
+          <div className="md:hidden absolute left-1/2 -translate-x-1/2">
+            {isHome ? (
+              <a href="#hero" className="flex items-center">
+                <Image src="/nm-gold.png" alt="Nathalia Malinowski" width={48} height={48} className="object-contain w-10 h-10" />
+              </a>
+            ) : (
+              <a href="/#hero" className="flex items-center" onClick={(e) => handleRouteClick(e, '/#hero')}>
+                <Image src="/nm-gold.png" alt="Nathalia Malinowski" width={48} height={48} className="object-contain w-10 h-10" />
+              </a>
+            )}
+          </div>
+
+          {/* Right icons on mobile */}
+          <div className="md:hidden ml-auto flex items-center gap-4">
+            {cartCount > 0 && (
+              <Link
+                href="/carrinho"
+                className={`relative inline-flex items-center justify-center transition-colors ${
+                  backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-bg hover:text-gold'
+                }`}
+                aria-label="Ir para carrinho"
+              >
+                <ShoppingCart size={20} />
+                <span className="absolute -top-2 -right-3 w-4 h-4 md:min-w-5 md:h-5 px-1 rounded-full bg-gold text-dirt text-[11px] font-semibold flex items-center justify-center">
+                  {cartCount}
+                </span>
+              </Link>
+            )}
             <Link
-              href="/carrinho"
-              className={`md:hidden relative mr-2 inline-flex items-center justify-center transition-colors ${
+              href={accountHref}
+              className={`inline-flex items-center justify-center transition-colors ${
                 backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-bg hover:text-gold'
               }`}
-              aria-label="Ir para carrinho"
+              aria-label={isLoggedIn ? 'Minha conta' : 'Entrar'}
             >
-              <ShoppingCart size={20} />
-              <span className="absolute -top-2 -right-3 min-w-5 h-5 px-1 rounded-full bg-gold text-dirt text-[11px] font-semibold flex items-center justify-center">
-                {cartCount}
-              </span>
+              <CircleUserRound size={20} />
             </Link>
-          )}
+          </div>
 
+          {/* ── Desktop layout: logo | nav links | cart + account ── */}
           <div className="hidden md:flex flex-1 items-center justify-center justify-between pr-12 pl-2">
             {isHome ? (
               <a href="#hero" className="flex items-center">
@@ -230,21 +293,17 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                 </span>
               </Link>
             )}
+            <Link
+              href={accountHref}
+              className={`inline-flex items-center justify-center transition-colors ${
+                backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-bg hover:text-gold'
+              }`}
+              aria-label={isLoggedIn ? 'Minha conta' : 'Entrar'}
+            >
+              <CircleUserRound size={22} />
+            </Link>
           </div>
 
-          {/* Mobile Menu Button */}
-          {/* Hamburger: min 44×44px touch target */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`md:hidden p-3 rounded-lg transition-colors ${
-              backgroundVariant === 'dirt'
-                ? 'text-bg hover:text-olive'
-                : 'text-bg hover:text-gold'
-            }`}
-            aria-label={navToggleLabel}
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
       </div>
 
@@ -330,6 +389,18 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                 </span>
               </Link>
             )}
+            <Link
+              href={accountHref}
+              className={`flex items-center py-3 min-h-[44px] text-sm font-medium transition-colors font-sans ${
+                backgroundVariant === 'dirt' ? 'text-bg hover:text-olive' : 'text-bg hover:text-gold'
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <span className="inline-flex items-center gap-2">
+                <CircleUserRound size={16} />
+                {isLoggedIn ? 'Minha conta' : 'Entrar'}
+              </span>
+            </Link>
           </div>
         </div>
       )}

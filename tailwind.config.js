@@ -31,7 +31,7 @@ module.exports = {
       },
       fontFamily: {
         serif: ['Libre Baskerville', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Montserrat', 'system-ui', 'sans-serif'],
         poetic: ['Cormorant Garamond', 'Georgia', 'serif'],
       },
       fontSize: {

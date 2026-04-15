@@ -3,12 +3,15 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getMercadoPagoPreference } from '@/lib/mercadopago'
 import { parseBrazilianPriceToCents } from '@/lib/price'
+import { getCheckoutProfile, quoteShippingForItems } from '@/lib/order-shipping'
+import { isSuperFreteConfigured } from '@/lib/superfrete'
 
 export const runtime = 'nodejs'
 
 type CheckoutProductBody = {
   productId?: string
   quantity?: number
+  shippingServiceCode?: number
 }
 
 function getBaseUrl(request: Request): string {
@@ -51,6 +54,7 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => ({}))) as CheckoutProductBody
     const productId = body.productId?.trim()
     const quantity = Number.isInteger(body.quantity) && (body.quantity || 0) > 0 ? (body.quantity as number) : 1
+    const shippingServiceCode = Number(body.shippingServiceCode)
 
     if (!productId) {
       return NextResponse.json({ error: 'Product is required' }, { status: 400 })
@@ -58,7 +62,9 @@ export async function POST(request: Request) {
 
     const { data: product, error: productError } = await supabaseAdmin
       .from('gallery_products')
-      .select('id, name, price_text, is_visible, quantity')
+      .select(
+        'id, name, price_text, is_visible, quantity, package_weight_grams, package_height_cm, package_width_cm, package_length_cm'
+      )
       .eq('id', productId)
       .eq('is_visible', true)
       .maybeSingle()
@@ -69,19 +75,47 @@ export async function POST(request: Request) {
     if (!product.quantity || product.quantity < quantity) {
       return NextResponse.json({ error: 'Product is out of stock' }, { status: 400 })
     }
+    if (!isSuperFreteConfigured()) {
+      return NextResponse.json({ error: 'Shipping is not configured on the server' }, { status: 500 })
+    }
+    if (!Number.isFinite(shippingServiceCode) || shippingServiceCode <= 0) {
+      return NextResponse.json({ error: 'Shipping option is required' }, { status: 400 })
+    }
 
     const unitPriceCents = parseBrazilianPriceToCents(product.price_text)
-    const totalCents = unitPriceCents * quantity
+    const profile = await getCheckoutProfile(user.id)
+    const shippingQuote = await quoteShippingForItems({
+      profile,
+      items: [{ quantity, product }]
+    })
+    const selectedShipping = shippingQuote.options.find((option) => option.serviceCode === shippingServiceCode)
+    if (!selectedShipping) {
+      return NextResponse.json({ error: 'Selected shipping option is no longer available' }, { status: 400 })
+    }
+
+    const totalCents = unitPriceCents * quantity + selectedShipping.priceCents
 
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
         user_id: user.id,
         status: 'pending',
-        subtotal_cents: totalCents,
+        subtotal_cents: unitPriceCents * quantity,
         discount_cents: 0,
         total_cents: totalCents,
-        coupon_code: null
+        coupon_code: null,
+        shipping_cents: selectedShipping.priceCents,
+        shipping_service_code: selectedShipping.serviceCode,
+        shipping_service_name: selectedShipping.serviceName,
+        shipping_delivery_days: selectedShipping.deliveryDays || null,
+        shipping_quote_data: selectedShipping.raw,
+        shipping_package_data: shippingQuote.volume,
+        shipping_address_data: {
+          postal_code: profile.postal_code,
+          city: profile.city,
+          state: profile.state
+        },
+        shipping_status: 'quote_selected'
       })
       .select('id')
       .single()
@@ -109,11 +143,11 @@ export async function POST(request: Request) {
       body: {
         items: [
           {
-            id: product.id,
-            title: product.name || 'Artwork',
-            quantity,
+            id: order.id,
+            title: `Pedido Nathalia Malinowski (${product.name || 'Artwork'})`,
+            quantity: 1,
             currency_id: 'BRL',
-            unit_price: Number((unitPriceCents / 100).toFixed(2))
+            unit_price: Number((totalCents / 100).toFixed(2))
           }
         ],
         payer: {
@@ -124,7 +158,8 @@ export async function POST(request: Request) {
         metadata: {
           order_id: order.id,
           user_id: user.id,
-          product_id: product.id
+          product_id: product.id,
+          shipping_service_code: selectedShipping.serviceCode
         },
         statement_descriptor: 'NATHALIAARTE',
         ...(isLocalhost

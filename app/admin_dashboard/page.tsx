@@ -130,7 +130,11 @@ export default function AdminDashboard() {
         author: '',
         description: '',
         price_text: '',
-        quantity: ''
+        quantity: '',
+        package_weight_grams: '',
+        package_height_cm: '',
+        package_width_cm: '',
+        package_length_cm: ''
     })
     const [productEditImages, setProductEditImages] = useState<string[]>([])
     const [productEditOriginalImages, setProductEditOriginalImages] = useState<string[]>([])
@@ -141,7 +145,11 @@ export default function AdminDashboard() {
         author: '',
         description: '',
         price_text: '',
-        quantity: ''
+        quantity: '',
+        package_weight_grams: '',
+        package_height_cm: '',
+        package_width_cm: '',
+        package_length_cm: ''
     })
     const [newProductFiles, setNewProductFiles] = useState<File[]>([])
     const [newProductFilesKey, setNewProductFilesKey] = useState(0)
@@ -254,6 +262,27 @@ export default function AdminDashboard() {
         if (files.length === 0) return 'Selecione pelo menos uma imagem'
         for (const file of files) {
             if (!file.type.startsWith('image/')) return 'Envie apenas arquivos de imagem'
+        }
+        return null
+    }
+
+    const validateProductShipping = (form: {
+        package_weight_grams: string
+        package_height_cm: string
+        package_width_cm: string
+        package_length_cm: string
+    }) => {
+        if (!form.package_weight_grams || Number.parseInt(form.package_weight_grams, 10) <= 0) {
+            return 'Informe o peso do pacote em gramas'
+        }
+        if (!form.package_height_cm || Number.parseFloat(form.package_height_cm) <= 0) {
+            return 'Informe a altura do pacote em centímetros'
+        }
+        if (!form.package_width_cm || Number.parseFloat(form.package_width_cm) <= 0) {
+            return 'Informe a largura do pacote em centímetros'
+        }
+        if (!form.package_length_cm || Number.parseFloat(form.package_length_cm) <= 0) {
+            return 'Informe o comprimento do pacote em centímetros'
         }
         return null
     }
@@ -572,6 +601,12 @@ export default function AdminDashboard() {
             return
         }
 
+        const shippingValidationError = validateProductShipping(newProduct)
+        if (shippingValidationError) {
+            alert(shippingValidationError)
+            return
+        }
+
         const validationError = validateFiles(newProductFiles)
         if (validationError) {
             alert(validationError)
@@ -590,6 +625,10 @@ export default function AdminDashboard() {
                     description: newProduct.description.trim() || null,
                     price_text: newProduct.price_text.trim() || null,
                     quantity: newProduct.quantity ? Number.parseInt(newProduct.quantity, 10) : null,
+                    package_weight_grams: newProduct.package_weight_grams ? Number.parseInt(newProduct.package_weight_grams, 10) : null,
+                    package_height_cm: newProduct.package_height_cm ? Number.parseFloat(newProduct.package_height_cm) : null,
+                    package_width_cm: newProduct.package_width_cm ? Number.parseFloat(newProduct.package_width_cm) : null,
+                    package_length_cm: newProduct.package_length_cm ? Number.parseFloat(newProduct.package_length_cm) : null,
                     images: JSON.stringify(urls),
                     display_order: products.length,
                     is_visible: true
@@ -598,7 +637,17 @@ export default function AdminDashboard() {
             if (error) throw error
 
             await fetchProducts()
-            setNewProduct({ name: '', author: '', description: '', price_text: '', quantity: '' })
+            setNewProduct({
+                name: '',
+                author: '',
+                description: '',
+                price_text: '',
+                quantity: '',
+                package_weight_grams: '',
+                package_height_cm: '',
+                package_width_cm: '',
+                package_length_cm: ''
+            })
             setNewProductFiles([])
             setNewProductFilesKey((prev) => prev + 1)
             alert('Produto criado com sucesso!')
@@ -618,7 +667,23 @@ export default function AdminDashboard() {
             author: product.author || '',
             description: product.description || '',
             price_text: product.price_text || '',
-            quantity: product.quantity !== null && product.quantity !== undefined ? String(product.quantity) : ''
+            quantity: product.quantity !== null && product.quantity !== undefined ? String(product.quantity) : '',
+            package_weight_grams:
+                product.package_weight_grams !== null && product.package_weight_grams !== undefined
+                    ? String(product.package_weight_grams)
+                    : '',
+            package_height_cm:
+                product.package_height_cm !== null && product.package_height_cm !== undefined
+                    ? String(product.package_height_cm)
+                    : '',
+            package_width_cm:
+                product.package_width_cm !== null && product.package_width_cm !== undefined
+                    ? String(product.package_width_cm)
+                    : '',
+            package_length_cm:
+                product.package_length_cm !== null && product.package_length_cm !== undefined
+                    ? String(product.package_length_cm)
+                    : ''
         })
         setProductEditImages(imagesList)
         setProductEditOriginalImages(imagesList)
@@ -628,7 +693,17 @@ export default function AdminDashboard() {
 
     const cancelProductEdit = () => {
         setEditingProductId(null)
-        setProductEditForm({ name: '', author: '', description: '', price_text: '', quantity: '' })
+        setProductEditForm({
+            name: '',
+            author: '',
+            description: '',
+            price_text: '',
+            quantity: '',
+            package_weight_grams: '',
+            package_height_cm: '',
+            package_width_cm: '',
+            package_length_cm: ''
+        })
         setProductEditImages([])
         setProductEditOriginalImages([])
         setProductEditNewFiles([])
@@ -637,6 +712,12 @@ export default function AdminDashboard() {
     const saveProductEdit = async (id: string) => {
         if (!productEditForm.name.trim()) {
             alert('O nome do produto nao pode ficar vazio')
+            return
+        }
+
+        const shippingValidationError = validateProductShipping(productEditForm)
+        if (shippingValidationError) {
+            alert(shippingValidationError)
             return
         }
 
@@ -666,6 +747,10 @@ export default function AdminDashboard() {
                     description: productEditForm.description.trim() || null,
                     price_text: productEditForm.price_text.trim() || null,
                     quantity: productEditForm.quantity ? Number.parseInt(productEditForm.quantity, 10) : null,
+                    package_weight_grams: productEditForm.package_weight_grams ? Number.parseInt(productEditForm.package_weight_grams, 10) : null,
+                    package_height_cm: productEditForm.package_height_cm ? Number.parseFloat(productEditForm.package_height_cm) : null,
+                    package_width_cm: productEditForm.package_width_cm ? Number.parseFloat(productEditForm.package_width_cm) : null,
+                    package_length_cm: productEditForm.package_length_cm ? Number.parseFloat(productEditForm.package_length_cm) : null,
                     images: JSON.stringify(finalImages)
                 })
                 .eq('id', id)
