@@ -102,6 +102,7 @@ export default function AdminDashboard() {
     const [images, setImages] = useState<PortfolioImage[]>([])
     const [loading, setLoading] = useState(true)
     const [user, setUser] = useState<User | null>(null)
+    const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
     const [authLoading, setAuthLoading] = useState(true)
     const [authError, setAuthError] = useState<string | null>(null)
     const [authForm, setAuthForm] = useState({ email: '', password: '' })
@@ -183,14 +184,36 @@ export default function AdminDashboard() {
         const loadSession = async () => {
             const { data } = await supabase.auth.getSession()
             if (!isMounted) return
-            setUser(data.session?.user ?? null)
+            const sessionUser = data.session?.user ?? null
+            setUser(sessionUser)
+            if (sessionUser) {
+                const { data: adminRow } = await supabase
+                    .from('admin_users')
+                    .select('id')
+                    .eq('id', sessionUser.id)
+                    .maybeSingle()
+                if (isMounted) setIsAdmin(!!adminRow)
+            } else {
+                setIsAdmin(null)
+            }
             setAuthLoading(false)
         }
 
         loadSession()
 
-        const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null)
+        const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            const sessionUser = session?.user ?? null
+            setUser(sessionUser)
+            if (sessionUser) {
+                const { data: adminRow } = await supabase
+                    .from('admin_users')
+                    .select('id')
+                    .eq('id', sessionUser.id)
+                    .maybeSingle()
+                setIsAdmin(!!adminRow)
+            } else {
+                setIsAdmin(null)
+            }
             setAuthLoading(false)
         })
 
@@ -1005,6 +1028,23 @@ export default function AdminDashboard() {
                             Entrar
                         </button>
                     </form>
+                </div>
+            </div>
+        )
+    }
+
+    if (user && isAdmin === false) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-off-white px-6">
+                <div className="text-center">
+                    <p className="text-lg font-medium text-graphite">Acesso não autorizado.</p>
+                    <button
+                        type="button"
+                        onClick={() => supabase.auth.signOut()}
+                        className="mt-4 text-sm text-graphite/60 underline"
+                    >
+                        Sair
+                    </button>
                 </div>
             </div>
         )

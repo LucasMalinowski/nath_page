@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { getMercadoPagoPayment } from '@/lib/mercadopago'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
@@ -6,6 +7,48 @@ import { getCheckoutProfile, purchaseShippingLabel } from '@/lib/order-shipping'
 import { isSuperFreteConfigured } from '@/lib/superfrete'
 
 export const runtime = 'nodejs'
+
+/**
+ * Verify MercadoPago webhook signature.
+ * Docs: https://www.mercadopago.com.br/developers/en/docs/your-integrations/notifications/webhooks
+ * The signed manifest is: "id:<data.id>;request-id:<x-request-id>;ts:<ts>;"
+ * Returns true when the secret is not configured (dev/sandbox fallback — log a warning).
+ */
+function verifyMercadoPagoSignature(request: Request, dataId: string | null): boolean {
+  const secret = process.env.MERCADO_PAGO_WEBHOOK_SECRET
+  if (!secret) {
+    console.warn('[MP webhook] MERCADO_PAGO_WEBHOOK_SECRET not set — skipping signature check')
+    return true
+  }
+
+  const xSignature = request.headers.get('x-signature')
+  const xRequestId = request.headers.get('x-request-id')
+
+  if (!xSignature || !xRequestId) {
+    return false
+  }
+
+  // x-signature format: "ts=<timestamp>,v1=<hash>"
+  const parts = Object.fromEntries(
+    xSignature.split(',').map((part) => {
+      const [k, v] = part.split('=', 2)
+      return [k?.trim(), v?.trim()]
+    })
+  )
+
+  const ts = parts['ts']
+  const v1 = parts['v1']
+  if (!ts || !v1) return false
+
+  const manifest = `id:${dataId ?? ''};request-id:${xRequestId};ts:${ts};`
+  const expected = crypto.createHmac('sha256', secret).update(manifest).digest('hex')
+
+  try {
+    return crypto.timingSafeEqual(Buffer.from(v1, 'hex'), Buffer.from(expected, 'hex'))
+  } catch {
+    return false
+  }
+}
 
 type MercadoPagoWebhookBody = {
   action?: string
@@ -50,6 +93,13 @@ export async function POST(request: Request) {
     const paymentId = resolvePaymentId(url, body)
     if (!paymentId) {
       return NextResponse.json({ received: true })
+    }
+
+    // Verify webhook signature before processing
+    const dataId = url.searchParams.get('data.id') || String(body?.data?.id ?? paymentId)
+    if (!verifyMercadoPagoSignature(request, dataId)) {
+      console.warn('[MP webhook] Invalid signature — rejecting request')
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
     const payment = await mercadoPagoPayment.get({ id: paymentId })
@@ -108,23 +158,11 @@ export async function POST(request: Request) {
       for (const item of orderItems || []) {
         if (!item.product_id) continue
 
-        const { data: product, error: productError } = await supabaseAdmin
-          .from('gallery_products')
-          .select('id, quantity')
-          .eq('id', item.product_id)
-          .single()
-
-        if (productError) {
-          return NextResponse.json({ error: productError.message }, { status: 500 })
-        }
-
-        const currentQuantity = product.quantity ?? 0
-        const nextQuantity = Math.max(currentQuantity - item.quantity, 0)
-
-        const { error: stockError } = await supabaseAdmin
-          .from('gallery_products')
-          .update({ quantity: nextQuantity })
-          .eq('id', item.product_id)
+        // Atomic decrement — avoids race conditions with concurrent webhooks
+        const { error: stockError } = await supabaseAdmin.rpc('deduct_product_stock', {
+          p_product_id: item.product_id,
+          p_quantity: item.quantity
+        })
 
         if (stockError) {
           return NextResponse.json({ error: stockError.message }, { status: 500 })

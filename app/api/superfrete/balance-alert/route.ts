@@ -28,11 +28,15 @@ function isOlderThan24Hours(timestamp: string | null | undefined) {
 
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET
-  if (cronSecret) {
-    const authHeader = request.headers.get('authorization')
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  // Always require the secret — if it is not configured, deny the request
+  // rather than allowing unauthenticated callers to trigger balance checks.
+  if (!cronSecret) {
+    console.error('[balance-alert] CRON_SECRET env var is not set')
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const authHeader = request.headers.get('authorization')
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   if (!isSuperFreteConfigured()) {

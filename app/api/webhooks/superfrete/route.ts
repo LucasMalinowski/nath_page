@@ -4,13 +4,22 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
 
-function verifyWebhookSignature(rawBody: string, signature: string | null) {
+function verifyWebhookSignature(rawBody: string, signature: string | null): boolean {
   const secret = process.env.SUPERFRETE_WEBHOOK_SECRET
-  if (!secret) return true
+  if (!secret) {
+    // In production this should never happen — warn loudly but allow through
+    // so existing orders aren't silently dropped during a config incident.
+    console.warn('[SuperFrete webhook] SUPERFRETE_WEBHOOK_SECRET not set — skipping signature check')
+    return true
+  }
   if (!signature) return false
 
   const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex')
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(signature, 'hex'))
+  } catch {
+    return false
+  }
 }
 
 export async function POST(request: Request) {
