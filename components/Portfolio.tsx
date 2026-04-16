@@ -225,12 +225,12 @@ const Portfolio = () => {
                     >
                       <h3 className="text-3xl font-serif font-bold text-text">{project.title}</h3>
                       {project.description && (
-                        <p className="mt-6 whitespace-pre-line text-lg leading-relaxed font-sans font-light text-[#735746]">
+                        <p className="mt-6 whitespace-pre-line text-base leading-relaxed font-sans font-light text-[#735746]">
                           {project.description}
                         </p>
                       )}
                       {project.phrase && (
-                        <p className="mt-5 border-l-2 border-[#735746]/40 pl-4 py-2 whitespace-pre-line text-xl font-sans font-light italic leading-snug text-[#9f876c]">
+                        <p className="mt-5 border-l-2 border-[#735746]/40 pl-4 py-2 whitespace-pre-line text-base font-sans font-light italic leading-snug text-[#9f876c]">
                           {project.phrase}
                         </p>
                       )}
