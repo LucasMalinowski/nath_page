@@ -130,7 +130,7 @@ export async function POST(request: Request) {
       product_name: product.name || 'Artwork',
       unit_price_cents: unitPriceCents,
       quantity,
-      line_total_cents: totalCents
+      line_total_cents: unitPriceCents * quantity
     })
 
     if (itemError) {
