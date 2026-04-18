@@ -206,9 +206,9 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                 <Image
                   src="/nm-gold.png"
                   alt="Nathalia Malinowski"
-                  width={20}
-                  height={20}
-                  className="object-contain w-20 h-20 mb-2"
+                  width={34}
+                  height={34}
+                  className="object-contain w-[34px] h-[34px]"
                 />
               </a>
             ) : (
@@ -220,27 +220,27 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                 <Image
                     src="/nm-gold.png"
                     alt="Nathalia Malinowski"
-                    width={20}
-                    height={20}
-                    className="object-contain w-20 h-20 mb-2"
+                    width={34}
+                    height={34}
+                    className="object-contain w-[34px] h-[34px]"
                 />
               </a>
             )}
             {navItems.map((item) => {
               const href = toHomeHref(item.href, item.isRoute)
               const isAnchor = isHome && item.href.startsWith('#')
-              const commonClass = `px-12 text-[20px] font-thin rounded-lg transition-colors duration-300 ${
+              const commonClass = `px-[14px] py-[6px] text-[13px] font-normal tracking-[0.05em] rounded-[5px] transition-colors duration-300 ${
                 item.href === '#contato'
-                  ? 'bg-[#ebeae0] text-[#3b2f26]'
+                  ? 'bg-[#F5F1EB] text-[#3b2f26] font-medium tracking-[0.06em] ml-2'
                   : item.isRoute && item.href === '/galeria'
-                    ? 'bg-[#6b7a5e] text-bg'
+                    ? 'bg-[#6b7a5e]/65 text-bg border border-white/10'
                   : item.isRoute
                     ? backgroundVariant === 'dirt'
                       ? 'bg-dirt text-bg hover:text-olive'
-                      : 'text-bg hover:text-gold'
+                      : 'text-bg hover:text-bg'
                     : backgroundVariant === 'dirt'
                       ? 'text-bg hover:text-olive'
-                      : 'text-bg hover:text-gold'
+                      : 'text-bg hover:text-bg'
               }`
               if (!isHome && isGaleria && item.isRoute && item.href === '/galeria') {
                 return (
