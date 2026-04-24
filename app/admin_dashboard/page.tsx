@@ -6,6 +6,7 @@ import { supabase, PortfolioImage, GalleryProduct, GalleryExhibitor } from '@/li
 import AdminPortfolioTab from '@/components/admin_dashboard/PortfolioTab'
 import AdminProductsTab from '@/components/admin_dashboard/ProductsTab'
 import AdminExhibitorsTab from '@/components/admin_dashboard/ExhibitorsTab'
+import AdminCouponsTab from '@/components/admin_dashboard/CouponsTab'
 import { parseImageList, parseGalleryImages } from '@/components/admin_dashboard/utils'
 
 const MAX_IMAGE_DIMENSION = 2400
@@ -176,7 +177,7 @@ export default function AdminDashboard() {
     })
     const [newExhibitorFile, setNewExhibitorFile] = useState<File | null>(null)
     const [newExhibitorFileKey, setNewExhibitorFileKey] = useState(0)
-    const [activeTab, setActiveTab] = useState<'portfolio' | 'products' | 'exhibitors'>('portfolio')
+    const [activeTab, setActiveTab] = useState<'portfolio' | 'products' | 'exhibitors' | 'coupons'>('portfolio')
 
     useEffect(() => {
         let isMounted = true
@@ -1065,7 +1066,7 @@ export default function AdminDashboard() {
                     <p className="text-xs uppercase tracking-widest text-graphite/70 font-sans">Admin</p>
                     <h1 className="text-3xl font-serif text-graphite">Painel</h1>
                     <p className="text-sm text-graphite/70 mt-1">
-                        Gerencie o portfólio, produtos e expositores.
+                        Gerencie o portfólio, produtos, expositores e cupons.
                     </p>
                     <div className="mt-4 flex items-center gap-4 text-xs">
                         <a
@@ -1120,6 +1121,18 @@ export default function AdminDashboard() {
                         type="button"
                     >
                         Expositores
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('coupons')}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                            activeTab === 'coupons'
+                                ? 'bg-olive-green text-off-white'
+                                : 'bg-warm-beige/60 text-graphite hover:bg-warm-beige'
+                        }`}
+                        aria-pressed={activeTab === 'coupons'}
+                        type="button"
+                    >
+                        Cupons
                     </button>
                 </div>
 
@@ -1199,6 +1212,8 @@ export default function AdminDashboard() {
                         deleteExhibitor={deleteExhibitor}
                     />
                 )}
+
+                {activeTab === 'coupons' && <AdminCouponsTab />}
             </div>
         </div>
     )

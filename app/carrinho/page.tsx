@@ -4,9 +4,10 @@ import Image from 'next/image'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MapPinHouse, ShoppingCart, TicketPercent, Trash2, Truck } from 'lucide-react'
+import { Loader2, MapPinHouse, ShoppingCart, TicketPercent, Trash2, Truck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { formatCentsToBRL, parseBrazilianPriceToCents } from '@/lib/price'
+import { calculateCouponDiscountCents, normalizeCouponCode, type CouponRecord } from '@/lib/coupons'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
@@ -29,6 +30,13 @@ type ShippingOption = {
   carrierName: string
   priceCents: number
   deliveryDays: number
+  raw?: {
+    type?: string
+    pickup_location?: {
+      city?: string
+      state?: string
+    }
+  }
 }
 
 type ProfileSummary = {
@@ -56,6 +64,10 @@ export default function CarrinhoPage() {
   const router = useRouter()
   const [items, setItems] = useState<CartItem[]>([])
   const [couponCode, setCouponCode] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState<CouponRecord | null>(null)
+  const [couponLoading, setCouponLoading] = useState(false)
+  const [couponMessage, setCouponMessage] = useState<string | null>(null)
+  const [couponError, setCouponError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [checkingOut, setCheckingOut] = useState(false)
   const [loadingShipping, setLoadingShipping] = useState(false)
@@ -128,29 +140,36 @@ export default function CarrinhoPage() {
     setLoadingShipping(true)
     setShippingError(null)
 
-    const response = await fetch('/api/shipping/quote', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`
-      }
-    })
-    const data = await response.json()
-    setLoadingShipping(false)
+    try {
+      const response = await fetch('/api/shipping/quote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`
+        }
+      })
+      const data = await response.json()
 
-    if (!response.ok) {
+      if (!response.ok) {
+        setShippingOptions([])
+        setSelectedShippingCode(null)
+        setShippingError(data.error || 'Não foi possível calcular o frete.')
+        return
+      }
+
+      const options = (data.options || []) as ShippingOption[]
+      setShippingOptions(options)
+      setSelectedShippingCode((current) => {
+        if (current && options.some((option) => option.serviceCode === current)) return current
+        return options[0]?.serviceCode ?? null
+      })
+    } catch {
       setShippingOptions([])
       setSelectedShippingCode(null)
-      setShippingError(data.error || 'Não foi possível calcular o frete.')
-      return
+      setShippingError('Não foi possível calcular o frete.')
+    } finally {
+      setLoadingShipping(false)
     }
-
-    const options = (data.options || []) as ShippingOption[]
-    setShippingOptions(options)
-    setSelectedShippingCode((current) => {
-      if (current && options.some((option) => option.serviceCode === current)) return current
-      return options[0]?.serviceCode ?? null
-    })
   }, [items])
 
   useEffect(() => {
@@ -168,8 +187,76 @@ export default function CarrinhoPage() {
     () => shippingOptions.find((option) => option.serviceCode === selectedShippingCode) || null,
     [selectedShippingCode, shippingOptions]
   )
+  const selectedShippingLabel = selectedShipping
+    ? selectedShipping.raw?.type === 'pickup'
+      ? 'Retirada'
+      : 'Frete'
+    : 'Frete'
+  const selectedShippingDisplayPrice =
+    selectedShipping?.raw?.type === 'pickup' ? 'Grátis' : selectedShipping ? formatCentsToBRL(selectedShipping.priceCents) : 'Selecione'
+  const appliedCouponDiscountCents = useMemo(() => {
+    if (!appliedCoupon) return 0
+    return calculateCouponDiscountCents(appliedCoupon, subtotalCents)
+  }, [appliedCoupon, subtotalCents])
 
-  const totalCents = subtotalCents + (selectedShipping?.priceCents || 0)
+  const totalCents = Math.max(subtotalCents - appliedCouponDiscountCents, 0) + (selectedShipping?.priceCents || 0)
+
+  const validateCoupon = useCallback(
+    async (inputCode?: string) => {
+      const code = normalizeCouponCode(inputCode ?? couponCode)
+      if (!code) {
+        setAppliedCoupon(null)
+        setCouponMessage(null)
+        setCouponError(null)
+        return null
+      }
+
+      setCouponLoading(true)
+      setCouponError(null)
+      setCouponMessage(null)
+
+      try {
+        const {
+          data: { session }
+        } = await supabase.auth.getSession()
+
+        if (!session?.user) {
+          setCouponError('Faça login novamente para validar o cupom.')
+          return null
+        }
+
+        const response = await fetch('/api/coupons/validate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            code,
+            subtotalCents
+          })
+        })
+        const data = await response.json()
+
+        if (!response.ok) {
+          setAppliedCoupon(null)
+          setCouponError(data.error || 'Cupom inválido.')
+          return null
+        }
+
+        setAppliedCoupon(data.coupon as CouponRecord)
+        setCouponMessage(`Cupom ${code} aplicado com sucesso.`)
+        return data.coupon as CouponRecord
+      } catch {
+        setAppliedCoupon(null)
+        setCouponError('Não foi possível validar o cupom.')
+        return null
+      } finally {
+        setCouponLoading(false)
+      }
+    },
+    [couponCode, subtotalCents]
+  )
 
   const updateQuantity = async (cartItemId: string, quantity: number) => {
     if (quantity <= 0) return
@@ -193,6 +280,7 @@ export default function CarrinhoPage() {
   const checkout = async () => {
     setCheckingOut(true)
     setError(null)
+    setCouponError(null)
 
     const {
       data: { session }
@@ -204,6 +292,15 @@ export default function CarrinhoPage() {
       return
     }
 
+    const typedCoupon = normalizeCouponCode(couponCode)
+    if (typedCoupon && appliedCoupon?.code !== typedCoupon) {
+      const validCoupon = await validateCoupon(typedCoupon)
+      if (!validCoupon) {
+        setCheckingOut(false)
+        return
+      }
+    }
+
     const response = await fetch('/api/checkout', {
       method: 'POST',
       headers: {
@@ -211,7 +308,7 @@ export default function CarrinhoPage() {
         Authorization: `Bearer ${session.access_token}`
       },
       body: JSON.stringify({
-        couponCode: couponCode.trim() || undefined,
+        couponCode: appliedCoupon?.code || typedCoupon || undefined,
         shippingServiceCode: selectedShippingCode || undefined
       })
     })
@@ -399,44 +496,62 @@ export default function CarrinhoPage() {
                     Frete
                   </p>
 
-                  {loadingShipping && <p className="mt-3 text-sm text-[#735746]">Calculando opções...</p>}
+                  <br/>
+
+                  {loadingShipping && (
+                    <p className="mt-3 inline-flex items-center gap-2 text-sm text-[#735746]" aria-live="polite">
+                      <Loader2 size={16} className="animate-spin text-[#b89b5e]" />
+                      Calculando opções...
+                    </p>
+                  )}
 
                   {!loadingShipping && shippingOptions.length > 0 && (
                     <div className="mt-3 space-y-3">
-                      {shippingOptions.map((option) => (
-                        <label
-                          key={option.serviceCode}
-                          className={`block cursor-pointer rounded-[14px] border px-4 py-3 transition-colors ${
-                            option.serviceCode === selectedShippingCode
-                              ? 'border-[#b89b5e] bg-[#f8f2e8]'
-                              : 'border-[#d8cdbf] bg-[#fbf8f2]'
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <input
-                              type="radio"
-                              name="shipping"
-                              checked={option.serviceCode === selectedShippingCode}
-                              onChange={() => setSelectedShippingCode(option.serviceCode)}
-                              className="mt-1"
-                            />
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between gap-4">
-                                <div>
-                                  <p className="text-sm font-medium text-[#3b2f26]">{option.serviceName}</p>
-                                  <p className="text-xs uppercase tracking-[0.14em] text-[#8a6f5f]">
-                                    {option.carrierName || 'SuperFrete'}
+                      {shippingOptions.map((option) => {
+                        const pickupCity = option.raw?.pickup_location?.city
+                        const pickupState = option.raw?.pickup_location?.state
+                        const isPickup = option.raw?.type === 'pickup'
+                        const subtitle = isPickup
+                          ? `Retire sem custo${pickupCity && pickupState ? ` em ${pickupCity}, ${pickupState}` : ''}. Você receberá as instruções por e-mail.`
+                          : option.deliveryDays > 0
+                            ? `${option.deliveryDays} dia(s) úteis estimados`
+                            : 'Prazo sob consulta'
+
+                        return (
+                          <label
+                            key={option.serviceCode}
+                            className={`block cursor-pointer rounded-[14px] border px-4 py-3 transition-colors ${
+                              option.serviceCode === selectedShippingCode
+                                ? 'border-[#b89b5e] bg-[#f8f2e8]'
+                                : 'border-[#d8cdbf] bg-[#fbf8f2]'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <input
+                                type="radio"
+                                name="shipping"
+                                checked={option.serviceCode === selectedShippingCode}
+                                onChange={() => setSelectedShippingCode(option.serviceCode)}
+                                className="mt-1"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between gap-4">
+                                  <div>
+                                    <p className="text-sm font-medium text-[#3b2f26]">{option.serviceName}</p>
+                                    <p className="text-xs uppercase tracking-[0.14em] text-[#8a6f5f]">
+                                      {isPickup ? 'Retirada presencial' : option.carrierName || 'SuperFrete'}
+                                    </p>
+                                  </div>
+                                  <p className="text-sm font-medium text-[#3b2f26]">
+                                    {isPickup ? 'Grátis' : formatCentsToBRL(option.priceCents)}
                                   </p>
                                 </div>
-                                <p className="text-sm font-medium text-[#3b2f26]">{formatCentsToBRL(option.priceCents)}</p>
+                                <p className="mt-1 text-sm text-[#735746]">{subtitle}</p>
                               </div>
-                              <p className="mt-1 text-sm text-[#735746]">
-                                {option.deliveryDays > 0 ? `${option.deliveryDays} dia(s) úteis estimados` : 'Prazo sob consulta'}
-                              </p>
                             </div>
-                          </div>
-                        </label>
-                      ))}
+                          </label>
+                        )
+                      })}
                     </div>
                   )}
 
@@ -449,24 +564,58 @@ export default function CarrinhoPage() {
                   <TicketPercent size={16} className="text-[#b89b5e]" />
                   Cupom
                 </label>
-                <input
-                  type="text"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  placeholder="EXEMPLO10"
-                  className="w-full border border-[#d5ccb9] bg-white rounded px-3 py-2 mb-5 text-[#3b2f26] placeholder:text-[#b0907a]"
-                />
+                <div className="mb-5 flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => {
+                      setCouponCode(e.target.value.toUpperCase())
+                      setAppliedCoupon(null)
+                      setCouponMessage(null)
+                      setCouponError(null)
+                    }}
+                    placeholder="EXEMPLO10"
+                    className="w-full border border-[#d5ccb9] bg-white rounded px-3 py-2 text-[#3b2f26] placeholder:text-[#b0907a]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void validateCoupon()}
+                    disabled={couponLoading}
+                    className="shrink-0 rounded-sm border border-[#d5ccb9] px-4 py-2 text-sm font-medium text-[#735746] hover:bg-[#efe7dc] disabled:opacity-60"
+                  >
+                    {couponLoading ? 'Validando...' : appliedCoupon ? 'Revalidar' : 'Aplicar'}
+                  </button>
+                </div>
+                {couponMessage && <p className="mb-3 text-sm text-[#5d7a54]">{couponMessage}</p>}
+                {couponError && <p className="mb-3 text-sm text-[#a16060]">{couponError}</p>}
+                {appliedCoupon && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedCoupon(null)
+                      setCouponMessage(null)
+                      setCouponError(null)
+                    }}
+                    className="mb-5 text-xs uppercase tracking-[0.14em] text-[#735746] hover:text-[#b89b5e]"
+                  >
+                    Remover cupom
+                  </button>
+                )}
 
                 <div className="space-y-2 text-sm text-[#735746] font-sans">
                   <div className="flex items-center justify-between">
                     <span>Produtos</span>
                     <span className="text-[#3b2f26]">{formatCentsToBRL(subtotalCents)}</span>
                   </div>
+                  {appliedCouponDiscountCents > 0 && (
+                    <div className="flex items-center justify-between">
+                      <span>Desconto do cupom</span>
+                      <span className="text-[#5d7a54]">- {formatCentsToBRL(appliedCouponDiscountCents)}</span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
-                    <span>Frete</span>
-                    <span className="text-[#3b2f26]">
-                      {selectedShipping ? formatCentsToBRL(selectedShipping.priceCents) : 'Selecione'}
-                    </span>
+                    <span>{selectedShippingLabel}</span>
+                    <span className="text-[#3b2f26]">{selectedShippingDisplayPrice}</span>
                   </div>
                   <div className="flex items-center justify-between border-t border-[#ddd2c4] pt-2 text-base">
                     <span>Total</span>
@@ -477,10 +626,10 @@ export default function CarrinhoPage() {
                 <button
                   type="button"
                   onClick={checkout}
-                  disabled={checkingOut || !selectedShippingCode}
+                  disabled={checkingOut || couponLoading || !selectedShippingCode}
                   className="mt-6 w-full bg-[#735746] text-[#f5f1eb] rounded-sm px-4 py-3 font-medium hover:bg-[#644435] transition-colors disabled:opacity-60"
                 >
-                  {checkingOut ? 'Redirecionando...' : 'Finalizar com Mercado Pago'}
+                  {checkingOut ? 'Redirecionando...' : couponLoading ? 'Validando cupom...' : 'Finalizar com Mercado Pago'}
                 </button>
               </aside>
             </div>

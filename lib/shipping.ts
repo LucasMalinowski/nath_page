@@ -1,5 +1,7 @@
 import { parseBrazilianPriceToCents } from '@/lib/price'
 
+export const PICKUP_SERVICE_CODE = 999001
+
 type ProductLike = {
   id: string
   name: string | null
@@ -24,6 +26,21 @@ type UserProfileLike = {
   postal_code: string | null
 }
 
+type SenderLocality = {
+  city: string
+  state: string
+}
+
+export type ShippingOption = {
+  serviceCode: number
+  serviceName: string
+  carrierName: string
+  priceCents: number
+  deliveryDays: number
+  packages: unknown[]
+  raw: any
+}
+
 function sanitizePostalCode(value: string | null | undefined) {
   return (value || '').replace(/\D/g, '')
 }
@@ -34,6 +51,15 @@ function sanitizeDocument(value: string | null | undefined) {
 
 function sanitizePhone(value: string | null | undefined) {
   return (value || '').replace(/\D/g, '')
+}
+
+function normalizeComparableText(value: string | null | undefined) {
+  return (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase()
 }
 
 function normalizeDimension(value: number | string | null | undefined) {
@@ -109,8 +135,44 @@ export function normalizeShippingOptions(raw: any[]) {
       packages: entry?.packages || [],
       raw: entry
     }))
-    .filter((entry) => entry.serviceCode > 0 && entry.priceCents >= 0)
+    .filter((entry) => {
+      if (entry.serviceCode <= 0 || entry.priceCents < 0) {
+        return false
+      }
+
+      const raw = entry.raw || {}
+      if (raw?.error || raw?.has_error) {
+        return false
+      }
+
+      return true
+    })
     .sort((a, b) => a.priceCents - b.priceCents)
+}
+
+export function buildPickupShippingOption(locality: SenderLocality): ShippingOption {
+  const city = locality.city.trim()
+  const state = locality.state.trim().toUpperCase()
+
+  return {
+    serviceCode: PICKUP_SERVICE_CODE,
+    serviceName: 'Retirada no local',
+    carrierName: 'Sem entrega',
+    priceCents: 0,
+    deliveryDays: 0,
+    packages: [],
+    raw: {
+      type: 'pickup',
+      pickup_location: {
+        city,
+        state
+      }
+    }
+  }
+}
+
+export function isPickupServiceCode(serviceCode: number | null | undefined) {
+  return Number(serviceCode) === PICKUP_SERVICE_CODE
 }
 
 export function assertCompleteShippingProfile(profile: UserProfileLike) {
@@ -160,6 +222,32 @@ export function pickOriginPostalCode(addresses: any[]) {
   }
 
   return postalCode
+}
+
+export function getSenderLocality(addresses: any[]): SenderLocality | null {
+  const preferred = addresses.find((address) => address?.default) || addresses[0]
+  const city = preferred?.city
+  const state = preferred?.state_abbr || preferred?.state
+
+  if (!city || !state) {
+    return null
+  }
+
+  return {
+    city: String(city).trim(),
+    state: String(state).trim().toUpperCase()
+  }
+}
+
+export function isPickupEligible(profile: UserProfileLike, locality: SenderLocality | null) {
+  if (!locality || !profile.city || !profile.state) {
+    return false
+  }
+
+  return (
+    normalizeComparableText(profile.city) === normalizeComparableText(locality.city) &&
+    normalizeComparableText(profile.state) === normalizeComparableText(locality.state)
+  )
 }
 
 export function buildSenderAddress(addresses: any[], user: any) {

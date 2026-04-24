@@ -4,7 +4,9 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getMercadoPagoPreference } from '@/lib/mercadopago'
 import { parseBrazilianPriceToCents } from '@/lib/price'
 import { getCheckoutProfile, quoteShippingForItems } from '@/lib/order-shipping'
+import { isPickupServiceCode } from '@/lib/shipping'
 import { isSuperFreteConfigured } from '@/lib/superfrete'
+import { calculateCouponDiscountCents, normalizeCouponCode } from '@/lib/coupons'
 
 export const runtime = 'nodejs'
 
@@ -12,6 +14,7 @@ type CheckoutProductBody = {
   productId?: string
   quantity?: number
   shippingServiceCode?: number
+  couponCode?: string
 }
 
 function getBaseUrl(request: Request): string {
@@ -55,6 +58,7 @@ export async function POST(request: Request) {
     const productId = body.productId?.trim()
     const quantity = Number.isInteger(body.quantity) && (body.quantity || 0) > 0 ? (body.quantity as number) : 1
     const shippingServiceCode = Number(body.shippingServiceCode)
+    const couponCode = normalizeCouponCode(body.couponCode)
 
     if (!productId) {
       return NextResponse.json({ error: 'Product is required' }, { status: 400 })
@@ -83,6 +87,25 @@ export async function POST(request: Request) {
     }
 
     const unitPriceCents = parseBrazilianPriceToCents(product.price_text)
+    const subtotalCents = unitPriceCents * quantity
+    let discountCents = 0
+    let coupon: { code: string; discount_type: 'percentage' | 'fixed' | null; discount_percent: number | null; discount_value_cents: number | null } | null = null
+
+    if (couponCode) {
+      const { data: couponRow, error: couponError } = await supabaseAdmin.rpc('consume_coupon_use', { p_code: couponCode })
+
+      if (couponError) {
+        return NextResponse.json({ error: couponError.message }, { status: 400 })
+      }
+
+      if (!couponRow) {
+        return NextResponse.json({ error: 'Invalid or expired coupon' }, { status: 400 })
+      }
+
+      coupon = couponRow
+      discountCents = calculateCouponDiscountCents(couponRow, subtotalCents)
+    }
+
     const profile = await getCheckoutProfile(user.id)
     const shippingQuote = await quoteShippingForItems({
       profile,
@@ -93,17 +116,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Selected shipping option is no longer available' }, { status: 400 })
     }
 
-    const totalCents = unitPriceCents * quantity + selectedShipping.priceCents
+    const totalCents = Math.max(subtotalCents - discountCents, 0) + selectedShipping.priceCents
 
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
         user_id: user.id,
         status: 'pending',
-        subtotal_cents: unitPriceCents * quantity,
-        discount_cents: 0,
+        subtotal_cents: subtotalCents,
+        discount_cents: discountCents,
         total_cents: totalCents,
-        coupon_code: null,
+        coupon_code: coupon?.code || null,
         shipping_cents: selectedShipping.priceCents,
         shipping_service_code: selectedShipping.serviceCode,
         shipping_service_name: selectedShipping.serviceName,
@@ -115,7 +138,7 @@ export async function POST(request: Request) {
           city: profile.city,
           state: profile.state
         },
-        shipping_status: 'quote_selected'
+        shipping_status: isPickupServiceCode(selectedShipping.serviceCode) ? 'pickup_selected' : 'quote_selected'
       })
       .select('id')
       .single()
@@ -159,7 +182,8 @@ export async function POST(request: Request) {
           order_id: order.id,
           user_id: user.id,
           product_id: product.id,
-          shipping_service_code: selectedShipping.serviceCode
+          shipping_service_code: selectedShipping.serviceCode,
+          coupon_code: coupon?.code || null
         },
         statement_descriptor: 'NATHALIAARTE',
         ...(isLocalhost

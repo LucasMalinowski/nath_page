@@ -66,3 +66,17 @@ export type GalleryExhibitor = {
     created_at: string
     updated_at: string | null
 }
+
+export type Coupon = {
+    id: string
+    code: string
+    discount_percent: number | null
+    discount_type: 'percentage' | 'fixed' | null
+    discount_value_cents: number | null
+    is_active: boolean | null
+    expires_at: string | null
+    max_uses: number | null
+    uses_count: number | null
+    created_at: string | null
+    updated_at: string | null
+}

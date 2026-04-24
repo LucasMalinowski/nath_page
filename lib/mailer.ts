@@ -4,6 +4,8 @@ type PaymentSuccessEmailParams = {
   productNames: string[]
   trackingCode?: string | null
   trackingUrl?: string | null
+  isPickup?: boolean
+  pickupLabel?: string | null
 }
 
 type SuperFreteLowBalanceEmailParams = {
@@ -60,10 +62,15 @@ export async function sendPaymentSuccessEmail(params: PaymentSuccessEmailParams)
   }
 
   const products = params.productNames.length ? params.productNames.join(', ') : 'obra adquirida'
-  const shippingText = params.trackingCode
+  const pickupLabel = params.pickupLabel?.trim() || 'o local combinado'
+  const shippingText = params.isPickup
+    ? `\n\nSeu pedido ficou marcado para retirada sem custo em ${pickupLabel}. Você receberá as instruções de retirada por e-mail.`
+    : params.trackingCode
     ? `\n\nSeu envio foi gerado com o código de rastreio ${params.trackingCode}.${params.trackingUrl ? ` Acompanhe em: ${params.trackingUrl}` : ''}`
     : '\n\nSeu envio será preparado em seguida e enviaremos o rastreio assim que estiver disponível.'
-  const shippingHtml = params.trackingCode
+  const shippingHtml = params.isPickup
+    ? `<p>Seu pedido ficou marcado para <strong>retirada sem custo</strong> em ${pickupLabel}. Você receberá as instruções de retirada por e-mail.</p>`
+    : params.trackingCode
     ? `<p>Seu envio foi gerado com o código de rastreio <strong>${params.trackingCode}</strong>.${params.trackingUrl ? ` <a href="${params.trackingUrl}">Acompanhar entrega</a>.` : ''}</p>`
     : '<p>Seu envio será preparado em seguida e enviaremos o rastreio assim que estiver disponível.</p>'
 

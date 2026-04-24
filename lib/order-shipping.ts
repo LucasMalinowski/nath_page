@@ -1,12 +1,15 @@
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import {
   assertCompleteShippingProfile,
+  buildPickupShippingOption,
   buildQuoteProducts,
   buildShippingDeclarationProducts,
   buildRecipientAddress,
   buildSenderAddress,
   buildVolumeFromItems,
   convertWeightGramsToKg,
+  getSenderLocality,
+  isPickupEligible,
   normalizeShippingOptions,
   pickOriginPostalCode
 } from '@/lib/shipping'
@@ -71,6 +74,7 @@ export async function quoteShippingForItems(params: {
   assertCompleteShippingProfile(params.profile)
   const addresses = await getSuperFreteAddresses()
   const originPostalCode = pickOriginPostalCode(addresses)
+  const senderLocality = getSenderLocality(addresses)
   const volume = buildVolumeFromItems(params.items)
   const products = buildQuoteProducts(params.items)
   const packageDimensions = {
@@ -94,8 +98,22 @@ export async function quoteShippingForItems(params: {
     }
   })
 
+  const rawOptions = Array.isArray(quoteResponse) ? quoteResponse : []
+  const options = normalizeShippingOptions(rawOptions)
+  if (isPickupEligible(params.profile, senderLocality)) {
+    options.unshift(buildPickupShippingOption(senderLocality!))
+  }
+
+  if (options.length === 0) {
+    const rawError = rawOptions.find((entry: any) => entry?.error || entry?.has_error) as
+      | { error?: string; message?: string }
+      | undefined
+    const message = rawError?.error || rawError?.message || 'Nenhuma opção de frete disponível para o trecho informado'
+    throw new Error(message)
+  }
+
   return {
-    options: normalizeShippingOptions(Array.isArray(quoteResponse) ? quoteResponse : []),
+    options,
     volume
   }
 }

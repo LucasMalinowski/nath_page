@@ -4,6 +4,7 @@ import { getMercadoPagoPayment } from '@/lib/mercadopago'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { sendPaymentSuccessEmail } from '@/lib/mailer'
 import { getCheckoutProfile, purchaseShippingLabel } from '@/lib/order-shipping'
+import { isPickupServiceCode } from '@/lib/shipping'
 import { isSuperFreteConfigured } from '@/lib/superfrete'
 
 export const runtime = 'nodejs'
@@ -111,7 +112,7 @@ export async function POST(request: Request) {
 
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
-      .select('id, user_id, status, shipping_service_code')
+      .select('id, user_id, status, shipping_service_code, shipping_service_name, shipping_quote_data')
       .eq('id', orderId)
       .maybeSingle()
 
@@ -174,8 +175,23 @@ export async function POST(request: Request) {
       const { data: authUserData, error: authUserError } = await supabaseAdmin.auth.admin.getUserById(order.user_id)
       const buyerEmail = authUserData.user?.email
       let shippingResult: Awaited<ReturnType<typeof purchaseShippingLabel>> | null = null
+      const isPickup = isPickupServiceCode(order.shipping_service_code)
+      const pickupLocation = order.shipping_quote_data?.pickup_location
+      const pickupLabel =
+        pickupLocation?.city && pickupLocation?.state
+          ? `${pickupLocation.city}, ${pickupLocation.state}`
+          : order.shipping_service_name || null
 
-      if (order.shipping_service_code && buyerEmail && isSuperFreteConfigured()) {
+      if (isPickup) {
+        await supabaseAdmin
+          .from('orders')
+          .update({
+            shipping_status: 'pickup_pending',
+            shipping_error_message: null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', order.id)
+      } else if (order.shipping_service_code && buyerEmail && isSuperFreteConfigured()) {
         try {
           const profile = await getCheckoutProfile(order.user_id)
           shippingResult = await purchaseShippingLabel({
@@ -214,6 +230,8 @@ export async function POST(request: Request) {
             productNames: (orderItems || [])
               .map((item) => item.product_name)
               .filter((name): name is string => !!name),
+            isPickup,
+            pickupLabel,
             trackingCode: shippingResult?.shipping_tracking_code,
             trackingUrl: shippingResult?.shipping_tracking_url
           })
