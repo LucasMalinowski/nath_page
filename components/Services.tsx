@@ -80,7 +80,7 @@ const Services = () => {
                     <h3 className="text-h3 font-serif font-semibold mb-3 text-[#3b2f26] whitespace-pre-line leading-[1.3]">
                       {service.title}
                     </h3>
-                    <p className="text-[11px] md:text-[11px] font-thin font-sans leading-[1.7] text-[#735746]">
+                    <p className="text-[12px] md:text-[15px] font-thin font-sans leading-[1.7] text-[#735746]">
                       {service.description}
                     </p>
                     <Link
@@ -88,7 +88,7 @@ const Services = () => {
                       className="absolute right-4 bottom-4 flex items-center gap-1 transition-opacity hover:opacity-80"
                       aria-label="Ir para servicos"
                     >
-                      <span className="font-sans text-[9px] font-medium tracking-[0.1em] uppercase text-[#B89B5E]">Ver mais</span>
+                      <span className="font-sans text-[10px] font-medium tracking-[0.1em] uppercase text-[#B89B5E]">Ver mais</span>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B89B5E" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </Link>
                   </div>
