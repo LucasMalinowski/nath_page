@@ -75,19 +75,21 @@ const Services = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 lg:gap-20">
               {services.map((service) => (
                 <div key={service.title}>
-                  <div className="relative bg-[#eee9e2] p-6 rounded-[22px] text-[#735746] shadow-sm min-h-[240px]">
-                    <h3 className="text-h3 font-serif font-semibold mb-6 text-[#3b2f26] whitespace-pre-line leading-tight">
+                  <div className="relative bg-[#FDFAF6] p-6 rounded-[8px] text-[#735746] border border-[#E8DFD2] min-h-[240px]">
+                    <div className="w-5 h-[1.5px] bg-[#B89B5E] mb-[14px] opacity-65" />
+                    <h3 className="text-h3 font-serif font-semibold mb-3 text-[#3b2f26] whitespace-pre-line leading-[1.3]">
                       {service.title}
                     </h3>
-                    <p className="text-body-mobile md:text-body font-thin font-sans leading-relaxed text-[#735746]">
+                    <p className="text-[11px] md:text-[11px] font-thin font-sans leading-[1.7] text-[#735746]">
                       {service.description}
                     </p>
                     <Link
                       href="/servicos"
-                      className="absolute right-8 bottom-5 text-xl text-[#b89b5e] hover:text-[#a58a51] transition-colors"
+                      className="absolute right-4 bottom-4 flex items-center gap-1 transition-opacity hover:opacity-80"
                       aria-label="Ir para servicos"
                     >
-                      →
+                      <span className="font-sans text-[9px] font-medium tracking-[0.1em] uppercase text-[#B89B5E]">Ver mais</span>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B89B5E" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </Link>
                   </div>
                   <p className="mt-3 text-xl font-poetic italic text-[#b89b5e] text-center px-4 sm:px-8 leading-tight">

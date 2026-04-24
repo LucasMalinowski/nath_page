@@ -192,7 +192,7 @@ const Portfolio = () => {
                   >
                     {project.coverImage ? (
                       <div
-                        className={`relative overflow-hidden border border-[#e3d8c8] bg-[#ede7de] ${
+                        className={`relative overflow-hidden bg-[#ede7de] ${
                           isTallFrame
                             ? 'aspect-[4/5] max-w-[360px] sm:max-w-[390px] md:max-w-[420px]'
                             : 'aspect-[16/10] max-w-[460px] sm:max-w-[520px]'
@@ -205,10 +205,11 @@ const Portfolio = () => {
                           className="object-cover"
                           unoptimized
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#3b2f26]/14 to-transparent pointer-events-none" />
                       </div>
                     ) : (
                       <div
-                        className={`border border-[#e3d8c8] bg-[#ede7de] ${
+                        className={`bg-[#ede7de] ${
                           isTallFrame
                             ? 'aspect-[4/5] max-w-[360px] sm:max-w-[390px] md:max-w-[420px]'
                             : 'aspect-[16/10] max-w-[460px] sm:max-w-[520px]'
@@ -220,31 +221,32 @@ const Portfolio = () => {
                   <div
                     className={`order-2 ${imageLeft ? 'md:order-2' : 'md:order-1'} flex h-full w-full flex-col py-10`}
                   >
-                    <div
-                      className="max-w-[540px] mb-4"
-                    >
-                      <h3 className="text-3xl font-serif font-bold text-text">{project.title}</h3>
+                    <div className="max-w-[540px] mb-4">
+                      <span className="font-sans text-[9px] font-semibold tracking-[0.2em] uppercase text-[#B89B5E] mb-3 block">
+                        {String(index + 1).padStart(2, '0')} — Residencial
+                      </span>
+                      <h3 className="text-2xl md:text-3xl font-serif font-bold text-text leading-[1.2]">{project.title}</h3>
+                      <div className="w-6 h-[1.5px] bg-[#B89B5E] my-[14px] opacity-60" />
                       {project.description && (
-                        <p className="mt-6 whitespace-pre-line text-base leading-relaxed font-sans font-light text-[#735746]">
+                        <p className="whitespace-pre-line text-[13px] md:text-sm leading-[1.8] font-sans font-light text-[#735746]">
                           {project.description}
                         </p>
                       )}
                       {project.phrase && (
-                        <p className="mt-5 border-l-2 border-[#735746]/40 pl-4 py-2 whitespace-pre-line text-base font-sans font-light italic leading-snug text-[#9f876c]">
-                          {project.phrase}
-                        </p>
+                        <blockquote className="mt-5 font-poetic italic text-[15px] text-[#9f8a74] leading-[1.5]">
+                          &ldquo;{project.phrase}&rdquo;
+                        </blockquote>
                       )}
                     </div>
 
                     <button
                       type="button"
                       onClick={() => openProjectModal(project)}
-                      className={`mt-auto inline-flex items-center gap-2 rounded-md bg-[#c3a35a] px-12 py-1 text-sm text-[#f5f1eb] transition-colors hover:bg-[#b59347] ${
+                      className={`mt-auto inline-flex items-center gap-2 rounded-[4px] bg-[#B89B5E] px-[22px] py-[7px] text-[10px] font-medium tracking-[0.1em] uppercase text-[#f5f1eb] transition-all hover:-translate-y-0.5 hover:bg-[#a58a51] ${
                         imageLeft ? 'self-center md:self-end' : 'self-center md:self-start'
                       }`}
                     >
                       Ver projeto
-                      <ArrowRight size={16} />
                     </button>
                   </div>
                 </article>
