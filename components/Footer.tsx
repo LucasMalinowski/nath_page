@@ -103,7 +103,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
             <div className="py-10 md:py-12">
               <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
                 <div className="flex flex-col items-center justify-center text-center">
-                  <p className="text-[24px] leading-[1.4] font-poetic italic font-light text-[#6b7a5e] max-w-[560px]">
+                  <p className="text-[26px] leading-[1.4] font-poetic italic font-light text-[#6b7a5e] max-w-[560px]">
                     Vamos criar um espaço
                     <br />
                     que faça sentido para você?
@@ -112,17 +112,17 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                     href={whatsappHref}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-6 px-6 py-[9px] rounded-[4px] bg-[#b89b5e] text-[#FDFAF6] font-sans font-medium text-[11px] tracking-[0.1em] uppercase leading-none transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(0,0,0,0.1)]"
+                    className="mt-6 px-6 py-[9px] rounded-[4px] bg-[#b89b5e] text-[#FDFAF6] font-sans font-medium text-[13px] tracking-[0.1em] uppercase leading-none transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(0,0,0,0.1)]"
                   >
                     Agendar conversa
                   </a>
-                  <p className="mt-3 font-sans text-[10px] font-light text-[#9f8a74]">Seg a Sex · 08h às 17h</p>
+                  <p className="mt-3 font-sans text-[13px] font-light text-[#9f8a74]">Seg a Sex · 08h às 17h</p>
                 </div>
 
                 <div className="flex flex-col items-center justify-center">
                   <div className="w-full max-w-[340px] text-left">
-                    <h3 className="font-sans text-[9px] font-semibold tracking-[0.18em] uppercase text-[#9f8a74] pb-[10px]">ATENDIMENTO</h3>
-                    <div className="w-full pt-[14px] space-y-[9px] text-[11px] font-light leading-none text-[#735746] border-t border-[#B89B5E]/25">
+                    <h3 className="font-sans text-[15px] font-semibold tracking-[0.18em] uppercase text-[#9f8a74] pb-[10px]">ATENDIMENTO</h3>
+                    <div className="w-full pt-[14px] space-y-[9px] text-[14px] font-light leading-none text-[#735746] border-t border-[#B89B5E]/25">
                       <a href={phoneHref} className="flex items-center gap-[9px] transition-opacity hover:opacity-80">
                         <WhatsAppIcon className="text-[#B89B5E]" />
                         <span>(45) 99802-8130</span>
@@ -145,7 +145,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
       ) : null}
 
       <div className="border-t border-[#B89B5E]/25 py-3 text-center">
-        <img src="/nm-gold.png" alt="NM" className="mx-auto h-7 w-auto opacity-80"/>
+        <img src="/nm-gold.png" alt="NM" className="mx-auto h-14 w-auto opacity-80"/>
       </div>
     </footer>
   )
