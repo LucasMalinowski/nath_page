@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   authors: [{ name: 'Nathalia Malinowski' }],
   viewport: 'width=device-width, initial-scale=1',
   themeColor: '#4E5F4A',
+  icons: {
+    icon: '/nm-gold.png',
+    shortcut: '/nm-gold.png',
+    apple: '/nm-gold.png'
+  },
   openGraph: {
     title: 'Nathalia Malinowski | Design de Interiores',
     description: 'Design de interiores com história, sensibilidade e identidade',
