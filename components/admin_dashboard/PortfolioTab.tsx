@@ -14,6 +14,7 @@ type ProjectForm = {
 
 type PortfolioTabProps = {
     images: PortfolioImage[]
+    imagesLoading: boolean
     newProject: ProjectForm
     setNewProject: React.Dispatch<React.SetStateAction<ProjectForm>>
     newCoverKey: number
@@ -43,6 +44,7 @@ type PortfolioTabProps = {
 
 export default function PortfolioTab({
     images,
+    imagesLoading,
     newProject,
     setNewProject,
     newCoverKey,
@@ -154,7 +156,9 @@ export default function PortfolioTab({
             </div>
 
             <div className="mt-6">
-                {images.length === 0 ? (
+                {imagesLoading ? (
+                    <p className="text-sm text-graphite/70">Carregando portfólio...</p>
+                ) : images.length === 0 ? (
                     <div className="text-center py-12 bg-white rounded-2xl border border-warm-beige/80 shadow-sm">
                         <p className="text-graphite text-lg mb-2">Nenhum projeto ainda.</p>
                         <p className="text-sm text-graphite/60">

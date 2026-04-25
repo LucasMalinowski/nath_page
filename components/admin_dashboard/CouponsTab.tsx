@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { BadgeDollarSign, Edit2, Loader2, Save, TicketPercent, Trash2, X } from 'lucide-react'
 import { formatCentsToBRL, parseBrazilianPriceToCents } from '@/lib/price'
-import { supabase, type Coupon } from '@/lib/supabase'
+import type { Coupon } from '@/lib/supabase'
 import {
   getCouponStatusLabel,
   normalizeCouponCode,
@@ -59,28 +59,12 @@ export default function CouponsTab() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  const getAuthHeaders = async () => {
-    const {
-      data: { session }
-    } = await supabase.auth.getSession()
-
-    if (!session?.access_token) {
-      throw new Error('Authentication required')
-    }
-
-    return {
-      Authorization: `Bearer ${session.access_token}`
-    }
-  }
-
   const fetchCoupons = async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const response = await fetch('/api/admin/coupons', {
-        headers: await getAuthHeaders()
-      })
+      const response = await fetch('/api/admin/coupons')
       const data = await response.json()
 
       if (!response.ok) {
@@ -158,12 +142,10 @@ export default function CouponsTab() {
     }
 
     try {
-      const authHeaders = await getAuthHeaders()
       const response = await fetch(editingId ? `/api/admin/coupons/${editingId}` : '/api/admin/coupons', {
         method: editingId ? 'PATCH' : 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           code,
@@ -200,8 +182,7 @@ export default function CouponsTab() {
 
     try {
       const response = await fetch(`/api/admin/coupons/${coupon.id}`, {
-        method: 'DELETE',
-        headers: await getAuthHeaders()
+        method: 'DELETE'
       })
       const data = await response.json()
       if (!response.ok) {

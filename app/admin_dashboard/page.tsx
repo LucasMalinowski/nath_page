@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Session, User } from '@supabase/supabase-js'
+import { User } from '@supabase/supabase-js'
 import { supabase, PortfolioImage, GalleryProduct, GalleryExhibitor } from '@/lib/supabase'
 import AdminPortfolioTab from '@/components/admin_dashboard/PortfolioTab'
 import AdminProductsTab from '@/components/admin_dashboard/ProductsTab'
@@ -101,7 +101,7 @@ const getUploadErrorMessage = (error: any) => {
 
 export default function AdminDashboard() {
     const [images, setImages] = useState<PortfolioImage[]>([])
-    const [loading, setLoading] = useState(true)
+    const [imagesLoading, setImagesLoading] = useState(true)
     const [user, setUser] = useState<User | null>(null)
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
     const [authLoading, setAuthLoading] = useState(true)
@@ -178,8 +178,15 @@ export default function AdminDashboard() {
     const [newExhibitorFileKey, setNewExhibitorFileKey] = useState(0)
     const [activeTab, setActiveTab] = useState<'portfolio' | 'products' | 'exhibitors' | 'coupons'>('portfolio')
 
-    const syncAuthState = async (session: Session | null) => {
-        const sessionUser = session?.user ?? null
+    const syncAuthState = async () => {
+        const { data, error: userError } = await supabase.auth.getUser()
+        if (userError) {
+            setIsAdmin(null)
+            setUser(null)
+            return
+        }
+
+        const sessionUser = data.user ?? null
         setUser(sessionUser)
 
         if (!sessionUser) {
@@ -187,14 +194,14 @@ export default function AdminDashboard() {
             return
         }
 
-        const { data: profile, error } = await supabase
+        const { data: profile, error: profileError } = await supabase
             .from('users')
             .select('admin')
             .eq('id', sessionUser.id)
             .maybeSingle()
 
-        if (error) {
-            throw error
+        if (profileError) {
+            throw profileError
         }
 
         setIsAdmin(Boolean(profile?.admin))
@@ -207,10 +214,7 @@ export default function AdminDashboard() {
             setAuthLoading(true)
 
             try {
-                const { data } = await supabase.auth.getSession()
-                if (!isMounted) return
-
-                await syncAuthState(data.session ?? null)
+                await syncAuthState()
             } catch (error) {
                 if (!isMounted) return
 
@@ -226,24 +230,8 @@ export default function AdminDashboard() {
 
         loadSession()
 
-        const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            try {
-                await syncAuthState(session)
-            } catch (error) {
-                if (!isMounted) return
-
-                console.error('Error syncing admin auth state:', error)
-                setIsAdmin(false)
-            } finally {
-                if (isMounted) {
-                    setAuthLoading(false)
-                }
-            }
-        })
-
         return () => {
             isMounted = false
-            subscription.subscription.unsubscribe()
         }
     }, [])
 
@@ -255,6 +243,7 @@ export default function AdminDashboard() {
     }, [user])
 
     const fetchImages = async () => {
+        setImagesLoading(true)
         try {
             const { data, error } = await supabase
                 .from('portfolio_images')
@@ -267,7 +256,7 @@ export default function AdminDashboard() {
             console.error('Error fetching images:', error)
             alert('Erro ao carregar imagens')
         } finally {
-            setLoading(false)
+            setImagesLoading(false)
         }
     }
 
@@ -578,17 +567,8 @@ export default function AdminDashboard() {
         if (!confirm('Tem certeza que deseja excluir este projeto?')) return
 
         try {
-            const {
-                data: { session }
-            } = await supabase.auth.getSession()
-
             const response = await fetch(`/api/admin/portfolio/${image.id}`, {
-                method: 'DELETE',
-                headers: session?.access_token
-                    ? {
-                          Authorization: `Bearer ${session.access_token}`
-                      }
-                    : undefined
+                method: 'DELETE'
             })
 
             const data = await response.json().catch(() => ({}))
@@ -996,11 +976,17 @@ export default function AdminDashboard() {
 
         if (error) {
             alert('Credenciais inválidas. Verifique seu email e senha.')
+            return
         }
+
+        await syncAuthState()
+        setAuthLoading(false)
     }
 
     const handleSignOut = async () => {
         await supabase.auth.signOut()
+        setUser(null)
+        setIsAdmin(null)
     }
 
     if (!user) {
@@ -1055,14 +1041,6 @@ export default function AdminDashboard() {
                         Sair
                     </button>
                 </div>
-            </div>
-        )
-    }
-
-    if (loading || productsLoading || exhibitorsLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-off-white">
-                <div className="text-lg font-medium text-graphite">Carregando painel...</div>
             </div>
         )
     }
@@ -1152,6 +1130,7 @@ export default function AdminDashboard() {
                 {activeTab === 'portfolio' && (
                     <AdminPortfolioTab
                         images={images}
+                        imagesLoading={imagesLoading}
                         newProject={newProject}
                         setNewProject={setNewProject}
                         newCoverKey={newCoverKey}
