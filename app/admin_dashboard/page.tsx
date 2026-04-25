@@ -437,18 +437,12 @@ export default function AdminDashboard() {
             return
         }
 
-        const validationError = validateFiles(newFiles)
-        if (validationError) {
-            alert(validationError)
-            return
-        }
-
         setUploading(true)
         try {
             const [coverUrl] = await uploadPortfolioFiles([newCoverFile])
-            const urls = await uploadPortfolioFiles(newFiles)
+            const urls = newFiles.length > 0 ? await uploadPortfolioFiles(newFiles) : []
 
-            const { error: insertError } = await supabase
+            const { data: insertedProject, error: insertError } = await supabase
                 .from('portfolio_images')
                 .insert({
                     title: newProject.title.trim(),
@@ -456,14 +450,18 @@ export default function AdminDashboard() {
                     phrase: newProject.phrase.trim() || null,
                     image_url: coverUrl,
                     cover_url: coverUrl,
-                    images: urls,
+                    images: urls.length > 0 ? urls : null,
                     display_order: images.length,
                     is_visible: true
                 })
+                .select('*')
+                .single()
 
             if (insertError) throw insertError
 
-            await fetchImages()
+            if (insertedProject) {
+                setImages((current) => [...current, insertedProject].sort((a, b) => a.display_order - b.display_order))
+            }
             setNewProject({ title: '', description: '', phrase: '' })
             setNewCoverFile(null)
             setNewFiles([])
@@ -517,12 +515,6 @@ export default function AdminDashboard() {
             return
         }
 
-        const validationError = editNewFiles.length ? validateFiles(editNewFiles) : null
-        if (validationError) {
-            alert(validationError)
-            return
-        }
-
         const finalImages = [...editImages]
         const previousCover = editCoverUrl
 
@@ -545,7 +537,7 @@ export default function AdminDashboard() {
                 return
             }
 
-            const { error } = await supabase
+            const { data: updatedProject, error } = await supabase
                 .from('portfolio_images')
                 .update({
                     title: editForm.title.trim(),
@@ -553,9 +545,11 @@ export default function AdminDashboard() {
                     phrase: editForm.phrase.trim() || null,
                     image_url: finalCoverUrl,
                     cover_url: finalCoverUrl,
-                    images: finalImages
+                    images: finalImages.length > 0 ? finalImages : null
                 })
                 .eq('id', id)
+                .select('*')
+                .single()
 
             if (error) throw error
 
@@ -567,7 +561,9 @@ export default function AdminDashboard() {
                 await removePortfolioFiles([previousCover])
             }
 
-            await fetchImages()
+            if (updatedProject) {
+                setImages((current) => current.map((item) => (item.id === id ? updatedProject : item)))
+            }
             cancelEdit()
             alert('Projeto atualizado com sucesso!')
         } catch (error) {
@@ -582,29 +578,30 @@ export default function AdminDashboard() {
         if (!confirm('Tem certeza que deseja excluir este projeto?')) return
 
         try {
-            const imageList = parseImageList(image)
-            const coverImage = image.cover_url || image.image_url
-            const filesToRemove = [...imageList]
-            if (coverImage && !filesToRemove.includes(coverImage)) {
-                filesToRemove.push(coverImage)
+            const {
+                data: { session }
+            } = await supabase.auth.getSession()
+
+            const response = await fetch(`/api/admin/portfolio/${image.id}`, {
+                method: 'DELETE',
+                headers: session?.access_token
+                    ? {
+                          Authorization: `Bearer ${session.access_token}`
+                      }
+                    : undefined
+            })
+
+            const data = await response.json().catch(() => ({}))
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Erro ao excluir projeto')
             }
 
-            if (filesToRemove.length > 0) {
-                await removePortfolioFiles(filesToRemove)
-            }
-
-            const { error } = await supabase
-                .from('portfolio_images')
-                .delete()
-                .eq('id', image.id)
-
-            if (error) throw error
-
-            await fetchImages()
+            setImages((current) => current.filter((item) => item.id !== image.id))
             alert('Projeto excluido com sucesso!')
         } catch (error) {
             console.error('Error deleting:', error)
-            alert('Erro ao excluir projeto')
+            alert(error instanceof Error ? error.message : 'Erro ao excluir projeto')
         }
     }
 

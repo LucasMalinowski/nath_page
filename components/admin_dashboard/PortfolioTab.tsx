@@ -128,7 +128,7 @@ export default function PortfolioTab({
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-graphite mb-1">Fotos do projeto *</label>
+                        <label className="block text-sm font-medium text-graphite mb-1">Fotos do projeto (opcional)</label>
                         <input
                             key={newFilesKey}
                             type="file"
@@ -138,7 +138,7 @@ export default function PortfolioTab({
                             className="w-full text-sm text-graphite/70"
                         />
                         <p className="text-xs text-graphite/60 mt-1">
-                            Selecione uma ou mais imagens para o modal.
+                            Se quiser, adicione imagens extras para o modal. A capa sozinha tambem funciona.
                         </p>
                     </div>
 
