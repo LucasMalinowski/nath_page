@@ -28,16 +28,15 @@ export async function resolveRequestUser(request: Request): Promise<User> {
 export async function requireAdmin(request: Request) {
   const supabaseAdmin = getSupabaseAdmin()
   const user = await resolveRequestUser(request)
-  const { data: adminRow, error } = await supabaseAdmin.from('admin_users').select('id').eq('id', user.id).maybeSingle()
+  const { data: profile, error } = await supabaseAdmin.from('users').select('admin').eq('id', user.id).maybeSingle()
 
   if (error) {
     throw new Error(error.message)
   }
 
-  if (!adminRow) {
+  if (!profile?.admin) {
     throw new Error('Admin access required')
   }
 
   return { user, supabaseAdmin }
 }
-

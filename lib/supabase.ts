@@ -39,6 +39,7 @@ export type GalleryProduct = {
 
 export type UserProfile = {
     id: string
+    admin: boolean | null
     full_name: string | null
     phone: string | null
     document: string | null

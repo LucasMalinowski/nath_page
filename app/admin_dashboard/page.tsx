@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User } from '@supabase/supabase-js'
+import { Session, User } from '@supabase/supabase-js'
 import { supabase, PortfolioImage, GalleryProduct, GalleryExhibitor } from '@/lib/supabase'
 import AdminPortfolioTab from '@/components/admin_dashboard/PortfolioTab'
 import AdminProductsTab from '@/components/admin_dashboard/ProductsTab'
@@ -105,7 +105,6 @@ export default function AdminDashboard() {
     const [user, setUser] = useState<User | null>(null)
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
     const [authLoading, setAuthLoading] = useState(true)
-    const [authError, setAuthError] = useState<string | null>(null)
     const [authForm, setAuthForm] = useState({ email: '', password: '' })
     const [uploading, setUploading] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -179,43 +178,67 @@ export default function AdminDashboard() {
     const [newExhibitorFileKey, setNewExhibitorFileKey] = useState(0)
     const [activeTab, setActiveTab] = useState<'portfolio' | 'products' | 'exhibitors' | 'coupons'>('portfolio')
 
+    const syncAuthState = async (session: Session | null) => {
+        const sessionUser = session?.user ?? null
+        setUser(sessionUser)
+
+        if (!sessionUser) {
+            setIsAdmin(null)
+            return
+        }
+
+        const { data: profile, error } = await supabase
+            .from('users')
+            .select('admin')
+            .eq('id', sessionUser.id)
+            .maybeSingle()
+
+        if (error) {
+            throw error
+        }
+
+        setIsAdmin(Boolean(profile?.admin))
+    }
+
     useEffect(() => {
         let isMounted = true
 
         const loadSession = async () => {
-            const { data } = await supabase.auth.getSession()
-            if (!isMounted) return
-            const sessionUser = data.session?.user ?? null
-            setUser(sessionUser)
-            if (sessionUser) {
-                const { data: adminRow } = await supabase
-                    .from('admin_users')
-                    .select('id')
-                    .eq('id', sessionUser.id)
-                    .maybeSingle()
-                if (isMounted) setIsAdmin(!!adminRow)
-            } else {
+            setAuthLoading(true)
+
+            try {
+                const { data } = await supabase.auth.getSession()
+                if (!isMounted) return
+
+                await syncAuthState(data.session ?? null)
+            } catch (error) {
+                if (!isMounted) return
+
+                console.error('Error loading admin auth state:', error)
+                setUser(null)
                 setIsAdmin(null)
+            } finally {
+                if (isMounted) {
+                    setAuthLoading(false)
+                }
             }
-            setAuthLoading(false)
         }
 
         loadSession()
 
         const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            const sessionUser = session?.user ?? null
-            setUser(sessionUser)
-            if (sessionUser) {
-                const { data: adminRow } = await supabase
-                    .from('admin_users')
-                    .select('id')
-                    .eq('id', sessionUser.id)
-                    .maybeSingle()
-                setIsAdmin(!!adminRow)
-            } else {
-                setIsAdmin(null)
+            try {
+                await syncAuthState(session)
+            } catch (error) {
+                if (!isMounted) return
+
+                console.error('Error syncing admin auth state:', error)
+                setIsAdmin(false)
+            } finally {
+                if (isMounted) {
+                    setAuthLoading(false)
+                }
             }
-            setAuthLoading(false)
         })
 
         return () => {
@@ -968,7 +991,6 @@ export default function AdminDashboard() {
 
     const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
-        setAuthError(null)
 
         const { error } = await supabase.auth.signInWithPassword({
             email: authForm.email.trim(),
@@ -976,20 +998,12 @@ export default function AdminDashboard() {
         })
 
         if (error) {
-            setAuthError('Credenciais inválidas. Verifique seu email e senha.')
+            alert('Credenciais inválidas. Verifique seu email e senha.')
         }
     }
 
     const handleSignOut = async () => {
         await supabase.auth.signOut()
-    }
-
-    if (authLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-off-white">
-                <div className="text-lg font-medium text-graphite">Carregando painel...</div>
-            </div>
-        )
     }
 
     if (!user) {
@@ -1019,9 +1033,6 @@ export default function AdminDashboard() {
                                 required
                             />
                         </div>
-                        {authError && (
-                            <p className="text-sm text-red-600">{authError}</p>
-                        )}
                         <button
                             type="submit"
                             className="w-full inline-flex items-center justify-center px-4 py-2 bg-olive-green hover:bg-coffee-brown text-off-white font-medium rounded-md transition-colors"
@@ -1068,6 +1079,11 @@ export default function AdminDashboard() {
                     <p className="text-sm text-graphite/70 mt-1">
                         Gerencie o portfólio, produtos, expositores e cupons.
                     </p>
+                    {authLoading || isAdmin === null ? (
+                        <p className="mt-2 text-xs text-olive-green">
+                            Verificando permissões em segundo plano...
+                        </p>
+                    ) : null}
                     <div className="mt-4 flex items-center gap-4 text-xs">
                         <a
                             href="/"
