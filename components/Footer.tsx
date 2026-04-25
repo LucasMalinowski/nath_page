@@ -1,6 +1,7 @@
 'use client'
 
 import { Instagram, Mail } from 'lucide-react'
+import Typewriter from '@/components/Typewriter'
 
 type FooterProps = {
   contactInfo?: boolean
@@ -27,7 +28,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
   const emailHref = 'mailto:malinowskinathalia@gmail.com?subject=Projeto%20de%20Interiores'
 
   return (
-    <footer className="relative bg-[#f5f1eb] text-[#6b7a5e]">
+    <footer className="relative bg-[#EEE9E2] text-[#6b7a5e]">
       {paymentInfo ? (
         <div>
           <div className="px-6 sm:px-8 lg:px-16">
@@ -104,9 +105,10 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
               <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
                 <div className="flex flex-col items-center justify-center text-center">
                   <p className="text-[26px] leading-[1.4] font-poetic italic font-light text-[#6b7a5e] max-w-[560px]">
-                    Vamos criar um espaço
-                    <br />
-                    que faça sentido para você?
+                    <Typewriter
+                      text={'Vamos criar um espaço\nque faça sentido para você?'}
+                      classes="text-[#6b7a5e]"
+                    />
                   </p>
                   <a
                     href={whatsappHref}

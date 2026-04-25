@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { ArrowLeft, ArrowRight, X } from 'lucide-react'
+import Typewriter from '@/components/Typewriter'
 import { supabase, PortfolioImage } from '@/lib/supabase'
 
 type PortfolioProject = PortfolioImage & {
@@ -164,7 +165,7 @@ const Portfolio = () => {
   return (
     <>
       <section id="portfolio" className="bg-[#f5f1eb] pb-20 border-b-2 border-[#d9cdb8]/20 mt-4">
-        <header className="md:text-center border-b-[1.5px] py-14 mb-2 border-[#DDB980] px-6 sm:px-8 md:px-20">
+        <header className="md:text-center py-24 mb-2 px-6 sm:px-8 md:px-20">
           <h2 className="text-h2-mobile md:text-5xl  font-serif font-normal text-[#c8aa6a]">{portfolioTitle}</h2>
           <p className="text-xl sm:text-xl md:text-2xl lg:text-3xl mt-5 italic font-poetic text-text/60">{portfolioSubtitle}</p>
         </header>
@@ -219,30 +220,34 @@ const Portfolio = () => {
                   </div>
 
                   <div
-                    className={`order-2 ${imageLeft ? 'md:order-2' : 'md:order-1'} flex h-full w-full flex-col py-10`}
+                    className={`order-2 ${imageLeft ? 'md:order-2' : 'md:order-1'} flex h-full w-full flex-col py-4`}
                   >
                     <div className="max-w-[540px] mb-4">
-                      <span className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase text-[#B89B5E] mb-3 block">
+                      <span className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase text-[#B89B5E] mb-5 block">
                         {String(index + 1).padStart(2, '0')} — Residencial
                       </span>
                       <h3 className="text-2xl md:text-3xl font-serif font-bold text-text leading-[1.2]">{project.title}</h3>
-                      <div className="w-6 h-[1.5px] bg-[#B89B5E] my-[14px] opacity-60" />
+                      <div className="w-6 h-[1.5px] bg-[#B89B5E] my-[16px] opacity-60" />
                       {project.description && (
                         <p className="whitespace-pre-line text-[15px] md:text-lg leading-[1.8] font-sans font-light text-[#735746]">
                           {project.description}
                         </p>
                       )}
-                      {project.phrase && (
-                        <blockquote className="mt-5 font-poetic italic text-[20px] text-[#9f8a74] leading-[1.5]">
-                          &ldquo;{project.phrase}&rdquo;
-                        </blockquote>
-                      )}
                     </div>
+                    {project.phrase && (
+                      <blockquote className="mt-auto font-poetic italic text-[20px] text-[#9f8a74] leading-[1.5]">
+                        <Typewriter
+                          text={`"${project.phrase}"`}
+                          loop={false}
+                          classes="text-[#9f8a74]"
+                        />
+                      </blockquote>
+                    )}
 
                     <button
                       type="button"
                       onClick={() => openProjectModal(project)}
-                      className={`mt-auto inline-flex items-center gap-2 rounded-[4px] bg-[#B89B5E] px-[22px] py-[7px] text-[12px] font-medium tracking-[0.1em] uppercase text-[#f5f1eb] transition-all hover:-translate-y-0.5 hover:bg-[#a58a51] ${
+                      className={`${!project.phrase ? 'mt-auto' : 'mt-5'} inline-flex items-center gap-2 rounded-[4px] bg-[#B89B5E] px-[22px] py-[7px] text-[12px] font-medium tracking-[0.1em] uppercase text-[#f5f1eb] transition-all hover:-translate-y-0.5 hover:bg-[#a58a51] ${
                         imageLeft ? 'self-center md:self-end' : 'self-center md:self-start'
                       }`}
                     >

@@ -43,9 +43,9 @@ const Services = () => {
   return (
     <section
       id="servicos"
-      className="relative bg-[#f6f2ed] pb-4"
+      className="relative bg-[#f6f2ed]"
     >
-      <div className="flex flex-col lg:flex-row mt-2 md:mt-0 sm:border-t-2 md:border-t-0 border-b-2 border-[#d9cdb8]/40">
+      <div className="flex flex-col lg:flex-row mt-2 md:mt-0 sm:border-t-2 md:border-t-0">
         {/* Left: Video — reduce height on mobile so it doesn't dominate before the service cards */}
         <div className="relative min-h-[220px] sm:min-h-[320px] lg:min-h-[760px] lg:w-1/3">
           <video
@@ -83,14 +83,24 @@ const Services = () => {
                     <p className="text-[12px] md:text-[15px] font-thin font-sans leading-[1.7] text-[#735746]">
                       {service.description}
                     </p>
-                    <Link
-                      href="/servicos"
-                      className="absolute right-4 bottom-4 flex items-center gap-1 transition-opacity hover:opacity-80"
-                      aria-label="Ir para servicos"
-                    >
-                      <span className="font-sans text-[10px] font-medium tracking-[0.1em] uppercase text-[#B89B5E]">Ver mais</span>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B89B5E" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </Link>
+                    {service.number === '03' ? (
+                      <Link
+                        href="/galeria"
+                        className="absolute right-4 bottom-4 inline-flex items-center justify-center rounded-[4px] border border-[#b89b5e] bg-[#f5f1eb] px-4 py-[7px] text-[11px] font-sans font-medium uppercase leading-none tracking-[0.1em] text-[#b89b5e] transition-all hover:-translate-y-0.5 hover:bg-[#f1eadf] hover:shadow-[0_10px_20px_rgba(0,0,0,0.08)]"
+                        aria-label="Ir para galeria"
+                      >
+                        Galeria de Artes
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/servicos"
+                        className="absolute right-4 bottom-4 flex items-center gap-1 transition-opacity hover:opacity-80"
+                        aria-label="Ir para servicos"
+                      >
+                        <span className="font-sans text-[10px] font-medium tracking-[0.1em] uppercase text-[#B89B5E]">Ver mais</span>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B89B5E" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                      </Link>
+                    )}
                   </div>
                   <p className="mt-3 text-xl font-poetic italic text-[#b89b5e] text-center px-4 sm:px-8 leading-tight">
                     {service.note}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, Instagram, ShoppingCart, SquareArrowUpRight, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -36,6 +36,7 @@ const formatPackageMetric = (value?: number | null): string | null => {
 
 export default function GaleriaPage() {
   const router = useRouter()
+  const exhibitorsSectionRef = useRef<HTMLElement | null>(null)
   const [products, setProducts] = useState<GalleryProduct[]>([])
   const [exhibitors, setExhibitors] = useState<GalleryExhibitor[]>([])
   const [loading, setLoading] = useState(true)
@@ -136,6 +137,33 @@ export default function GaleriaPage() {
           currentProductPage * productsPerPage + productsPerPage
       )
       : products
+
+  useEffect(() => {
+    const root = exhibitorsSectionRef.current
+    if (!root || loading) return
+
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-exhibitor-reveal]'))
+    if (cards.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      {
+        threshold: 0.18,
+        rootMargin: '0px 0px -8% 0px'
+      }
+    )
+
+    cards.forEach((card) => observer.observe(card))
+
+    return () => observer.disconnect()
+  }, [loading, visibleExhibitors.length, currentExhibitorPage, exhibitorsCarouselEnabled])
 
   const nextExhibitorPage = () => {
     setCurrentExhibitorPage((prev) =>
@@ -274,7 +302,7 @@ export default function GaleriaPage() {
         </section>
 
         {/* Products - WITH CAROUSEL */}
-        <section className="bg-[#f5f1eb] pt-16 lg:pt-20 pb-8 relative border-b-2 border-[#d9cdb8]/20">
+        <section className="relative overflow-hidden bg-[#f5f1eb] pt-16 lg:pt-20 pb-8 before:pointer-events-none before:absolute before:left-0 before:right-0 before:top-0 before:h-5 before:bg-gradient-to-b before:from-[#d9cdb8]/15 before:to-transparent">
           {/* Lateral Chevrons for Products */}
           {productsCarouselEnabled && currentProductPage > 0 && (
               <button
@@ -394,7 +422,7 @@ export default function GaleriaPage() {
         </section>
 
         {/* Exhibitors - Chevrons only on hover, positioned at exhibitors */}
-        <section className="bg-[#f5f1eb] pt-8 pb-16 group/exhibitors border-b-2 border-[#d9cdb8]/20">
+        <section ref={exhibitorsSectionRef} className="relative overflow-hidden bg-[#f5f1eb] pt-8 pb-16 group/exhibitors before:pointer-events-none before:absolute before:left-0 before:right-0 before:top-0 before:h-5 before:bg-gradient-to-b before:from-[#d9cdb8]/15 before:to-transparent">
           <div className="px-6 sm:px-8 lg:px-24">
             <div className="mb-12">
               <h2 className="text-[41px] font-serif text-[#b89b5e]">
@@ -429,38 +457,60 @@ export default function GaleriaPage() {
               )}
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
-                {visibleExhibitors.map((exhibitor) => (
-                    <article key={exhibitor.id} className="flex gap-4 sm:gap-6 items-start min-w-0">
+                {visibleExhibitors.map((exhibitor) => {
+                  const instagramHandle = exhibitor.instagram_path
+                    ? exhibitor.instagram_path.replace(/^@/, '').toLowerCase()
+                    : null
+                  const instagramHref = instagramHandle
+                    ? `https://instagram.com/${instagramHandle}`
+                    : null
+
+                  return (
+                    <article
+                      key={exhibitor.id}
+                      data-exhibitor-reveal
+                      className="flex min-w-0 items-start gap-4 sm:gap-6 opacity-0 translate-y-2 scale-[0.995] transition-[opacity,transform] duration-[1200ms] ease-out will-change-transform [transition-delay:var(--reveal-delay,0ms)] [&.is-visible]:opacity-100 [&.is-visible]:translate-y-0 [&.is-visible]:scale-100"
+                    >
                       <div className="relative w-24 h-24 sm:w-[132px] sm:h-[132px] rounded-[6px] overflow-hidden shrink-0">
                         {exhibitor.avatar_url && (
-                            <Image
-                                src={exhibitor.avatar_url}
-                                alt={exhibitor.name}
-                                fill
-                                className="object-cover"
-                            />
+                          <Image
+                            src={exhibitor.avatar_url}
+                            alt={exhibitor.name}
+                            fill
+                            className="object-cover"
+                          />
                         )}
                       </div>
                       <div className="min-w-0 pt-1">
-                        <h3 className="font-serif text-[18px] text-[#3b2f26] leading-tight mb-2">
+                        <h3 className="font-serif text-[18px] text-text leading-tight mb-2">
                           {exhibitor.name.split('\n').map((line, i) => (
-                              <span key={i} className="block">{line}</span>
+                            <span key={i} className="block">
+                              {line}
+                            </span>
                           ))}
                         </h3>
-                        <p className="text-[13px] text-[#3b2f26] font-serif font-thin leading-relaxed">
+                        <p className="text-[13px] text-[#735746] font-serif font-thin leading-relaxed">
                           {(exhibitor.title || '').split('\n').map((line, i) => (
-                              <span key={i} className="block">{line}</span>
+                            <span key={i} className="block">
+                              {line}
+                            </span>
                           ))}
                         </p>
-                        {exhibitor.instagram_path && (
-                            <p className="text-[12px] text-[#3b2f26] mt-6 font-serif font-thin inline-flex items-center gap-1">
-                              <Instagram size={12} className="text-[#b89b5e]" />
-                              {exhibitor.instagram_path}
-                            </p>
+                        {instagramHref && (
+                          <a
+                            href={instagramHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-6 inline-flex items-center gap-1 font-serif font-thin text-[12px] text-[#735746]/80 transition-colors hover:text-[#9f8450]"
+                          >
+                            <Instagram size={12} className="text-[#b89b5e]" />
+                            {instagramHandle}
+                          </a>
                         )}
                       </div>
                     </article>
-                ))}
+                  )
+                })}
               </div>
             </div>
 

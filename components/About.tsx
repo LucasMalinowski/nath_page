@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Typewriter from '@/components/Typewriter'
 
 const About = () => {
   return (
@@ -8,7 +9,7 @@ const About = () => {
       id="sobre"
       className="relative bg-[#f5f1eb] pt-4"
     >
-      <div className="px-6 sm:px-8 lg:pl-20 lg:pr-8 border-b-2 border-[#d9cdb8]/20">
+      <div className="px-6 sm:px-8 lg:pl-20 lg:pr-8">
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(380px,520px)] lg:gap-20 xl:grid-cols-[minmax(0,1fr)_minmax(420px,560px)] xl:gap-24">
           <div className="w-full max-w-[42rem] py-4 space-y-6 lg:space-y-8">
             <span className="font-sans text-[9px] font-semibold tracking-[0.2em] uppercase text-[#B89B5E]">
@@ -19,7 +20,7 @@ const About = () => {
             </h2>
             <div className="w-7 h-[1.5px] bg-[#B89B5E] opacity-65" />
 
-            <div className="space-y-5 text-[13px] md:text-base font-thin font-sans text-[#735746] leading-[1.85]">
+            <div className="space-y-5 text-[13px] md:text-[18px] font-thin font-sans text-[#735746] leading-[1.85]">
               <p>
                 Sou Nathalia Malinowski, designer de interiores e artista plástica. Fundadora e direção criativa da marca, conduzo cada projeto a partir da escuta sensível e da construção de narrativas que unem estética, funcionalidade e significado.
               </p>
@@ -33,7 +34,11 @@ const About = () => {
 
             <div className="pt-5 border-t border-[#d9cdb8]/45">
               <blockquote className="text-xl md:text-2xl font-poetic italic text-olive leading-[1.45]">
-                "Projetar é dar forma ao que faz sentido."
+                <Typewriter
+                  text={'"Projetar é dar forma ao que faz sentido."'}
+                  loop={false}
+                  classes="text-olive"
+                />
               </blockquote>
             </div>
           </div>

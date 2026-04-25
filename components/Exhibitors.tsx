@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Instagram } from 'lucide-react'
@@ -12,10 +12,38 @@ const sectionSubtitle = 'A marca se constrói no encontro entre direção criati
 const Exhibitors = () => {
   const [exhibitors, setExhibitors] = useState<GalleryExhibitor[]>([])
   const [loading, setLoading] = useState(true)
+  const sectionRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     void fetchExhibitors()
   }, [])
+
+  useEffect(() => {
+    const root = sectionRef.current
+    if (!root) return
+
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-exhibitor-reveal]'))
+    if (cards.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      {
+        threshold: 0.18,
+        rootMargin: '0px 0px -8% 0px'
+      }
+    )
+
+    cards.forEach((card) => observer.observe(card))
+
+    return () => observer.disconnect()
+  }, [loading, exhibitors.length])
 
   const fetchExhibitors = async () => {
     try {
@@ -40,7 +68,7 @@ const Exhibitors = () => {
   }
 
   return (
-    <section id="expositores" className="relative bg-[#f5f1eb] py-16 md:py-24 border-b-2 border-[#d9cdb8]/20">
+    <section ref={sectionRef} id="expositores" className="relative bg-[#f5f1eb] py-16 md:py-24 border-b-[2px] border-[#DDB980]">
       <div className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-16">
         <header className="md:text-center">
           <h2 className="text-h2-mobile md:text-5xl  font-serif font-normal text-[#c8aa6a]">
@@ -63,15 +91,19 @@ const Exhibitors = () => {
                 </div>
               ))
             : exhibitors.map((exhibitor) => {
-                const instagramHref = exhibitor.instagram_path
-                  ? `https://instagram.com/${exhibitor.instagram_path.replace(/^@/, '')}`
+                const instagramHandle = exhibitor.instagram_path
+                  ? exhibitor.instagram_path.replace(/^@/, '').toLowerCase()
+                  : null
+                const instagramHref = instagramHandle
+                  ? `https://instagram.com/${instagramHandle}`
                   : null
 
                 return (
-                  <article
-                    key={exhibitor.id}
-                    className="grid bg-[#eee9e2] md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)]"
-                  >
+                    <article
+                        key={exhibitor.id}
+                        data-exhibitor-reveal
+                        className="grid bg-[#eee9e2] opacity-0 translate-y-2 scale-[0.995] transition-[opacity,transform] duration-[1200ms] ease-out will-change-transform md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)] [transition-delay:var(--reveal-delay,0ms)] [&.is-visible]:opacity-100 [&.is-visible]:translate-y-0 [&.is-visible]:scale-100"
+                    >
                     <div className="p-5 md:p-6">
                       <div className="relative aspect-[4/4.8] bg-[#ddd2c4]">
                         {exhibitor.avatar_url && (
@@ -111,7 +143,7 @@ const Exhibitors = () => {
                           className="mt-5 inline-flex items-center font-light gap-2 text-sm text-[#735746]/80 transition-colors hover:text-[#9f8450] md:text-base"
                         >
                           <Instagram size={16} className="text-[#b89b5e]"/>
-                          {exhibitor.instagram_path}
+                          {instagramHandle}
                         </Link>
                       )}
                     </div>

@@ -94,7 +94,7 @@ export default function ServicosPage() {
     <main className="min-h-screen bg-[#f5f1eb] page-fade-in">
       <Navbar />
 
-      <section className="pt-24 border-b-2 border-[#d9cdb8]/20">
+      <section className="relative overflow-hidden pt-24 before:pointer-events-none before:absolute before:left-0 before:right-0 before:top-0 before:h-5 before:bg-gradient-to-b before:from-[#d9cdb8]/15 before:to-transparent">
         <header className="border-b-[2px] border-[#DDB980] px-6 pb-8 sm:px-10 lg:px-16">
           <div className="relative flex items-center justify-center">
             <button
@@ -150,7 +150,7 @@ export default function ServicosPage() {
                     <div className="mt-10 flex">
                       <Link
                         href={service.cta.href}
-                        className="inline-flex items-center justify-center rounded-lg bg-[#4e5f4a] px-8 py-3 text-[16px] text-[#f6f2ed] transition-colors hover:bg-[#f0ebe4]"
+                        className="inline-flex items-center justify-center rounded-lg border border-[#6b7a5e]/20 bg-[#6b7a5e] px-8 py-1 text-[16px] text-[#f6f2ed] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#5f6d53] hover:shadow-[0_10px_20px_rgba(107,122,94,0.18)]"
                       >
                         {service.cta.label}
                       </Link>

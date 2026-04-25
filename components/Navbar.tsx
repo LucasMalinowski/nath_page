@@ -16,13 +16,14 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [cartCount, setCartCount] = useState(0)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [activeAnchor, setActiveAnchor] = useState<string | null>(null)
   const navRef = useRef<HTMLElement | null>(null)
   const pathname = usePathname()
 
   const navSobre = 'Sobre'
   const navServicos = 'Serviços'
   const navPortfolio = 'Portfólio'
-  const navGaleria = 'Galeria'
+  const navGaleria = 'Galeria de Artes'
   const navContato = 'Contato'
   const navToggleLabel = 'Alternar menu'
 
@@ -91,18 +92,78 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
     }
   }, [isMobileMenuOpen])
 
+  useEffect(() => {
+    if (pathname !== '/') {
+      setActiveAnchor(null)
+      return
+    }
+
+    setActiveAnchor(window.location.hash.replace('#', '') || null)
+
+    const sectionIds = ['sobre', 'portfolio', 'servicos', 'contato']
+
+    const updateActiveAnchor = () => {
+      const marker = 160
+      let currentAnchor: string | null = null
+      const nearPageBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 220
+
+      for (const id of sectionIds) {
+        const element = document.getElementById(id)
+        if (!element) continue
+
+        const { top } = element.getBoundingClientRect()
+        if (id === 'contato') {
+          if (nearPageBottom || top <= marker) {
+            currentAnchor = id
+          }
+          continue
+        }
+
+        if (top <= marker) {
+          currentAnchor = id
+        }
+      }
+
+      setActiveAnchor(currentAnchor)
+
+      const nextHash = currentAnchor ? `#${currentAnchor}` : ''
+      if (window.location.hash !== nextHash) {
+        window.history.replaceState(null, '', `${window.location.pathname}${nextHash}`)
+      }
+    }
+
+    const handleHashChange = () => {
+      setActiveAnchor(window.location.hash.replace('#', '') || null)
+    }
+
+    updateActiveAnchor()
+    window.addEventListener('scroll', updateActiveAnchor, { passive: true })
+    window.addEventListener('resize', updateActiveAnchor)
+    window.addEventListener('hashchange', handleHashChange)
+
+    return () => {
+      window.removeEventListener('scroll', updateActiveAnchor)
+      window.removeEventListener('resize', updateActiveAnchor)
+      window.removeEventListener('hashchange', handleHashChange)
+    }
+  }, [pathname])
+
   const navItems = useMemo(() => ([
     { name: navSobre, href: '#sobre' },
     { name: navPortfolio, href: '#portfolio' },
     { name: navServicos, href: '#servicos' },
-    { name: navGaleria, href: '/galeria', isRoute: true },
-    { name: navContato, href: '#contato' }
+    { name: navContato, href: '#contato' },
+    { name: navGaleria, href: '/galeria', isRoute: true }
   ]), [navSobre, navPortfolio, navServicos, navGaleria, navContato])
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!href.startsWith('#')) return
     e.preventDefault()
     setIsMobileMenuOpen(false)
+    const anchorId = href.slice(1)
+    setActiveAnchor(anchorId)
+    window.history.pushState(null, '', href)
 
     const element = document.querySelector(href)
     if (element) {
@@ -206,9 +267,9 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
                 <Image
                   src="/nm-gold.png"
                   alt="Nathalia Malinowski"
-                  width={34}
-                  height={34}
-                  className="object-contain w-[34px] h-[34px]"
+                  width={48}
+                  height={48}
+                  className="object-contain w-[48px] h-[48px]"
                 />
               </a>
             ) : (
@@ -229,11 +290,14 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
             {navItems.map((item) => {
               const href = toHomeHref(item.href, item.isRoute)
               const isAnchor = isHome && item.href.startsWith('#')
+              const isActiveAnchor = isHome && item.href === `#${activeAnchor}`
               const commonClass = `px-[14px] py-[6px] text-[13px] font-normal tracking-[0.05em] rounded-[5px] transition-colors duration-300 ${
-                item.href === '#contato'
-                  ? 'bg-[#F5F1EB] text-[#3b2f26] font-medium tracking-[0.06em] ml-2'
-                  : item.isRoute && item.href === '/galeria'
-                    ? 'bg-[#6b7a5e]/65 text-bg border border-white/10'
+                item.isRoute && item.href === '/galeria'
+                  ? `bg-[#B89B5E]/70 text-bg rounded-[4px] px-[16px] py-[7px] ml-2 hover:bg-[#B89B5E]/90 hover:shadow-[0_10px_20px_rgba(0,0,0,0.08)] ${
+                      isGaleria ? 'text-[15px] !font-medium' : 'font-medium tracking-[0.02em]'
+                    }`
+                  : isActiveAnchor
+                    ? 'text-gold text-[16px] !font-bold'
                   : item.isRoute
                     ? backgroundVariant === 'dirt'
                       ? 'bg-dirt text-bg hover:text-olive'
@@ -317,11 +381,14 @@ const Navbar = ({ backgroundVariant = 'bg' }: NavbarProps) => {
             {navItems.map((item) => {
               const href = toHomeHref(item.href, item.isRoute)
               const isAnchor = isHome && item.href.startsWith('#')
+              const isActiveAnchor = isHome && item.href === `#${activeAnchor}`
               const commonClass = `flex items-center py-3 min-h-[44px] text-sm font-medium transition-colors font-sans ${
-                item.href === '#contato'
-                  ? 'bg-[#ebeae0] text-gold rounded-md px-3'
-                  : item.isRoute && item.href === '/galeria'
-                    ? 'bg-[#6b7a5e] text-bg rounded-md px-3'
+                item.isRoute && item.href === '/galeria'
+                  ? `bg-[#f5f1eb] text-[#b89b5e] rounded-[4px] border border-[#b89b5e] px-3 py-2 hover:bg-[#f1eadf] hover:shadow-[0_10px_20px_rgba(0,0,0,0.08)] ${
+                      isGaleria ? 'text-[16px] !font-bold' : ''
+                    }`
+                  : isActiveAnchor
+                    ? 'text-gold text-[16px] !font-bold'
                   : item.isRoute
                     ? backgroundVariant === 'dirt'
                       ? 'text-bg bg-dirt rounded-md px-3'

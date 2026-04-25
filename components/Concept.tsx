@@ -18,7 +18,7 @@ const Concept = () => {
   return (
       <section
           id="conceito"
-          className="relative mt-4 py-8 bg-[url('/carpet.png')] md:bg-cover bg-center"
+          className="relative mt-3.5 py-8 bg-[url('/carpet.png')] md:bg-cover bg-center"
       >
         {/* Mobile: gap-10 lets content flow naturally (no clipping from justify-between).
             md+: justify-between pushes description to bottom-right corner — original desktop layout. */}

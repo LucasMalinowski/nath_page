@@ -5,11 +5,13 @@ import {useEffect, useMemo, useState} from 'react'
 type TypewriterProps = {
   text: string,
   speedMs?: number,
+  loop?: boolean,
   classes?: string
 }
 
-const Typewriter = ({text, speedMs = 35, classes}: TypewriterProps) => {
+const Typewriter = ({text, speedMs = 80, loop = true, classes}: TypewriterProps) => {
   const [index, setIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
   const reducedMotion = useMemo(() => {
     if (typeof window === 'undefined') return false
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -18,23 +20,38 @@ const Typewriter = ({text, speedMs = 35, classes}: TypewriterProps) => {
   useEffect(() => {
     if (reducedMotion) {
       setIndex(text.length)
+      setIsDeleting(false)
       return
     }
 
-    const intervalId = setInterval(() => {
-      setIndex((current) => {
-        if (current >= text.length) {
-          clearInterval(intervalId)
-          return current
-        }
-        return current + 1
-      })
-    }, speedMs)
+    if (!loop && index >= text.length) {
+      return
+    }
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+    if (!isDeleting && index < text.length) {
+      timeoutId = setTimeout(() => {
+        setIndex((current) => current + 1)
+      }, speedMs)
+    } else if (loop && !isDeleting && index >= text.length) {
+      timeoutId = setTimeout(() => {
+        setIsDeleting(true)
+      }, 5000)
+    } else if (loop && isDeleting && index > 0) {
+      timeoutId = setTimeout(() => {
+        setIndex((current) => current - 1)
+      }, speedMs / 2)
+    } else if (loop && isDeleting && index <= 0) {
+      timeoutId = setTimeout(() => {
+        setIsDeleting(false)
+      }, speedMs)
+    }
 
     return () => {
-      clearInterval(intervalId)
+      if (timeoutId) clearTimeout(timeoutId)
     }
-  }, [text, speedMs, reducedMotion])
+  }, [text, speedMs, loop, index, isDeleting, reducedMotion])
 
   const visibleText = text.slice(0, index)
   const lines = visibleText.split('\n')
@@ -53,11 +70,15 @@ const Typewriter = ({text, speedMs = 35, classes}: TypewriterProps) => {
           {lineIndex < lines.length - 1 && <br/>}
         </span>
       ))}
-      <span className="typewriter-cursor" aria-hidden="true">▍</span>
-      <noscript>{text}</noscript>
+      <span className="typewriter-cursor" aria-hidden="true">|</span>
       <style jsx>{`
           .typewriter-cursor {
               animation: blink 1s steps(2, start) infinite;
+              display: inline-block;
+              font-weight: 300;
+              transform: scaleX(0.7);
+              transform-origin: left center;
+              margin-left: 1px;
           }
 
           @keyframes blink {
