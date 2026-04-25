@@ -224,7 +224,7 @@ const Portfolio = () => {
                   >
                     <div className="max-w-[540px] mb-4">
                       <span className="font-sans text-[11px] font-semibold tracking-[0.2em] uppercase text-[#B89B5E] mb-5 block">
-                        {String(index + 1).padStart(2, '0')} — Residencial
+                        {String(index + 1).padStart(2, '0')} —
                       </span>
                       <h3 className="text-2xl md:text-3xl font-serif font-bold text-text leading-[1.2]">{project.title}</h3>
                       <div className="w-6 h-[1.5px] bg-[#B89B5E] my-[16px] opacity-60" />
