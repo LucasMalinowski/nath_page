@@ -60,18 +60,35 @@ const Typewriter = ({text, speedMs = 80, loop = true, classes}: TypewriterProps)
     <span
       aria-label={text}
       className={classes}
+      style={{display: 'inline-block', position: 'relative', verticalAlign: 'top'}}
     >
-      {lines.map((line, lineIndex) => (
-        <span
-          key={`${lineIndex}-${line}`}
-          className={classes}
-        >
-          {line}
-          {lineIndex < lines.length - 1 && <br/>}
-        </span>
-      ))}
-      <span className="typewriter-cursor" aria-hidden="true">|</span>
+      <span aria-hidden="true" className="typewriter-placeholder">
+        {text}
+      </span>
+      <span aria-hidden="true" className="typewriter-content">
+        {lines.map((line, lineIndex) => (
+          <span key={`${lineIndex}-${line}`}>
+            {line}
+            {lineIndex < lines.length - 1 && <br />}
+          </span>
+        ))}
+        <span className="typewriter-cursor">|</span>
+      </span>
       <style jsx>{`
+          .typewriter-placeholder {
+              visibility: hidden;
+              white-space: pre-line;
+              user-select: none;
+          }
+
+          .typewriter-content {
+              position: absolute;
+              top: 0;
+              left: 0;
+              white-space: pre-line;
+              pointer-events: none;
+          }
+
           .typewriter-cursor {
               animation: blink 1s steps(2, start) infinite;
               display: inline-block;
