@@ -64,6 +64,7 @@ export default function GaleriaPage() {
             .from('gallery_exhibitors')
             .select('*')
             .eq('is_visible', true)
+            .eq('exhibitor_member', true)
             .order('display_order', { ascending: true })
 
         setProducts(productsData || [])

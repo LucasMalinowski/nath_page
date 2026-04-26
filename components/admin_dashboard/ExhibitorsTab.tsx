@@ -11,6 +11,7 @@ type ExhibitorForm = {
     description: string
     instagram_path: string
     brand_member: boolean
+    exhibitor_member: boolean
 }
 
 type ExhibitorsTabProps = {
@@ -124,6 +125,19 @@ export default function ExhibitorsTab({
                         </div>
                     </div>
 
+                    <div className="flex items-center gap-3 rounded-md border border-warm-beige bg-off-white px-3 py-2">
+                        <input
+                            id="new-exhibitor-member"
+                            type="checkbox"
+                            checked={newExhibitor.exhibitor_member}
+                            onChange={(e) => setNewExhibitor({ ...newExhibitor, exhibitor_member: e.target.checked })}
+                            className="h-4 w-4 rounded border-warm-beige text-olive-green focus:ring-olive-green/60"
+                        />
+                        <label htmlFor="new-exhibitor-member" className="text-sm font-medium text-graphite">
+                            Exibidor da galeria
+                        </label>
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-graphite mb-1">Foto *</label>
                         <input
@@ -225,6 +239,15 @@ export default function ExhibitorsTab({
                                                     />
                                                     <span className="text-sm font-medium text-graphite">Membro da marca</span>
                                                 </label>
+                                                <label className="flex items-center gap-3 rounded-md border border-warm-beige bg-off-white px-3 py-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={exhibitorEditForm.exhibitor_member}
+                                                        onChange={(e) => setExhibitorEditForm({ ...exhibitorEditForm, exhibitor_member: e.target.checked })}
+                                                        className="h-4 w-4 rounded border-warm-beige text-olive-green focus:ring-olive-green/60"
+                                                    />
+                                                    <span className="text-sm font-medium text-graphite">Exibidor da galeria</span>
+                                                </label>
                                                 <div>
                                                     <label className="block text-sm font-medium text-graphite mb-1">Nova foto</label>
                                                     <input
@@ -267,6 +290,9 @@ export default function ExhibitorsTab({
                                                 )}
                                                 <p className="text-xs text-graphite/60 mt-2">
                                                     Membro da marca: {exhibitor.brand_member ? 'Sim' : 'Nao'}
+                                                </p>
+                                                <p className="text-xs text-graphite/60 mt-1">
+                                                    Exibidor da galeria: {exhibitor.exhibitor_member ? 'Sim' : 'Nao'}
                                                 </p>
                                                 <div className="flex gap-2 mt-3">
                                                     <button

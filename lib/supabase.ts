@@ -60,6 +60,7 @@ export type GalleryExhibitor = {
     title: string | null
     description: string | null
     brand_member: boolean | null
+    exhibitor_member: boolean | null
     instagram_path: string | null
     avatar_url: string | null
     display_order: number | null
