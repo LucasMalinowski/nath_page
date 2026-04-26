@@ -238,7 +238,6 @@ const Portfolio = () => {
                       <blockquote className="mt-auto font-poetic italic text-[20px] text-[#9f8a74] leading-[1.5]">
                         <Typewriter
                           text={`"${project.phrase}"`}
-                          loop={false}
                           classes="text-[#9f8a74]"
                         />
                       </blockquote>

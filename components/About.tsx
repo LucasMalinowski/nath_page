@@ -34,9 +34,8 @@ const About = () => {
 
             <div className="pt-5 border-t border-[#d9cdb8]/45">
               <blockquote className="text-xl md:text-2xl font-poetic italic text-olive leading-[1.45]">
-                <Typewriter
+              <Typewriter
                   text={'"Projetar é dar forma ao que faz sentido."'}
-                  loop={false}
                   classes="text-olive"
                 />
               </blockquote>
