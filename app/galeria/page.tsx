@@ -282,7 +282,7 @@ export default function GaleriaPage() {
         {/* Hero — CSS background like Concept section; starts at y=0 so the fixed navbar
             (z-50) covers the top 64px naturally, no bg-dirt gap. pt-16 clears the navbar. */}
         <section
-          className="relative bg-[url('/frame.png')] md:bg-cover bg-center "
+          className="relative bg-[url('/frame.png')] bg-cover bg-center"
         >
           <div className="relative z-10 px-6 sm:px-8 lg:px-16 pt-16 flex items-end pb-10 lg:pb-14">
             <div className="grid w-full grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-10 mt-16">
