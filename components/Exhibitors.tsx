@@ -9,14 +9,19 @@ import { supabase, GalleryExhibitor } from '@/lib/supabase'
 const sectionTitle = 'Quem constrói a marca'
 const sectionSubtitle = 'A marca se constrói no encontro entre direção criativa, técnica e expressão'
 
-const Exhibitors = () => {
-  const [exhibitors, setExhibitors] = useState<GalleryExhibitor[]>([])
-  const [loading, setLoading] = useState(true)
+type ExhibitorsProps = {
+  initialExhibitors?: GalleryExhibitor[]
+}
+
+const Exhibitors = ({ initialExhibitors }: ExhibitorsProps) => {
+  const [exhibitors, setExhibitors] = useState<GalleryExhibitor[]>(initialExhibitors || [])
+  const [loading, setLoading] = useState(!initialExhibitors)
   const sectionRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
+    if (initialExhibitors) return
     void fetchExhibitors()
-  }, [])
+  }, [initialExhibitors])
 
   useEffect(() => {
     const root = sectionRef.current

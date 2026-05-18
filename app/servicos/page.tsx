@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import JsonLd from '@/components/JsonLd'
+import { breadcrumbJsonLd, siteUrl } from '@/lib/seo'
 
 const services = [
   {
@@ -78,6 +80,37 @@ const services = [
   }
 ]
 
+const faqs = [
+  {
+    question: 'Qual a diferenca entre consultoria e projeto completo?',
+    answer:
+      'A consultoria orienta decisoes esteticas e funcionais de forma pontual. O projeto completo desenvolve conceito, layout, materiais, paleta e direcionamento para execucao.'
+  },
+  {
+    question: 'Nathalia atende projetos online?',
+    answer:
+      'Sim. Consultorias e curadorias podem ser conduzidas online, conforme o escopo e as necessidades do ambiente.'
+  },
+  {
+    question: 'O que inclui a curadoria de artes?',
+    answer:
+      'A curadoria seleciona obras e pecas autorais que dialogam com o espaco, a identidade do morador e a narrativa estetica do projeto.'
+  }
+]
+
+const servicesFaqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.answer
+    }
+  }))
+}
+
 export default function ServicosPage() {
   const router = useRouter()
 
@@ -92,6 +125,15 @@ export default function ServicosPage() {
 
   return (
     <main className="min-h-screen bg-[#f5f1eb] page-fade-in">
+      <JsonLd
+        data={[
+          servicesFaqJsonLd,
+          breadcrumbJsonLd([
+            { name: 'Inicio', url: `${siteUrl}/` },
+            { name: 'Servicos', url: `${siteUrl}/servicos` }
+          ])
+        ]}
+      />
       <Navbar />
 
       <section className="relative overflow-hidden pt-24 before:pointer-events-none before:absolute before:left-0 before:right-0 before:top-0 before:h-5 before:bg-gradient-to-b before:from-[#d9cdb8]/15 before:to-transparent">
@@ -157,6 +199,26 @@ export default function ServicosPage() {
                     </div>
                   )}
                 </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="faq-title" className="bg-[#efe8de] px-6 py-14 sm:px-10 lg:px-24">
+        <div className="mx-auto max-w-5xl">
+          <h2 id="faq-title" className="font-serif text-3xl text-[#6b7a5e] sm:text-4xl">
+            Perguntas frequentes
+          </h2>
+          <div className="mt-8 divide-y divide-[#d9cdb8]">
+            {faqs.map((faq) => (
+              <article key={faq.question} className="py-6 first:pt-0 last:pb-0">
+                <h3 className="font-sans text-lg font-medium text-[#3b2f26]">
+                  {faq.question}
+                </h3>
+                <p className="mt-3 max-w-3xl font-sans text-base leading-7 text-[#735746]">
+                  {faq.answer}
+                </p>
               </article>
             ))}
           </div>

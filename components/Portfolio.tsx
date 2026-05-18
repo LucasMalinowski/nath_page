@@ -11,6 +11,10 @@ type PortfolioProject = PortfolioImage & {
   coverImage: string
 }
 
+type PortfolioProps = {
+  initialProjects?: PortfolioImage[]
+}
+
 const parseImages = (item: PortfolioImage): string[] => {
   if (item.images) {
     if (Array.isArray(item.images)) return item.images.filter(Boolean)
@@ -28,9 +32,27 @@ const parseImages = (item: PortfolioImage): string[] => {
   return item.image_url ? [item.image_url] : []
 }
 
-const Portfolio = () => {
-  const [projects, setProjects] = useState<PortfolioProject[]>([])
-  const [loading, setLoading] = useState(true)
+const mapPortfolioProjects = (items: PortfolioImage[]): PortfolioProject[] =>
+  items.map((item) => {
+    const parsedImages = parseImages(item)
+    const coverImage = item.cover_url || item.image_url || parsedImages[0] || ''
+
+    const galleryImages = [coverImage, ...parsedImages].filter(
+      (url, index, array) => Boolean(url) && array.indexOf(url) === index
+    )
+
+    return {
+      ...item,
+      coverImage,
+      galleryImages
+    }
+  })
+
+const Portfolio = ({ initialProjects }: PortfolioProps) => {
+  const [projects, setProjects] = useState<PortfolioProject[]>(() =>
+    initialProjects ? mapPortfolioProjects(initialProjects) : []
+  )
+  const [loading, setLoading] = useState(!initialProjects)
   const [activeProject, setActiveProject] = useState<PortfolioProject | null>(null)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
 
@@ -40,8 +62,9 @@ const Portfolio = () => {
   const portfolioEmpty = 'Em breve, novos projetos serão adicionados'
 
   useEffect(() => {
+    if (initialProjects) return
     void fetchPortfolioImages()
-  }, [])
+  }, [initialProjects])
 
   useEffect(() => {
     if (!activeProject) return
@@ -86,22 +109,7 @@ const Portfolio = () => {
 
       if (error) throw error
 
-      const mappedProjects: PortfolioProject[] = (data || []).map((item) => {
-        const parsedImages = parseImages(item)
-        const coverImage = item.cover_url || item.image_url || parsedImages[0] || ''
-
-        const galleryImages = [coverImage, ...parsedImages].filter(
-          (url, index, array) => Boolean(url) && array.indexOf(url) === index
-        )
-
-        return {
-          ...item,
-          coverImage,
-          galleryImages
-        }
-      })
-
-      setProjects(mappedProjects)
+      setProjects(mapPortfolioProjects(data || []))
     } catch (error) {
       console.error('Error fetching portfolio images:', error)
     } finally {

@@ -2,7 +2,7 @@
 import Typewriter from '@/components/Typewriter'
 
 const Hero = () => {
-  const heroHeadline = 'Projetos que unem estética,\nhistória e funcionalidade.'
+  const heroHeadline = 'Design de interiores com estética,\nhistória e funcionalidade.'
 
   return (
     <section id="hero" className="relative h-[90vh] md:h-[90vh] pt-20">
@@ -13,6 +13,8 @@ const Hero = () => {
           loop
           muted
           playsInline
+          preload="metadata"
+          aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src="/hero-video.mp4" type="video/mp4" />
@@ -29,6 +31,10 @@ const Hero = () => {
               <Typewriter text={heroHeadline}
                           classes={"text-[#F5F1EB]"} />
             </h1>
+            <p className="mb-6 max-w-lg text-sm leading-6 text-[#F5F1EB]/90 md:text-base">
+              Nathalia Malinowski desenvolve projetos residenciais, consultorias,
+              curadoria e murais autorais para espaços com identidade.
+            </p>
             <a
               href="#portfolio"
               className="inline-block font-sans text-[11px] font-medium tracking-[0.14em] uppercase text-[#B89B5E] border border-[#B89B5E]/50 px-[22px] py-[7px] rounded-[4px] transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(0,0,0,0.1)]"

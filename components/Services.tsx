@@ -53,6 +53,8 @@ const Services = () => {
             loop
             muted
             playsInline
+            preload="metadata"
+            aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover"
           >
             <source src="/service-video.mp4" type="video/mp4" />

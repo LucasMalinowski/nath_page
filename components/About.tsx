@@ -46,11 +46,10 @@ const About = () => {
             <div className="relative w-full aspect-[4/5] overflow-hidden shadow-2xl">
               <Image
                 src="/profile-photo.jpeg"
-                alt="Nathalia Malinowski"
+                alt="Nathalia Malinowski, designer de interiores"
                 fill
                 sizes="(min-width: 1280px) 560px, (min-width: 1024px) 520px, 100vw"
                 className="object-cover object-center"
-                priority
               />
             </div>
           </div>
