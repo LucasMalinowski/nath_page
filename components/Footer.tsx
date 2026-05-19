@@ -126,7 +126,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                 <div className="flex flex-col items-center justify-center text-center">
                   <p className="text-[26px] leading-[1.4] font-poetic italic font-light text-[#6b7a5e] max-w-[560px]">
                     <Typewriter
-                      text={'Vamos criar um espaço\nque faça sentido para você?'}
+                      text={'Vamos conversar sobre o espaço\nque você deseja transformar?'}
                       classes="text-[#6b7a5e]"
                     />
                   </p>
@@ -136,7 +136,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                     rel="noreferrer"
                     className="mt-6 px-6 py-[9px] rounded-[4px] bg-[#b89b5e] text-[#FDFAF6] font-sans font-medium text-[13px] tracking-[0.1em] uppercase leading-none transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(0,0,0,0.1)]"
                   >
-                    Agendar conversa
+                    Vamos pensar meu espaço juntas
                   </a>
                   <p className="mt-3 font-sans text-[13px] font-light text-[#9f8a74]">Seg a Sex · 08h às 17h</p>
                 </div>

@@ -2,6 +2,9 @@ import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
 import About from '@/components/About'
 import Concept from '@/components/Concept'
+import ArtSection from '@/components/ArtSection'
+import Method from '@/components/Method'
+import IdealClient from '@/components/IdealClient'
 import Exhibitors from '@/components/Exhibitors'
 import Services from '@/components/Services'
 import Portfolio from '@/components/Portfolio'
@@ -40,6 +43,9 @@ export default async function Home() {
       <Hero />
       <Concept />
       <About />
+      <ArtSection />
+      <Method />
+      <IdealClient />
       <Exhibitors initialExhibitors={brandExhibitors} />
       <Portfolio initialProjects={portfolioProjects} />
       <Services />

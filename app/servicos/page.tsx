@@ -94,7 +94,7 @@ const faqs = [
   {
     question: 'O que inclui a curadoria de artes?',
     answer:
-      'A curadoria seleciona obras e pecas autorais que dialogam com o espaco, a identidade do morador e a narrativa estetica do projeto.'
+      'A curadoria seleciona obras e pecas autorais que dialogam com o espaço, a identidade do morador e a narrativa estetica do projeto.'
   }
 ]
 

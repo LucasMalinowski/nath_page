@@ -8,6 +8,16 @@ type PaymentSuccessEmailParams = {
   pickupLabel?: string | null
 }
 
+type PickupPendingEmailParams = {
+  to: string
+  orderId: string
+  buyerEmail: string
+  buyerName?: string | null
+  buyerPhone?: string | null
+  productNames: string[]
+  pickupLabel?: string | null
+}
+
 type SuperFreteLowBalanceEmailParams = {
   to: string
   balance: number
@@ -82,6 +92,16 @@ async function getTransporter() {
   }
 }
 
+function getPickupDetails() {
+  return {
+    address: process.env.PICKUP_ADDRESS?.trim() || null,
+    contact: process.env.PICKUP_CONTACT?.trim() || process.env.PICKUP_CONTACT_WHATSAPP?.trim() || null,
+    instructions:
+      process.env.PICKUP_INSTRUCTIONS?.trim() ||
+      'Entre em contato para combinar o melhor dia e horario de retirada.'
+  }
+}
+
 export async function sendPaymentSuccessEmail(params: PaymentSuccessEmailParams) {
   const transport = await getTransporter()
   if (!transport) {
@@ -90,13 +110,26 @@ export async function sendPaymentSuccessEmail(params: PaymentSuccessEmailParams)
 
   const products = params.productNames.length ? params.productNames.join(', ') : 'obra adquirida'
   const pickupLabel = params.pickupLabel?.trim() || 'o local combinado'
+  const pickupDetails = getPickupDetails()
+  const pickupTextParts = [
+    `Seu pedido ficou marcado para retirada sem custo em ${pickupLabel}.`,
+    pickupDetails.address ? `Endereco para retirada: ${pickupDetails.address}.` : null,
+    pickupDetails.contact ? `Contato para combinar a retirada: ${pickupDetails.contact}.` : null,
+    `Instrucao: ${pickupDetails.instructions}`
+  ].filter(Boolean)
+  const pickupHtmlParts = [
+    `Seu pedido ficou marcado para <strong>retirada sem custo</strong> em ${escapeHtml(pickupLabel)}.`,
+    pickupDetails.address ? `<br/><strong>Endereco para retirada:</strong> ${escapeHtml(pickupDetails.address)}.` : null,
+    pickupDetails.contact ? `<br/><strong>Contato:</strong> ${escapeHtml(pickupDetails.contact)}.` : null,
+    `<br/><strong>Instrucao:</strong> ${escapeHtml(pickupDetails.instructions)}`
+  ].filter(Boolean)
   const shippingText = params.isPickup
-    ? `\n\nSeu pedido ficou marcado para retirada sem custo em ${pickupLabel}. Você receberá as instruções de retirada por e-mail.`
+    ? `\n\n${pickupTextParts.join(' ')}`
     : params.trackingCode
     ? `\n\nSeu envio foi gerado com o código de rastreio ${params.trackingCode}.${params.trackingUrl ? ` Acompanhe em: ${params.trackingUrl}` : ''}`
     : '\n\nSeu envio será preparado em seguida e enviaremos o rastreio assim que estiver disponível.'
   const shippingHtml = params.isPickup
-    ? `<p>Seu pedido ficou marcado para <strong>retirada sem custo</strong> em ${pickupLabel}. Você receberá as instruções de retirada por e-mail.</p>`
+    ? `<p>${pickupHtmlParts.join('')}</p>`
     : params.trackingCode
     ? `<p>Seu envio foi gerado com o código de rastreio <strong>${params.trackingCode}</strong>.${params.trackingUrl ? ` <a href="${params.trackingUrl}">Acompanhar entrega</a>.` : ''}</p>`
     : '<p>Seu envio será preparado em seguida e enviaremos o rastreio assim que estiver disponível.</p>'
@@ -108,6 +141,49 @@ export async function sendPaymentSuccessEmail(params: PaymentSuccessEmailParams)
     text: `Olá!\n\nRecebemos seu pagamento com sucesso para o pedido ${params.orderId}.\nProduto(s): ${products}.${shippingText}\n\nObrigada!`,
     html: `<p>Olá!</p><p>Recebemos seu pagamento com sucesso para o pedido <strong>${params.orderId}</strong>.</p><p>Produto(s): <strong>${products}</strong>.</p>${shippingHtml}<p>Obrigada!</p>`
   })
+}
+
+export async function sendPickupPendingEmail(params: PickupPendingEmailParams): Promise<boolean> {
+  const transport = await getTransporter()
+  if (!transport) {
+    return false
+  }
+
+  const products = params.productNames.length ? params.productNames.join(', ') : 'obra adquirida'
+  const pickupLabel = params.pickupLabel?.trim() || 'Retirada no local'
+  const pickupDetails = getPickupDetails()
+  const buyerName = params.buyerName?.trim() || 'Nome nao informado'
+  const buyerPhone = params.buyerPhone?.trim() || 'Telefone nao informado'
+
+  await transport.transporter.sendMail({
+    from: transport.from,
+    to: params.to,
+    subject: 'Retirada pendente - Nathalia Malinowski',
+    text:
+      `Um pedido pago ficou pendente de retirada.\n\n` +
+      `Pedido: ${params.orderId}\n` +
+      `Cliente: ${buyerName}\n` +
+      `E-mail: ${params.buyerEmail}\n` +
+      `Telefone: ${buyerPhone}\n` +
+      `Produto(s): ${products}\n` +
+      `Localidade selecionada: ${pickupLabel}\n` +
+      `Endereco configurado: ${pickupDetails.address || 'Nao configurado'}\n` +
+      `Contato configurado: ${pickupDetails.contact || 'Nao configurado'}\n` +
+      `Instrucao enviada ao cliente: ${pickupDetails.instructions}\n`,
+    html:
+      `<p>Um pedido pago ficou pendente de retirada.</p>` +
+      `<p><strong>Pedido:</strong> ${escapeHtml(params.orderId)}<br/>` +
+      `<strong>Cliente:</strong> ${escapeHtml(buyerName)}<br/>` +
+      `<strong>E-mail:</strong> ${escapeHtml(params.buyerEmail)}<br/>` +
+      `<strong>Telefone:</strong> ${escapeHtml(buyerPhone)}<br/>` +
+      `<strong>Produto(s):</strong> ${escapeHtml(products)}<br/>` +
+      `<strong>Localidade selecionada:</strong> ${escapeHtml(pickupLabel)}<br/>` +
+      `<strong>Endereco configurado:</strong> ${escapeHtml(pickupDetails.address || 'Nao configurado')}<br/>` +
+      `<strong>Contato configurado:</strong> ${escapeHtml(pickupDetails.contact || 'Nao configurado')}<br/>` +
+      `<strong>Instrucao enviada ao cliente:</strong> ${escapeHtml(pickupDetails.instructions)}</p>`
+  })
+
+  return true
 }
 
 export async function sendSuperFreteLowBalanceEmail(params: SuperFreteLowBalanceEmailParams) {

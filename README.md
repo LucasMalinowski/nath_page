@@ -190,12 +190,17 @@ POSTHOG_PROJECT_API_KEY=phc_...
 POSTHOG_HOST=https://us.i.posthog.com
 CART_ABANDONMENT_EMAIL=malinowskinathalia@gmail.com
 CART_ABANDONMENT_HOURS=4
+PICKUP_ADDRESS="Endereco completo para retirada"
+PICKUP_CONTACT="WhatsApp ou e-mail para combinar retirada"
+PICKUP_INSTRUCTIONS="Combine o melhor dia e horario antes de vir retirar."
 CRON_SECRET=...
 ```
 
 O app registra pageviews, autocapture, login/logout, visualização de produto, add-to-cart, alterações no carrinho, cupom, frete, início de checkout, criação de pedido, retorno do Mercado Pago e status de pagamento.
 
 O alerta de carrinho abandonado roda diariamente em `/api/admin/cart-abandonment`. Ele exige `CRON_SECRET`, procura carrinhos parados por pelo menos `CART_ABANDONMENT_HOURS` e envia um e-mail para `CART_ABANDONMENT_EMAIL` com nome, e-mail, telefone, itens, subtotal e pedidos pendentes. A tabela `cart_abandonment_notifications` evita repetir o mesmo alerta até o carrinho mudar.
+
+Pedidos aprovados com "Retirada no local" tambem usam `PICKUP_ADDRESS`, `PICKUP_CONTACT` e `PICKUP_INSTRUCTIONS` no e-mail de pagamento aprovado do cliente. O admin recebe um aviso em `CART_ABANDONMENT_EMAIL` quando o pedido pago fica com retirada pendente.
 
 ## 📝 Observações Importantes
 

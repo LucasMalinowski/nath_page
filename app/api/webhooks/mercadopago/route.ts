@@ -2,13 +2,15 @@ import crypto from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { getMercadoPagoPayment } from '@/lib/mercadopago'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { sendPaymentSuccessEmail } from '@/lib/mailer'
+import { sendPaymentSuccessEmail, sendPickupPendingEmail } from '@/lib/mailer'
 import { getCheckoutProfile, purchaseShippingLabel } from '@/lib/order-shipping'
 import { isPickupServiceCode } from '@/lib/shipping'
 import { isSuperFreteConfigured } from '@/lib/superfrete'
 import { captureServerEvent, captureServerException } from '@/lib/posthog-server'
 
 export const runtime = 'nodejs'
+
+const DEFAULT_ADMIN_EMAIL = 'malinowskinathalia@gmail.com'
 
 /**
  * Verify MercadoPago webhook signature.
@@ -209,6 +211,11 @@ export async function POST(request: Request) {
 
       const { data: authUserData, error: authUserError } = await supabaseAdmin.auth.admin.getUserById(order.user_id)
       const buyerEmail = authUserData.user?.email
+      const { data: buyerProfile, error: buyerProfileError } = await supabaseAdmin
+        .from('users')
+        .select('full_name, phone')
+        .eq('id', order.user_id)
+        .maybeSingle()
       let shippingResult: Awaited<ReturnType<typeof purchaseShippingLabel>> | null = null
       const isPickup = isPickupServiceCode(order.shipping_service_code)
       const pickupLocation = order.shipping_quote_data?.pickup_location
@@ -216,6 +223,13 @@ export async function POST(request: Request) {
         pickupLocation?.city && pickupLocation?.state
           ? `${pickupLocation.city}, ${pickupLocation.state}`
           : order.shipping_service_name || null
+      const productNames = (orderItems || [])
+        .map((item) => item.product_name)
+        .filter((name): name is string => !!name)
+
+      if (buyerProfileError) {
+        console.warn('Could not load buyer profile for pickup notification', buyerProfileError.message)
+      }
 
       if (isPickup) {
         await supabaseAdmin
@@ -226,6 +240,36 @@ export async function POST(request: Request) {
             updated_at: new Date().toISOString()
           })
           .eq('id', order.id)
+
+        if (buyerEmail) {
+          const pickupRecipient = process.env.CART_ABANDONMENT_EMAIL || DEFAULT_ADMIN_EMAIL
+
+          try {
+            const sent = await sendPickupPendingEmail({
+              to: pickupRecipient,
+              orderId: order.id,
+              buyerEmail,
+              buyerName: buyerProfile?.full_name || null,
+              buyerPhone: buyerProfile?.phone || null,
+              productNames,
+              pickupLabel
+            })
+
+            if (sent) {
+              await captureServerEvent('pickup_pending_admin_notified', order.user_id, {
+                order_id: order.id,
+                recipient: pickupRecipient,
+                pickup_label: pickupLabel,
+                product_names: productNames
+              })
+            }
+          } catch (pickupMailError) {
+            console.error('Failed to send pickup pending email', pickupMailError)
+            await captureServerException('pickup_pending_email_failed', order.user_id, pickupMailError, {
+              order_id: order.id
+            })
+          }
+        }
       } else if (order.shipping_service_code && buyerEmail && isSuperFreteConfigured()) {
         try {
           const profile = await getCheckoutProfile(order.user_id)
@@ -266,9 +310,7 @@ export async function POST(request: Request) {
           await sendPaymentSuccessEmail({
             to: buyerEmail,
             orderId: order.id,
-            productNames: (orderItems || [])
-              .map((item) => item.product_name)
-              .filter((name): name is string => !!name),
+            productNames,
             isPickup,
             pickupLabel,
             trackingCode: shippingResult?.shipping_tracking_code,

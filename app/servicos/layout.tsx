@@ -3,32 +3,32 @@ import type { ReactNode } from 'react'
 import { baseOpenGraph, defaultOgImage, siteUrl } from '@/lib/seo'
 
 export const metadata: Metadata = {
-  title: 'Servicos de Design de Interiores',
+  title: 'Serviços de Design de Interiores Autoral',
   description:
-    'Consultoria de interiores, curadoria, pinturas murais autorais e projetos residenciais por Nathalia Malinowski.',
+    'Projeto residencial, consultoria, curadoria, pinturas murais autorais e galeria de artes. Espaços com identidade, estética e significado.',
   alternates: {
     canonical: '/servicos'
   },
   openGraph: {
     ...baseOpenGraph,
-    title: 'Servicos de Design de Interiores | Nathalia Malinowski',
+    title: 'Serviços | Nathalia Malinowski — Design de Interiores Autoral',
     description:
-      'Conheca os servicos de interiores, curadoria e murais autorais de Nathalia Malinowski.',
+      'Projetos pensados a partir da sua história, da sua rotina e da atmosfera que você deseja viver.',
     url: `${siteUrl}/servicos`,
     images: [
       {
         url: defaultOgImage,
         width: 1200,
         height: 630,
-        alt: 'Servicos de design de interiores Nathalia Malinowski'
+        alt: 'Serviços de design de interiores autoral — Nathalia Malinowski'
       }
     ]
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Servicos de Design de Interiores | Nathalia Malinowski',
+    title: 'Serviços | Nathalia Malinowski — Design de Interiores Autoral',
     description:
-      'Consultoria, curadoria, murais autorais e projetos residenciais com identidade.',
+      'Projeto residencial, consultoria, curadoria, murais autorais e galeria de artes com identidade e significado.',
     images: [defaultOgImage]
   }
 }

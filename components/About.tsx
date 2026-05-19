@@ -13,7 +13,7 @@ const About = () => {
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(380px,520px)] lg:gap-20 xl:grid-cols-[minmax(0,1fr)_minmax(420px,560px)] xl:gap-24">
           <div className="w-full max-w-[42rem] py-4 space-y-6 lg:space-y-8">
             <span className="font-sans text-[9px] font-semibold tracking-[0.2em] uppercase text-[#B89B5E]">
-              Designer de Interiores
+              Designer de Interiores · Artista Plástica
             </span>
             <h2 className="text-h2-mobile md:text-5xl font-serif font-normal text-text leading-[1.15]">
               Sobre mim

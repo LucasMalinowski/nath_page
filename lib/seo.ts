@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 
 export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nathalia-malinowski.vercel.app'
 export const siteName = 'Nathalia Malinowski'
-export const defaultTitle = 'Nathalia Malinowski | Design de Interiores em Foz do Iguacu'
+export const defaultTitle = 'Nathalia Malinowski | Design de Interiores Autoral'
 export const defaultDescription =
-  'Design de interiores residencial, consultoria, curadoria e murais autorais por Nathalia Malinowski. Projetos com identidade, historia e funcionalidade.'
+  'Design de interiores autoral, curadoria e arte para criar espaços com identidade, estética e significado.'
 export const defaultOgImage = '/profile-photo.jpeg'
 
 export const baseOpenGraph: Metadata['openGraph'] = {
