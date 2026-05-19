@@ -179,6 +179,24 @@ npm run start    # Servidor de produção
 npm run lint     # Verificar erros
 ```
 
+## 📊 Tracking, PostHog e carrinho abandonado
+
+Configure estas variáveis na Vercel para ativar o tracking:
+
+```bash
+NEXT_PUBLIC_POSTHOG_KEY=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+POSTHOG_PROJECT_API_KEY=phc_...
+POSTHOG_HOST=https://us.i.posthog.com
+CART_ABANDONMENT_EMAIL=malinowskinathalia@gmail.com
+CART_ABANDONMENT_HOURS=4
+CRON_SECRET=...
+```
+
+O app registra pageviews, autocapture, login/logout, visualização de produto, add-to-cart, alterações no carrinho, cupom, frete, início de checkout, criação de pedido, retorno do Mercado Pago e status de pagamento.
+
+O alerta de carrinho abandonado roda diariamente em `/api/admin/cart-abandonment`. Ele exige `CRON_SECRET`, procura carrinhos parados por pelo menos `CART_ABANDONMENT_HOURS` e envia um e-mail para `CART_ABANDONMENT_EMAIL` com nome, e-mail, telefone, itens, subtotal e pedidos pendentes. A tabela `cart_abandonment_notifications` evita repetir o mesmo alerta até o carrinho mudar.
+
 ## 📝 Observações Importantes
 
 1. **Vídeo**: O arquivo `hero-video.mp4` tem 13MB. Para melhor performance, considere comprimir o vídeo antes do deploy.

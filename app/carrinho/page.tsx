@@ -10,6 +10,7 @@ import { formatCentsToBRL, parseBrazilianPriceToCents } from '@/lib/price'
 import { calculateCouponDiscountCents, normalizeCouponCode, type CouponRecord } from '@/lib/coupons'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { captureBrowserEvent } from '@/lib/posthog-browser'
 
 type CartItem = {
   id: string
@@ -102,7 +103,13 @@ export default function CarrinhoPage() {
       return
     }
 
-    setItems((data || []) as unknown as CartItem[])
+    const nextItems = (data || []) as unknown as CartItem[]
+    setItems(nextItems)
+    captureBrowserEvent('cart_viewed', {
+      item_count: nextItems.length,
+      total_quantity: nextItems.reduce((sum, item) => sum + item.quantity, 0),
+      product_ids: nextItems.map((item) => item.product?.id).filter(Boolean)
+    })
   }, [router])
 
   useEffect(() => {
@@ -222,6 +229,10 @@ export default function CarrinhoPage() {
 
         if (!session?.user) {
           setCouponError('Faça login novamente para validar o cupom.')
+          captureBrowserEvent('coupon_validation_failed', {
+            coupon_code: code,
+            reason: 'auth_required'
+          })
           return null
         }
 
@@ -241,15 +252,29 @@ export default function CarrinhoPage() {
         if (!response.ok) {
           setAppliedCoupon(null)
           setCouponError(data.error || 'Cupom inválido.')
+          captureBrowserEvent('coupon_validation_failed', {
+            coupon_code: code,
+            reason: data.error || 'invalid_coupon',
+            subtotal_cents: subtotalCents
+          })
           return null
         }
 
         setAppliedCoupon(data.coupon as CouponRecord)
         setCouponMessage(`Cupom ${code} aplicado com sucesso.`)
+        captureBrowserEvent('coupon_applied', {
+          coupon_code: code,
+          subtotal_cents: subtotalCents
+        })
         return data.coupon as CouponRecord
       } catch {
         setAppliedCoupon(null)
         setCouponError('Não foi possível validar o cupom.')
+        captureBrowserEvent('coupon_validation_failed', {
+          coupon_code: code,
+          reason: 'request_failed',
+          subtotal_cents: subtotalCents
+        })
         return null
       } finally {
         setCouponLoading(false)
@@ -260,20 +285,45 @@ export default function CarrinhoPage() {
 
   const updateQuantity = async (cartItemId: string, quantity: number) => {
     if (quantity <= 0) return
+    const item = items.find((cartItem) => cartItem.id === cartItemId)
     const { error: updateError } = await supabase.from('cart_items').update({ quantity }).eq('id', cartItemId)
     if (updateError) {
       setError(updateError.message)
+      captureBrowserEvent('cart_quantity_update_failed', {
+        cart_item_id: cartItemId,
+        product_id: item?.product?.id || null,
+        quantity,
+        error_message: updateError.message
+      })
       return
     }
+    captureBrowserEvent('cart_quantity_updated', {
+      cart_item_id: cartItemId,
+      product_id: item?.product?.id || null,
+      product_name: item?.product?.name || null,
+      quantity
+    })
     await loadCart()
   }
 
   const removeItem = async (cartItemId: string) => {
+    const item = items.find((cartItem) => cartItem.id === cartItemId)
     const { error: deleteError } = await supabase.from('cart_items').delete().eq('id', cartItemId)
     if (deleteError) {
       setError(deleteError.message)
+      captureBrowserEvent('cart_item_remove_failed', {
+        cart_item_id: cartItemId,
+        product_id: item?.product?.id || null,
+        error_message: deleteError.message
+      })
       return
     }
+    captureBrowserEvent('cart_item_removed', {
+      cart_item_id: cartItemId,
+      product_id: item?.product?.id || null,
+      product_name: item?.product?.name || null,
+      quantity: item?.quantity || null
+    })
     await loadCart()
   }
 
@@ -288,6 +338,9 @@ export default function CarrinhoPage() {
 
     if (!session?.user) {
       setCheckingOut(false)
+      captureBrowserEvent('checkout_start_failed', {
+        reason: 'auth_required'
+      })
       router.push('/login?next=/carrinho')
       return
     }
@@ -300,6 +353,17 @@ export default function CarrinhoPage() {
         return
       }
     }
+
+    captureBrowserEvent('checkout_button_clicked', {
+      subtotal_cents: subtotalCents,
+      discount_cents: appliedCouponDiscountCents,
+      shipping_cents: selectedShipping?.priceCents || 0,
+      total_cents: totalCents,
+      item_count: items.length,
+      total_quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+      coupon_code: appliedCoupon?.code || typedCoupon || null,
+      shipping_service_code: selectedShippingCode
+    })
 
     const response = await fetch('/api/checkout', {
       method: 'POST',
@@ -318,13 +382,37 @@ export default function CarrinhoPage() {
 
     if (!response.ok) {
       setError(data.error || 'Could not start checkout')
+      captureBrowserEvent('checkout_start_failed', {
+        reason: data.error || 'request_failed',
+        subtotal_cents: subtotalCents,
+        discount_cents: appliedCouponDiscountCents,
+        shipping_cents: selectedShipping?.priceCents || 0,
+        total_cents: totalCents,
+        item_count: items.length
+      })
       return
     }
 
     if (!data.init_point) {
       setError('Missing checkout URL')
+      captureBrowserEvent('checkout_start_failed', {
+        reason: 'missing_checkout_url',
+        order_id: data.orderId || null
+      })
       return
     }
+
+    captureBrowserEvent('checkout_started', {
+      order_id: data.orderId,
+      subtotal_cents: subtotalCents,
+      discount_cents: appliedCouponDiscountCents,
+      shipping_cents: selectedShipping?.priceCents || 0,
+      total_cents: totalCents,
+      item_count: items.length,
+      total_quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+      coupon_code: appliedCoupon?.code || typedCoupon || null,
+      shipping_service_code: selectedShippingCode
+    })
 
     const link = document.createElement('a')
     link.href = data.init_point
@@ -531,7 +619,17 @@ export default function CarrinhoPage() {
                                 type="radio"
                                 name="shipping"
                                 checked={option.serviceCode === selectedShippingCode}
-                                onChange={() => setSelectedShippingCode(option.serviceCode)}
+                                onChange={() => {
+                                  setSelectedShippingCode(option.serviceCode)
+                                  captureBrowserEvent('shipping_option_selected', {
+                                    shipping_service_code: option.serviceCode,
+                                    shipping_service_name: option.serviceName,
+                                    carrier_name: option.carrierName,
+                                    price_cents: option.priceCents,
+                                    delivery_days: option.deliveryDays,
+                                    shipping_type: option.raw?.type || 'delivery'
+                                  })
+                                }}
                                 className="mt-1"
                               />
                               <div className="flex-1">
@@ -595,6 +693,9 @@ export default function CarrinhoPage() {
                       setAppliedCoupon(null)
                       setCouponMessage(null)
                       setCouponError(null)
+                      captureBrowserEvent('coupon_removed', {
+                        coupon_code: appliedCoupon.code
+                      })
                     }}
                     className="mb-5 text-xs uppercase tracking-[0.14em] text-[#735746] hover:text-[#b89b5e]"
                   >

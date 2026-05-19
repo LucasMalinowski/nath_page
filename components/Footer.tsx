@@ -1,6 +1,7 @@
 'use client'
 
 import { Instagram, Mail } from 'lucide-react'
+import Image from 'next/image'
 import Typewriter from '@/components/Typewriter'
 
 type FooterProps = {
@@ -10,13 +11,14 @@ type FooterProps = {
 
 const WhatsAppIcon = ({ className = 'text-[#B89B5E]', color = 'B89B5E' }: { className?: string; color?: string }) => (
   <span className="flex h-3 w-3 items-center justify-center">
-    <img
+    <Image
       src={`https://cdn.simpleicons.org/whatsapp/${color}?viewbox=auto`}
       alt=""
       aria-hidden="true"
       className={className}
-      width="12"
-      height="12"
+      width={12}
+      height={12}
+      unoptimized
     />
   </span>
 )
@@ -60,35 +62,53 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
                     <h3 className="text-[16px] font-sans font-normal tracking-wide text-[#6b7a5e] pb-5">PAGAMENTO</h3>
                     <div className="w-full pt-10 border-t-2 border-[#6b7a5e]/40">
                       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-                        <img
+                        <Image
                           src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Visa_Inc._logo_%282021%E2%80%93present%29.svg/960px-Visa_Inc._logo_%282021%E2%80%93present%29.svg.png"
                           alt="Visa"
                           className="h-4 md:h-5 w-auto object-contain"
+                          width={96}
+                          height={32}
+                          unoptimized
                         />
-                        <img
+                        <Image
                           src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Mastercard_2019_logo.svg/330px-Mastercard_2019_logo.svg.png"
                           alt="Mastercard"
                           className="h-4 md:h-5 w-auto object-contain"
+                          width={64}
+                          height={40}
+                          unoptimized
                         />
-                        <img
+                        <Image
                           src="https://upload.wikimedia.org/wikipedia/commons/5/51/Elo_logo.png"
                           alt="Elo"
                           className="h-4 md:h-6 w-auto object-contain"
+                          width={64}
+                          height={40}
+                          unoptimized
                         />
-                        <img
+                        <Image
                           src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Mercado_Pago.svg/960px-Mercado_Pago.svg.png"
                           alt="Mercado Pago"
                           className="h-4 md:h-7 w-auto object-contain"
+                          width={112}
+                          height={32}
+                          unoptimized
                         />
-                        <img
+                        <Image
                           src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Pix_%28Brazil%29_logo.svg/330px-Pix_%28Brazil%29_logo.svg.png"
                           alt="Pix"
                           className="h-4 md:h-6 w-auto object-contain opacity-70"
+                          width={64}
+                          height={32}
+                          unoptimized
                         />
-                        <img
+                        <Image
                           src="https://cdn.worldvectorlogo.com/logos/picpay-1.svg"
                           alt="PicPay"
                           className="h-4 md:h-5 w-auto object-contain"
+                          width={72}
+                          height={32}
+                          unoptimized
                         />
                       </div>
                     </div>
@@ -147,7 +167,7 @@ const Footer = ({ contactInfo = true, paymentInfo = false }: FooterProps) => {
       ) : null}
 
       <div className="border-t border-[#B89B5E]/25 py-3 text-center">
-        <img src="/nm-gold.png" alt="NM" className="mx-auto h-14 w-auto opacity-80"/>
+        <Image src="/nm-gold.png" alt="NM" className="mx-auto h-14 w-auto opacity-80" width={56} height={56} />
       </div>
     </footer>
   )

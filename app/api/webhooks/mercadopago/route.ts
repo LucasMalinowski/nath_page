@@ -6,6 +6,7 @@ import { sendPaymentSuccessEmail } from '@/lib/mailer'
 import { getCheckoutProfile, purchaseShippingLabel } from '@/lib/order-shipping'
 import { isPickupServiceCode } from '@/lib/shipping'
 import { isSuperFreteConfigured } from '@/lib/superfrete'
+import { captureServerEvent, captureServerException } from '@/lib/posthog-server'
 
 export const runtime = 'nodejs'
 
@@ -100,6 +101,10 @@ export async function POST(request: Request) {
     const dataId = url.searchParams.get('data.id') || String(body?.data?.id ?? paymentId)
     if (!verifyMercadoPagoSignature(request, dataId)) {
       console.warn('[MP webhook] Invalid signature — rejecting request')
+      await captureServerEvent('payment_webhook_rejected', dataId || 'mercadopago', {
+        reason: 'invalid_signature',
+        payment_id: paymentId
+      })
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
@@ -122,6 +127,13 @@ export async function POST(request: Request) {
 
     const nextStatus = resolveStatus(payment.status)
 
+    await captureServerEvent('payment_webhook_received', order.user_id, {
+      order_id: order.id,
+      payment_id: String(payment.id),
+      payment_status: payment.status,
+      next_order_status: nextStatus
+    })
+
     const { error: updateError } = await supabaseAdmin
       .from('orders')
       .update({
@@ -135,8 +147,20 @@ export async function POST(request: Request) {
       .eq('id', order.id)
 
     if (updateError) {
+      await captureServerException('payment_webhook_failed', order.user_id, updateError, {
+        reason: 'order_update_failed',
+        order_id: order.id,
+        payment_id: String(payment.id)
+      })
       return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
+
+    await captureServerEvent('payment_status_updated', order.user_id, {
+      order_id: order.id,
+      payment_id: String(payment.id),
+      payment_status: payment.status,
+      order_status: nextStatus
+    })
 
     let approvedProductIds: string[] = []
 
@@ -166,11 +190,22 @@ export async function POST(request: Request) {
         })
 
         if (stockError) {
+          await captureServerException('payment_webhook_failed', order.user_id, stockError, {
+            reason: 'stock_deduct_failed',
+            order_id: order.id,
+            product_id: item.product_id
+          })
           return NextResponse.json({ error: stockError.message }, { status: 500 })
         }
       }
 
       await supabaseAdmin.from('cart_items').delete().eq('user_id', order.user_id)
+      await captureServerEvent('payment_approved', order.user_id, {
+        order_id: order.id,
+        payment_id: String(payment.id),
+        product_ids: approvedProductIds,
+        item_count: approvedProductIds.length
+      })
 
       const { data: authUserData, error: authUserError } = await supabaseAdmin.auth.admin.getUserById(order.user_id)
       const buyerEmail = authUserData.user?.email
@@ -209,6 +244,10 @@ export async function POST(request: Request) {
         } catch (shippingError) {
           const message = shippingError instanceof Error ? shippingError.message : 'Could not purchase shipping label'
           console.error('Failed to create SuperFrete label', shippingError)
+          await captureServerException('shipping_label_failed', order.user_id, shippingError, {
+            order_id: order.id,
+            shipping_service_code: order.shipping_service_code
+          })
           await supabaseAdmin
             .from('orders')
             .update({
@@ -237,8 +276,18 @@ export async function POST(request: Request) {
           })
         } catch (mailError) {
           console.error('Failed to send payment success email', mailError)
+          await captureServerException('payment_success_email_failed', order.user_id, mailError, {
+            order_id: order.id
+          })
         }
       }
+    } else if (nextStatus === 'failed' || nextStatus === 'cancelled') {
+      await captureServerEvent('payment_not_completed', order.user_id, {
+        order_id: order.id,
+        payment_id: String(payment.id),
+        payment_status: payment.status,
+        order_status: nextStatus
+      })
     }
 
     return NextResponse.json({ received: true, product_ids: approvedProductIds })

@@ -7,6 +7,7 @@ import { getCheckoutProfile, quoteShippingForItems } from '@/lib/order-shipping'
 import { isPickupServiceCode } from '@/lib/shipping'
 import { isSuperFreteConfigured } from '@/lib/superfrete'
 import { calculateCouponDiscountCents, normalizeCouponCode } from '@/lib/coupons'
+import { captureServerEvent, captureServerException } from '@/lib/posthog-server'
 
 export const runtime = 'nodejs'
 
@@ -54,6 +55,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
+    await captureServerEvent('checkout_product_requested', user.id, {
+      user_email: user.email || null
+    })
+
     const body = (await request.json().catch(() => ({}))) as CheckoutProductBody
     const productId = body.productId?.trim()
     const quantity = Number.isInteger(body.quantity) && (body.quantity || 0) > 0 ? (body.quantity as number) : 1
@@ -61,6 +66,7 @@ export async function POST(request: Request) {
     const couponCode = normalizeCouponCode(body.couponCode)
 
     if (!productId) {
+      await captureServerEvent('checkout_product_failed', user.id, { reason: 'missing_product_id' })
       return NextResponse.json({ error: 'Product is required' }, { status: 400 })
     }
 
@@ -74,15 +80,22 @@ export async function POST(request: Request) {
       .maybeSingle()
 
     if (productError || !product) {
+      await captureServerException('checkout_product_failed', user.id, productError || new Error('Product not found'), {
+        reason: 'product_not_found',
+        product_id: productId
+      })
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
     if (!product.quantity || product.quantity < quantity) {
+      await captureServerEvent('checkout_product_failed', user.id, { reason: 'out_of_stock', product_id: product.id })
       return NextResponse.json({ error: 'Product is out of stock' }, { status: 400 })
     }
     if (!isSuperFreteConfigured()) {
+      await captureServerEvent('checkout_product_failed', user.id, { reason: 'shipping_not_configured', product_id: product.id })
       return NextResponse.json({ error: 'Shipping is not configured on the server' }, { status: 500 })
     }
     if (!Number.isFinite(shippingServiceCode) || shippingServiceCode <= 0) {
+      await captureServerEvent('checkout_product_failed', user.id, { reason: 'missing_shipping_option', product_id: product.id })
       return NextResponse.json({ error: 'Shipping option is required' }, { status: 400 })
     }
 
@@ -95,10 +108,20 @@ export async function POST(request: Request) {
       const { data: couponRow, error: couponError } = await supabaseAdmin.rpc('consume_coupon_use', { p_code: couponCode })
 
       if (couponError) {
+        await captureServerException('checkout_product_failed', user.id, couponError, {
+          reason: 'coupon_error',
+          coupon_code: couponCode,
+          product_id: product.id
+        })
         return NextResponse.json({ error: couponError.message }, { status: 400 })
       }
 
       if (!couponRow) {
+        await captureServerEvent('checkout_product_failed', user.id, {
+          reason: 'invalid_coupon',
+          coupon_code: couponCode,
+          product_id: product.id
+        })
         return NextResponse.json({ error: 'Invalid or expired coupon' }, { status: 400 })
       }
 
@@ -113,6 +136,11 @@ export async function POST(request: Request) {
     })
     const selectedShipping = shippingQuote.options.find((option) => option.serviceCode === shippingServiceCode)
     if (!selectedShipping) {
+      await captureServerEvent('checkout_product_failed', user.id, {
+        reason: 'shipping_option_unavailable',
+        product_id: product.id,
+        shipping_service_code: shippingServiceCode
+      })
       return NextResponse.json({ error: 'Selected shipping option is no longer available' }, { status: 400 })
     }
 
@@ -144,8 +172,27 @@ export async function POST(request: Request) {
       .single()
 
     if (orderError || !order) {
+      await captureServerException('checkout_product_failed', user.id, orderError || new Error('Could not create order'), {
+        reason: 'order_create_failed',
+        product_id: product.id
+      })
       return NextResponse.json({ error: orderError?.message || 'Could not create order' }, { status: 500 })
     }
+
+    await captureServerEvent('order_created', user.id, {
+      order_id: order.id,
+      channel: 'product',
+      product_id: product.id,
+      product_name: product.name || null,
+      subtotal_cents: subtotalCents,
+      discount_cents: discountCents,
+      shipping_cents: selectedShipping.priceCents,
+      total_cents: totalCents,
+      quantity,
+      coupon_code: coupon?.code || null,
+      shipping_service_code: selectedShipping.serviceCode,
+      shipping_service_name: selectedShipping.serviceName
+    })
 
     const { error: itemError } = await supabaseAdmin.from('order_items').insert({
       order_id: order.id,
@@ -157,6 +204,11 @@ export async function POST(request: Request) {
     })
 
     if (itemError) {
+      await captureServerException('checkout_product_failed', user.id, itemError, {
+        reason: 'order_item_create_failed',
+        order_id: order.id,
+        product_id: product.id
+      })
       return NextResponse.json({ error: itemError.message }, { status: 500 })
     }
 
@@ -208,8 +260,21 @@ export async function POST(request: Request) {
       .eq('id', order.id)
 
     if (updateError) {
+      await captureServerException('checkout_product_failed', user.id, updateError, {
+        reason: 'preference_update_failed',
+        order_id: order.id,
+        product_id: product.id
+      })
       return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
+
+    await captureServerEvent('checkout_redirect_created', user.id, {
+      order_id: order.id,
+      channel: 'product',
+      preference_id: preference.id,
+      product_id: product.id,
+      total_cents: totalCents
+    })
 
     return NextResponse.json({
       orderId: order.id,

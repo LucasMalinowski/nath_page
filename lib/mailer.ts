@@ -14,6 +14,33 @@ type SuperFreteLowBalanceEmailParams = {
   threshold: number
 }
 
+type AbandonedCartEmailParams = {
+  to: string
+  userEmail: string
+  fullName?: string | null
+  phone?: string | null
+  userId: string
+  cartUpdatedAt: string
+  cartUrl: string
+  subtotalText: string
+  items: {
+    productName: string
+    quantity: number
+    unitPriceText: string
+    lineTotalText: string
+  }[]
+  pendingOrdersCount: number
+}
+
+function escapeHtml(value: string | number | null | undefined) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 function getSmtpConfig() {
   const host = process.env.SMTP_HOST
   const port = process.env.SMTP_PORT ? Number.parseInt(process.env.SMTP_PORT, 10) : 587
@@ -99,4 +126,61 @@ export async function sendSuperFreteLowBalanceEmail(params: SuperFreteLowBalance
     text: `Olá!\n\nO saldo atual da conta SuperFrete está em ${balanceText}, abaixo do limite configurado de ${thresholdText}.\n\nFaça uma recarga para evitar falhas na emissão de etiquetas.\n`,
     html: `<p>Olá!</p><p>O saldo atual da conta SuperFrete está em <strong>${balanceText}</strong>, abaixo do limite configurado de <strong>${thresholdText}</strong>.</p><p>Faça uma recarga para evitar falhas na emissão de etiquetas.</p>`
   })
+}
+
+export async function sendAbandonedCartEmail(params: AbandonedCartEmailParams): Promise<boolean> {
+  const transport = await getTransporter()
+  if (!transport) {
+    return false
+  }
+
+  const name = params.fullName?.trim() || 'Nome nao informado'
+  const phone = params.phone?.trim() || 'Telefone nao informado'
+  const escapedName = escapeHtml(name)
+  const escapedPhone = escapeHtml(phone)
+  const escapedEmail = escapeHtml(params.userEmail)
+  const escapedUserId = escapeHtml(params.userId)
+  const escapedCartUpdatedAt = escapeHtml(params.cartUpdatedAt)
+  const escapedPendingOrdersCount = escapeHtml(params.pendingOrdersCount)
+  const escapedSubtotalText = escapeHtml(params.subtotalText)
+  const escapedCartUrl = escapeHtml(params.cartUrl)
+  const itemsText = params.items
+    .map((item) => `- ${item.productName} x${item.quantity}: ${item.lineTotalText} (${item.unitPriceText} un.)`)
+    .join('\n')
+  const itemsHtml = params.items
+    .map(
+      (item) =>
+        `<li><strong>${escapeHtml(item.productName)}</strong> x${escapeHtml(item.quantity)}: ${escapeHtml(item.lineTotalText)} <span style="color:#735746">(${escapeHtml(item.unitPriceText)} un.)</span></li>`
+    )
+    .join('')
+
+  await transport.transporter.sendMail({
+    from: transport.from,
+    to: params.to,
+    subject: 'Carrinho abandonado - Nathalia Malinowski',
+    text:
+      `Um cliente deixou itens no carrinho sem finalizar.\n\n` +
+      `Cliente: ${name}\n` +
+      `E-mail: ${params.userEmail}\n` +
+      `Telefone: ${phone}\n` +
+      `User ID: ${params.userId}\n` +
+      `Atualizado em: ${params.cartUpdatedAt}\n` +
+      `Pedidos pendentes: ${params.pendingOrdersCount}\n` +
+      `Subtotal: ${params.subtotalText}\n\n` +
+      `Itens:\n${itemsText}\n\n` +
+      `Link do carrinho: ${params.cartUrl}\n`,
+    html:
+      `<p>Um cliente deixou itens no carrinho sem finalizar.</p>` +
+      `<p><strong>Cliente:</strong> ${escapedName}<br/>` +
+      `<strong>E-mail:</strong> ${escapedEmail}<br/>` +
+      `<strong>Telefone:</strong> ${escapedPhone}<br/>` +
+      `<strong>User ID:</strong> ${escapedUserId}<br/>` +
+      `<strong>Atualizado em:</strong> ${escapedCartUpdatedAt}<br/>` +
+      `<strong>Pedidos pendentes:</strong> ${escapedPendingOrdersCount}<br/>` +
+      `<strong>Subtotal:</strong> ${escapedSubtotalText}</p>` +
+      `<ul>${itemsHtml}</ul>` +
+      `<p><a href="${escapedCartUrl}">Abrir site</a></p>`
+  })
+
+  return true
 }

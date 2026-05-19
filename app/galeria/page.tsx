@@ -6,8 +6,11 @@ import { ChevronLeft, ChevronRight, Instagram, ShoppingCart, SquareArrowUpRight,
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import JsonLd from '@/components/JsonLd'
 import { supabase, GalleryProduct, GalleryExhibitor } from '@/lib/supabase'
 import { MiniCarousel } from '@/components/MiniCarousel'
+import { captureBrowserEvent } from '@/lib/posthog-browser'
+import { breadcrumbJsonLd, siteUrl } from '@/lib/seo'
 
 const parseImages = (item: { images?: string | string[] | null }): string[] => {
   if (!item.images) return []
@@ -32,6 +35,20 @@ const formatPriceText = (price?: string | null): string => {
 const formatPackageMetric = (value?: number | null): string | null => {
   if (value === null || value === undefined || Number.isNaN(value)) return null
   return Number(value).toLocaleString('pt-BR', { maximumFractionDigits: 2 })
+}
+
+const galleryJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  '@id': `${siteUrl}/galeria#collection`,
+  name: 'Galeria de Artes e Curadoria',
+  url: `${siteUrl}/galeria`,
+  inLanguage: 'pt-BR',
+  description:
+    'Galeria de artes, obras autorais e curadoria de pecas selecionadas por Nathalia Malinowski para interiores com identidade.',
+  isPartOf: {
+    '@id': `${siteUrl}/#website`
+  }
 }
 
 export default function GaleriaPage() {
@@ -95,6 +112,13 @@ export default function GaleriaPage() {
 
   useEffect(() => {
     if (!selectedProduct) return
+
+    captureBrowserEvent('product_viewed', {
+      product_id: selectedProduct.id,
+      product_name: selectedProduct.name,
+      product_author: selectedProduct.author,
+      product_price_text: selectedProduct.price_text
+    })
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -191,6 +215,12 @@ export default function GaleriaPage() {
   }
 
   const checkoutProduct = async (productId: string) => {
+    const product = products.find((item) => item.id === productId)
+    captureBrowserEvent('buy_now_clicked', {
+      product_id: productId,
+      product_name: product?.name || null,
+      product_price_text: product?.price_text || null
+    })
     setCheckoutLoadingProductId(productId)
     await addToCart(productId, {
       successMessage: 'Produto adicionado. Escolha o frete no carrinho para finalizar a compra.',
@@ -204,6 +234,13 @@ export default function GaleriaPage() {
     productId: string,
     options?: { successMessage?: string; skipLoadingState?: boolean }
   ) => {
+    const product = products.find((item) => item.id === productId)
+    captureBrowserEvent('add_to_cart_clicked', {
+      product_id: productId,
+      product_name: product?.name || null,
+      product_price_text: product?.price_text || null
+    })
+
     if (!options?.skipLoadingState) {
       setAddingToCartProductId(productId)
     }
@@ -211,6 +248,10 @@ export default function GaleriaPage() {
 
     const { data: { session } } = await supabase.auth.getSession()
     if (!session?.user) {
+      captureBrowserEvent('add_to_cart_failed', {
+        product_id: productId,
+        reason: 'auth_required'
+      })
       if (!options?.skipLoadingState) {
         setAddingToCartProductId(null)
       }
@@ -226,6 +267,11 @@ export default function GaleriaPage() {
       .maybeSingle()
 
     if (existingItemError) {
+      captureBrowserEvent('add_to_cart_failed', {
+        product_id: productId,
+        reason: 'existing_item_lookup_failed',
+        error_message: existingItemError.message
+      })
       if (!options?.skipLoadingState) {
         setAddingToCartProductId(null)
       }
@@ -243,11 +289,22 @@ export default function GaleriaPage() {
         setAddingToCartProductId(null)
       }
       if (updateError) {
+        captureBrowserEvent('add_to_cart_failed', {
+          product_id: productId,
+          reason: 'cart_update_failed',
+          error_message: updateError.message
+        })
         setCheckoutMessage(updateError.message)
         return
       }
 
       window.dispatchEvent(new Event('cart-updated'))
+      captureBrowserEvent('cart_item_added', {
+        product_id: productId,
+        product_name: product?.name || null,
+        quantity: existingItem.quantity + 1,
+        action: 'increment'
+      })
       setCheckoutMessage(options?.successMessage || 'Produto adicionado ao carrinho.')
       return
     }
@@ -264,11 +321,22 @@ export default function GaleriaPage() {
       setAddingToCartProductId(null)
     }
     if (insertError) {
+      captureBrowserEvent('add_to_cart_failed', {
+        product_id: productId,
+        reason: 'cart_insert_failed',
+        error_message: insertError.message
+      })
       setCheckoutMessage(insertError.message)
       return
     }
 
     window.dispatchEvent(new Event('cart-updated'))
+    captureBrowserEvent('cart_item_added', {
+      product_id: productId,
+      product_name: product?.name || null,
+      quantity: 1,
+      action: 'insert'
+    })
     setCheckoutMessage(options?.successMessage || 'Produto adicionado ao carrinho.')
   }
 
@@ -277,6 +345,15 @@ export default function GaleriaPage() {
   return (
       <>
       <main id="galeria" className="min-h-screen bg-dirt text-bg page-fade-in">
+        <JsonLd
+          data={[
+            galleryJsonLd,
+            breadcrumbJsonLd([
+              { name: 'Inicio', url: `${siteUrl}/` },
+              { name: 'Galeria', url: `${siteUrl}/galeria` }
+            ])
+          ]}
+        />
         <Navbar />
 
         {/* Hero — CSS background like Concept section; starts at y=0 so the fixed navbar
