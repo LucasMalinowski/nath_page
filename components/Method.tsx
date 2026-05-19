@@ -39,7 +39,7 @@ const Method = () => {
             Como trabalhamos
           </span>
           <h2 className="mt-4 text-3xl md:text-4xl font-serif font-normal text-[#ebe0e0] leading-[1.2]">
-            Método "Espaço com Sentido"
+            Método &quot;Espaço com Sentido&quot;
           </h2>
           <div className="mt-5 w-7 h-[1.5px] bg-[#B89B5E] opacity-65" />
           <p className="mt-6 text-[14px] md:text-[16px] font-sans font-light text-[#c5b49f] leading-[1.8]">
