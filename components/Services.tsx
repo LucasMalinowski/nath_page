@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 const Services = () => {
   const servicesTitle = 'Meus serviços acompanham diferentes momentos,\nsempre com um olhar autoral, sensível e\nestruturado.'
-  const servicesSubtitle = 'Um processo sensível, autoral e bem conduzido — do conceito à materialização.'
+  const servicesSubtitle = 'Um processo sensível, autoral e bem conduzido do conceito à materialização.'
   const service2Title = 'Consultoria e \n Curadoria'
   const service2Desc = 'Direcionamento estratégico para decisões mais seguras e coerentes com o seu espaço.'
   const service3Title = 'Pinturas Murais\nAutorais'

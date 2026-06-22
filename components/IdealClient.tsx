@@ -27,7 +27,7 @@ const IdealClient = () => {
         <p className="mt-8 text-[15px] md:text-[18px] font-sans font-light text-[#735746] leading-[1.85] max-w-2xl mx-auto">
           Este trabalho é para pessoas que desejam transformar seus espaços com
           intenção, sensibilidade e identidade. Para quem valoriza arte, memória,
-          afeto e funcionalidade — e quer viver em um ambiente que traduza
+          afeto e funcionalidade e quer viver em um ambiente que traduza
           seu modo de ser.
         </p>
 

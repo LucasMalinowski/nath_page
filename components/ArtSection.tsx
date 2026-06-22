@@ -53,7 +53,7 @@ const ArtSection = () => {
             </p>
             <p>
               Ser designer e artista plástica ao mesmo tempo significa que cada espaço
-              que projeto carrega não apenas função, mas sensibilidade — um olhar que
+              que projeto carrega não apenas função, mas sensibilidade e um olhar que
               enxerga o ambiente como composição, narrativa e identidade viva.
             </p>
           </div>
