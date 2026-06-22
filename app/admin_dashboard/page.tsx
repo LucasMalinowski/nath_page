@@ -135,7 +135,8 @@ export default function AdminDashboard() {
         package_weight_grams: '',
         package_height_cm: '',
         package_width_cm: '',
-        package_length_cm: ''
+        package_length_cm: '',
+        image_blank_side: 'right' as 'left' | 'right'
     })
     const [productEditImages, setProductEditImages] = useState<string[]>([])
     const [productEditOriginalImages, setProductEditOriginalImages] = useState<string[]>([])
@@ -150,7 +151,8 @@ export default function AdminDashboard() {
         package_weight_grams: '',
         package_height_cm: '',
         package_width_cm: '',
-        package_length_cm: ''
+        package_length_cm: '',
+        image_blank_side: 'right' as 'left' | 'right'
     })
     const [newProductFiles, setNewProductFiles] = useState<File[]>([])
     const [newProductFilesKey, setNewProductFilesKey] = useState(0)
@@ -656,6 +658,7 @@ export default function AdminDashboard() {
                     package_width_cm: newProduct.package_width_cm ? Number.parseFloat(newProduct.package_width_cm) : null,
                     package_length_cm: newProduct.package_length_cm ? Number.parseFloat(newProduct.package_length_cm) : null,
                     images: JSON.stringify(urls),
+                    image_blank_side: newProduct.image_blank_side,
                     display_order: products.length,
                     is_visible: true
                 })
@@ -672,7 +675,8 @@ export default function AdminDashboard() {
                 package_weight_grams: '',
                 package_height_cm: '',
                 package_width_cm: '',
-                package_length_cm: ''
+                package_length_cm: '',
+                image_blank_side: 'right'
             })
             setNewProductFiles([])
             setNewProductFilesKey((prev) => prev + 1)
@@ -709,7 +713,8 @@ export default function AdminDashboard() {
             package_length_cm:
                 product.package_length_cm !== null && product.package_length_cm !== undefined
                     ? String(product.package_length_cm)
-                    : ''
+                    : '',
+            image_blank_side: product.image_blank_side === 'left' ? 'left' : 'right'
         })
         setProductEditImages(imagesList)
         setProductEditOriginalImages(imagesList)
@@ -728,7 +733,8 @@ export default function AdminDashboard() {
             package_weight_grams: '',
             package_height_cm: '',
             package_width_cm: '',
-            package_length_cm: ''
+            package_length_cm: '',
+            image_blank_side: 'right'
         })
         setProductEditImages([])
         setProductEditOriginalImages([])
@@ -777,7 +783,8 @@ export default function AdminDashboard() {
                     package_height_cm: productEditForm.package_height_cm ? Number.parseFloat(productEditForm.package_height_cm) : null,
                     package_width_cm: productEditForm.package_width_cm ? Number.parseFloat(productEditForm.package_width_cm) : null,
                     package_length_cm: productEditForm.package_length_cm ? Number.parseFloat(productEditForm.package_length_cm) : null,
-                    images: JSON.stringify(finalImages)
+                    images: JSON.stringify(finalImages),
+                    image_blank_side: productEditForm.image_blank_side
                 })
                 .eq('id', id)
 

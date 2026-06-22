@@ -16,6 +16,7 @@ type ProductForm = {
     package_height_cm: string
     package_width_cm: string
     package_length_cm: string
+    image_blank_side: 'left' | 'right'
 }
 
 type ProductsTabProps = {
@@ -194,6 +195,40 @@ export default function ProductsTab({
                         </p>
                     </div>
 
+                    <div>
+                        <label className="block text-sm font-medium text-graphite mb-1">
+                            Espaco em branco na primeira foto
+                        </label>
+                        <div className="inline-flex rounded-md border border-warm-beige overflow-hidden">
+                            <button
+                                type="button"
+                                onClick={() => setNewProduct({ ...newProduct, image_blank_side: 'left' })}
+                                className={`px-4 py-2 text-sm font-medium transition-colors ${
+                                    newProduct.image_blank_side === 'left'
+                                        ? 'bg-olive-green text-off-white'
+                                        : 'bg-off-white text-graphite hover:bg-warm-beige/60'
+                                }`}
+                            >
+                                Esquerda
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setNewProduct({ ...newProduct, image_blank_side: 'right' })}
+                                className={`px-4 py-2 text-sm font-medium transition-colors border-l border-warm-beige ${
+                                    newProduct.image_blank_side === 'right'
+                                        ? 'bg-olive-green text-off-white'
+                                        : 'bg-off-white text-graphite hover:bg-warm-beige/60'
+                                }`}
+                            >
+                                Direita
+                            </button>
+                        </div>
+                        <p className="text-xs text-graphite/60 mt-1">
+                            A primeira foto deve ser a obra emoldurada na parede com espaco vazio de um dos lados.
+                            Escolha em qual lado fica o espaco vazio — o texto do produto sera exibido ali na Galeria.
+                        </p>
+                    </div>
+
                     <button
                         type="submit"
                         disabled={productUploading}
@@ -344,6 +379,39 @@ export default function ProductsTab({
                                                             min="0.1"
                                                         />
                                                     </div>
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-graphite mb-1">
+                                                        Espaco em branco na primeira foto
+                                                    </label>
+                                                    <div className="inline-flex rounded-md border border-warm-beige overflow-hidden">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setProductEditForm({ ...productEditForm, image_blank_side: 'left' })}
+                                                            className={`px-4 py-2 text-sm font-medium transition-colors ${
+                                                                productEditForm.image_blank_side === 'left'
+                                                                    ? 'bg-olive-green text-off-white'
+                                                                    : 'bg-off-white text-graphite hover:bg-warm-beige/60'
+                                                            }`}
+                                                        >
+                                                            Esquerda
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setProductEditForm({ ...productEditForm, image_blank_side: 'right' })}
+                                                            className={`px-4 py-2 text-sm font-medium transition-colors border-l border-warm-beige ${
+                                                                productEditForm.image_blank_side === 'right'
+                                                                    ? 'bg-olive-green text-off-white'
+                                                                    : 'bg-off-white text-graphite hover:bg-warm-beige/60'
+                                                            }`}
+                                                        >
+                                                            Direita
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-graphite/60 mt-1">
+                                                        Lado onde fica o espaco vazio na primeira foto (onde o texto do produto aparece na Galeria).
+                                                    </p>
                                                 </div>
 
                                                 <div>

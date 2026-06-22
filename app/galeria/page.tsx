@@ -281,7 +281,11 @@ export default function GaleriaPage() {
     setCheckoutMessage(options?.successMessage || 'Produto adicionado ao carrinho.')
   }
 
-  const selectedProductImages = selectedProduct ? parseImages(selectedProduct) : []
+  const selectedProductAllImages = selectedProduct ? parseImages(selectedProduct) : []
+  // The first image is the wall photo with reserved blank space, used only for the gallery
+  // grid overlay — skip it here unless it's the only photo the product has.
+  const selectedProductImages =
+    selectedProductAllImages.length > 1 ? selectedProductAllImages.slice(1) : selectedProductAllImages
 
   return (
       <>
@@ -353,81 +357,102 @@ export default function GaleriaPage() {
           {!loading && products.map((product, index) => {
             const images = parseImages(product)
             const hasImages = images.length > 0
-            const isReversed = index % 2 === 1
+            const blankSide = product.image_blank_side === 'left' ? 'left' : 'right'
+
+            const info = (
+              <>
+                <p className="mb-5 flex items-center gap-3 font-poetic text-[12px] tracking-[0.28em] text-[#B89B5E]">
+                  {String(index + 1).padStart(2, '0')}
+                  <span className="h-px max-w-9 flex-1 bg-[#B89B5E]/25" />
+                </p>
+
+                <div className="mb-2 flex items-start justify-between gap-4">
+                  <h3 className="line-clamp-2 font-serif text-[20px] leading-tight text-[#3b2f26] sm:text-[24px] lg:text-[28px]">
+                    {product.name}
+                  </h3>
+                  <button
+                      type="button"
+                      onClick={() => setSelectedProduct(product)}
+                      className="mt-1 shrink-0 text-[#8a7560] transition-colors hover:text-[#3b2f26]"
+                      aria-label={`Abrir detalhes de ${product.name}`}
+                  >
+                    <SquareArrowUpRight size={18} />
+                  </button>
+                </div>
+
+                {product.author && (
+                  <p className="mb-3 font-poetic text-[17px] font-light italic text-[#8a7560]">por {product.author}</p>
+                )}
+
+                {product.description && (
+                  <p className="mb-8 line-clamp-4 max-w-[360px] border-l-2 border-[#B89B5E]/25 pl-3.5 font-poetic text-[15px] font-light italic leading-[1.7] text-[#8a7560]">
+                    {product.description}
+                  </p>
+                )}
+
+                <div className="mb-5 flex flex-wrap items-center gap-4">
+                  <p className="font-serif text-[22px] text-[#3b2f26]">
+                    <sub className="mr-1 font-sans text-[13px] font-light text-[#8a7560]">R$</sub>
+                    {formatPriceText(product.price_text)}
+                  </p>
+                  <span className="rounded-sm border border-[#B89B5E]/30 px-2.5 py-1 font-sans text-[9px] font-medium uppercase tracking-[0.22em] text-[#B89B5E]">
+                    Exclusivo
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                      type="button"
+                      onClick={() => checkoutProduct(product.id)}
+                      disabled={checkoutLoadingProductId === product.id}
+                      className="rounded-sm bg-[#3b2f26] px-7 py-3 font-sans text-[11px] font-semibold uppercase tracking-[0.13em] text-[#f5f1eb] transition-colors hover:bg-[#5a3c28] disabled:opacity-60"
+                  >
+                    {checkoutLoadingProductId === product.id ? '...' : 'Compre agora'}
+                  </button>
+                  <button
+                      type="button"
+                      onClick={() => addToCart(product.id)}
+                      disabled={addingToCartProductId === product.id}
+                      className="flex items-center gap-2 rounded-sm border border-[#3b2f26]/20 px-5 py-[11px] font-sans text-[11px] text-[#8a7560] transition-colors hover:border-[#3b2f26] hover:text-[#3b2f26] disabled:opacity-60"
+                  >
+                    <ShoppingCart size={15} />
+                    Adicionar ao carrinho
+                  </button>
+                </div>
+              </>
+            )
 
             return (
               <article
                 key={product.id}
                 data-reveal
-                className={`grid grid-cols-1 border-t border-[#3b2f26]/10 last:border-b lg:grid-cols-2 ${revealClasses}`}
+                className={`border-t border-[#3b2f26]/10 last:border-b ${revealClasses}`}
               >
-                <div className={`relative min-h-[320px] overflow-hidden bg-[#ddd2c4] lg:min-h-[560px] ${isReversed ? 'lg:order-2' : ''}`}>
-                  {hasImages ? (
-                    <MiniCarousel images={images} alt={product.name} className="h-full !min-h-0 !p-0" />
-                  ) : (
-                    <div className="h-full w-full bg-[#ddd2c4]" />
+                {/* Photo of the work hanging on a wall — the first image always reserves blank
+                    wall space on one side, where the product text floats on larger screens. */}
+                <div className="relative min-h-[420px] overflow-hidden bg-[#ddd2c4] sm:min-h-[560px] lg:min-h-[640px]">
+                  {hasImages && (
+                    <Image
+                      src={images[0]}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                      sizes="100vw"
+                    />
                   )}
+
+                  <div
+                    className={`absolute inset-y-0 hidden w-full flex-col justify-center px-6 py-10 sm:flex sm:w-[50%] sm:px-10 lg:w-[42%] lg:px-16 ${
+                      blankSide === 'left' ? 'left-0' : 'right-0'
+                    }`}
+                  >
+                    {info}
+                  </div>
                 </div>
 
-                <div className={`flex flex-col justify-center bg-[#ede8df] px-6 py-10 sm:px-[6vw] sm:py-14 ${isReversed ? 'lg:order-1' : ''}`}>
-                  <p className="mb-5 flex items-center gap-3 font-poetic text-[12px] tracking-[0.28em] text-[#B89B5E]">
-                    {String(index + 1).padStart(2, '0')}
-                    <span className="h-px max-w-9 flex-1 bg-[#B89B5E]/25" />
-                  </p>
-
-                  <div className="mb-2 flex items-start justify-between gap-4">
-                    <h3 className="font-serif text-[20px] leading-tight text-[#3b2f26] sm:text-[24px] lg:text-[28px]">
-                      {product.name}
-                    </h3>
-                    <button
-                        type="button"
-                        onClick={() => setSelectedProduct(product)}
-                        className="mt-1 shrink-0 text-[#8a7560] transition-colors hover:text-[#3b2f26]"
-                        aria-label={`Abrir detalhes de ${product.name}`}
-                    >
-                      <SquareArrowUpRight size={18} />
-                    </button>
-                  </div>
-
-                  {product.author && (
-                    <p className="mb-3 font-poetic text-[17px] font-light italic text-[#8a7560]">por {product.author}</p>
-                  )}
-
-                  {product.description && (
-                    <p className="mb-8 max-w-[360px] border-l-2 border-[#B89B5E]/25 pl-3.5 font-poetic text-[15px] font-light italic leading-[1.7] text-[#8a7560]">
-                      {product.description}
-                    </p>
-                  )}
-
-                  <div className="mb-5 flex flex-wrap items-center gap-4">
-                    <p className="font-serif text-[22px] text-[#3b2f26]">
-                      <sub className="mr-1 font-sans text-[13px] font-light text-[#8a7560]">R$</sub>
-                      {formatPriceText(product.price_text)}
-                    </p>
-                    <span className="rounded-sm border border-[#B89B5E]/30 px-2.5 py-1 font-sans text-[9px] font-medium uppercase tracking-[0.22em] text-[#B89B5E]">
-                      Exclusivo
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3">
-                    <button
-                        type="button"
-                        onClick={() => checkoutProduct(product.id)}
-                        disabled={checkoutLoadingProductId === product.id}
-                        className="rounded-sm bg-[#3b2f26] px-7 py-3 font-sans text-[11px] font-semibold uppercase tracking-[0.13em] text-[#f5f1eb] transition-colors hover:bg-[#5a3c28] disabled:opacity-60"
-                    >
-                      {checkoutLoadingProductId === product.id ? '...' : 'Compre agora'}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => addToCart(product.id)}
-                        disabled={addingToCartProductId === product.id}
-                        className="flex items-center gap-2 rounded-sm border border-[#3b2f26]/20 px-5 py-[11px] font-sans text-[11px] text-[#8a7560] transition-colors hover:border-[#3b2f26] hover:text-[#3b2f26] disabled:opacity-60"
-                    >
-                      <ShoppingCart size={15} />
-                      Adicionar ao carrinho
-                    </button>
-                  </div>
+                {/* Mobile: not enough room to float text over the blank wall, so it stacks below */}
+                <div className="px-6 py-10 sm:hidden">
+                  {info}
                 </div>
               </article>
             )

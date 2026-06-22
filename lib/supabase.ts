@@ -31,6 +31,7 @@ export type GalleryProduct = {
     package_width_cm: number | null
     package_length_cm: number | null
     images: string[] | string | null
+    image_blank_side: 'left' | 'right' | null
     display_order: number | null
     is_visible: boolean | null
     created_at: string
