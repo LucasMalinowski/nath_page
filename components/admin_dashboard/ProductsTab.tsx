@@ -191,13 +191,15 @@ export default function ProductsTab({
                             className="block w-full min-w-0 rounded-md border border-warm-beige bg-off-white text-sm text-graphite/70 file:mr-3 file:border-0 file:bg-olive-green/10 file:px-3 file:py-2 file:text-sm file:font-medium file:text-graphite"
                         />
                         <p className="text-xs text-graphite/60 mt-1">
-                            Selecione uma ou mais imagens. Maximo 10MB por arquivo.
+                            Selecione uma ou mais imagens. Maximo 10MB por arquivo. A primeira foto deve ser um
+                            recorte da obra com fundo transparente (PNG) — ela flutua sobre o fundo da Galeria,
+                            sem corte. As demais fotos sao usadas nos detalhes do produto.
                         </p>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-graphite mb-1">
-                            Espaco em branco na primeira foto
+                            Lado do texto na Galeria
                         </label>
                         <div className="inline-flex rounded-md border border-warm-beige overflow-hidden">
                             <button
@@ -209,7 +211,7 @@ export default function ProductsTab({
                                         : 'bg-off-white text-graphite hover:bg-warm-beige/60'
                                 }`}
                             >
-                                Esquerda
+                                Texto a esquerda
                             </button>
                             <button
                                 type="button"
@@ -220,12 +222,12 @@ export default function ProductsTab({
                                         : 'bg-off-white text-graphite hover:bg-warm-beige/60'
                                 }`}
                             >
-                                Direita
+                                Texto a direita
                             </button>
                         </div>
                         <p className="text-xs text-graphite/60 mt-1">
-                            A primeira foto deve ser a obra emoldurada na parede com espaco vazio de um dos lados.
-                            Escolha em qual lado fica o espaco vazio — o texto do produto sera exibido ali na Galeria.
+                            Define em qual lado o texto do produto aparece na Galeria. A foto (recorte
+                            transparente) aparece automaticamente do lado oposto.
                         </p>
                     </div>
 
@@ -383,7 +385,7 @@ export default function ProductsTab({
 
                                                 <div>
                                                     <label className="block text-sm font-medium text-graphite mb-1">
-                                                        Espaco em branco na primeira foto
+                                                        Lado do texto na Galeria
                                                     </label>
                                                     <div className="inline-flex rounded-md border border-warm-beige overflow-hidden">
                                                         <button
@@ -395,7 +397,7 @@ export default function ProductsTab({
                                                                     : 'bg-off-white text-graphite hover:bg-warm-beige/60'
                                                             }`}
                                                         >
-                                                            Esquerda
+                                                            Texto a esquerda
                                                         </button>
                                                         <button
                                                             type="button"
@@ -406,11 +408,12 @@ export default function ProductsTab({
                                                                     : 'bg-off-white text-graphite hover:bg-warm-beige/60'
                                                             }`}
                                                         >
-                                                            Direita
+                                                            Texto a direita
                                                         </button>
                                                     </div>
                                                     <p className="text-xs text-graphite/60 mt-1">
-                                                        Lado onde fica o espaco vazio na primeira foto (onde o texto do produto aparece na Galeria).
+                                                        Define em qual lado o texto do produto aparece na Galeria. A primeira foto (recorte
+                                                        transparente em PNG) aparece automaticamente do lado oposto.
                                                     </p>
                                                 </div>
 

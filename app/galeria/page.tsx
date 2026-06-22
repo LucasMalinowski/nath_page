@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight, Instagram, ShoppingCart, SquareArrowUpRight, X } from 'lucide-react'
+import { Instagram, ShoppingCart, SquareArrowUpRight, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -51,21 +51,28 @@ const galleryJsonLd = {
   }
 }
 
+const commissionTypes = [
+  { title: 'Telas personalizadas', sub: 'Dimensão, paleta e tema escolhidos por você' },
+  { title: 'Bastidores sob medida', sub: 'Para nichos, cabeceiras, áreas de destaque' },
+  { title: 'Composição por ambiente', sub: 'Coleção de múltiplas peças para um espaço' },
+]
+
+const commissionsWhatsappHref =
+  'https://wa.me/5545998028130?text=Ola%20Nathalia%2C%20tenho%20interesse%20em%20uma%20encomenda%20personalizada!'
+
+const revealClasses =
+  'opacity-0 translate-y-3 transition-[opacity,transform] duration-[900ms] ease-out [&.is-visible]:opacity-100 [&.is-visible]:translate-y-0'
+
 export default function GaleriaPage() {
   const router = useRouter()
-  const exhibitorsSectionRef = useRef<HTMLElement | null>(null)
+  const revealRootRef = useRef<HTMLElement | null>(null)
   const [products, setProducts] = useState<GalleryProduct[]>([])
   const [exhibitors, setExhibitors] = useState<GalleryExhibitor[]>([])
   const [loading, setLoading] = useState(true)
   const [addingToCartProductId, setAddingToCartProductId] = useState<string | null>(null)
   const [checkoutLoadingProductId, setCheckoutLoadingProductId] = useState<string | null>(null)
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null)
-  const [currentExhibitorPage, setCurrentExhibitorPage] = useState(0)
-  const [currentProductPage, setCurrentProductPage] = useState(0)
-  const [exhibitorsPerPage, setExhibitorsPerPage] = useState(2)
   const [selectedProduct, setSelectedProduct] = useState<GalleryProduct | null>(null)
-  const productsPerPage = 3 // 2 rows of 3
-  const productsPhrase = 'Uma seleção de peças autorais e obras de artistas independentes, escolhidas com intenção para dialogar com o espaço, o tempo e a identidade de quem habita.'
 
   useEffect(() => {
     const loadData = async () => {
@@ -97,20 +104,6 @@ export default function GaleriaPage() {
   }, [])
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1200) {
-        setExhibitorsPerPage(2)
-      } else {
-        setExhibitorsPerPage(1)
-      }
-    }
-
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  useEffect(() => {
     if (!selectedProduct) return
 
     captureBrowserEvent('product_viewed', {
@@ -135,40 +128,12 @@ export default function GaleriaPage() {
     }
   }, [selectedProduct])
 
-  const exhibitorsCarouselEnabled = exhibitors.length > 2
-  const totalExhibitorPages = exhibitorsCarouselEnabled
-    ? Math.ceil(exhibitors.length / exhibitorsPerPage)
-    : 1
-
-  const productsCarouselEnabled = products.length > productsPerPage
-  const totalProductPages = Math.ceil(products.length / productsPerPage)
-
   useEffect(() => {
-    if (currentExhibitorPage >= totalExhibitorPages) {
-      setCurrentExhibitorPage(0)
-    }
-  }, [currentExhibitorPage, totalExhibitorPages])
-
-  const visibleExhibitors = exhibitorsCarouselEnabled
-    ? exhibitors.slice(
-      currentExhibitorPage * exhibitorsPerPage,
-      currentExhibitorPage * exhibitorsPerPage + exhibitorsPerPage
-    )
-    : exhibitors
-
-  const visibleProducts = productsCarouselEnabled
-    ? products.slice(
-      currentProductPage * productsPerPage,
-      currentProductPage * productsPerPage + productsPerPage
-    )
-    : products
-
-  useEffect(() => {
-    const root = exhibitorsSectionRef.current
+    const root = revealRootRef.current
     if (!root || loading) return
 
-    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-exhibitor-reveal]'))
-    if (cards.length === 0) return
+    const targets = Array.from(root.querySelectorAll<HTMLElement>('[data-reveal]'))
+    if (targets.length === 0) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -180,39 +145,15 @@ export default function GaleriaPage() {
         })
       },
       {
-        threshold: 0.18,
+        threshold: 0.15,
         rootMargin: '0px 0px -8% 0px'
       }
     )
 
-    cards.forEach((card) => observer.observe(card))
+    targets.forEach((target) => observer.observe(target))
 
     return () => observer.disconnect()
-  }, [loading, visibleExhibitors.length, currentExhibitorPage, exhibitorsCarouselEnabled])
-
-  const nextExhibitorPage = () => {
-    setCurrentExhibitorPage((prev) =>
-      prev === totalExhibitorPages - 1 ? 0 : prev + 1
-    )
-  }
-
-  const prevExhibitorPage = () => {
-    setCurrentExhibitorPage((prev) =>
-      prev === 0 ? totalExhibitorPages - 1 : prev - 1
-    )
-  }
-
-  const nextProductPage = () => {
-    if (currentProductPage < totalProductPages - 1) {
-      setCurrentProductPage(prev => prev + 1)
-    }
-  }
-
-  const prevProductPage = () => {
-    if (currentProductPage > 0) {
-      setCurrentProductPage(prev => prev - 1)
-    }
-  }
+  }, [loading, products.length, exhibitors.length])
 
   const checkoutProduct = async (productId: string) => {
     const product = products.find((item) => item.id === productId)
@@ -340,11 +281,15 @@ export default function GaleriaPage() {
     setCheckoutMessage(options?.successMessage || 'Produto adicionado ao carrinho.')
   }
 
-  const selectedProductImage = selectedProduct ? parseImages(selectedProduct)[0] || null : null
+  const selectedProductAllImages = selectedProduct ? parseImages(selectedProduct) : []
+  // The first image is a transparent-background cutout meant only for the gallery grid —
+  // skip it here unless it's the only photo the product has.
+  const selectedProductImages =
+    selectedProductAllImages.length > 1 ? selectedProductAllImages.slice(1) : selectedProductAllImages
 
   return (
     <>
-      <main id="galeria" className="min-h-screen bg-dirt text-bg page-fade-in">
+      <main ref={revealRootRef} id="galeria" className="min-h-screen bg-[#ede8df] text-[#3b2f26] page-fade-in">
         <JsonLd
           data={[
             galleryJsonLd,
@@ -356,259 +301,289 @@ export default function GaleriaPage() {
         />
         <Navbar />
 
-        {/* Hero — CSS background like Concept section; starts at y=0 so the fixed navbar
-            (z-50) covers the top 64px naturally, no bg-dirt gap. pt-16 clears the navbar. */}
-        <section
-          className="relative bg-[url('/frame.png')] bg-cover bg-center"
-        >
-          <div className="relative z-10 px-6 sm:px-8 lg:px-16 pt-16 flex items-end pb-10 lg:pb-14">
-            <div className="grid w-full grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-10 mt-16">
-              <div className="flex flex-col">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#c2a46f] leading-tight mb-10">
-                  Galeria e
-                  <br />
-                  Curadoria
-                </h1>
-                <div className="mt-6 lg:mt-16 mb-8 border-l border-[#F6F2ED]/40 pl-5 text-lg sm:text-xl font-serif text-[#d5ccb9]">
-                  A arte não decora.
-                  <br />
-                  Ela dialoga.
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Products - WITH CAROUSEL */}
-        <section className="relative overflow-hidden bg-[#f5f1eb] pt-16 lg:pt-20 pb-8 before:pointer-events-none before:absolute before:left-0 before:right-0 before:top-0 before:h-5 before:bg-gradient-to-b before:from-[#d9cdb8]/15 before:to-transparent">
-          {/* Lateral Chevrons for Products */}
-          {productsCarouselEnabled && currentProductPage > 0 && (
-            <button
-              onClick={prevProductPage}
-              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-bg/95 hover:bg-bg rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-              aria-label="Produtos anteriores"
-            >
-              <ChevronLeft size={24} className="text-olive group-hover:text-gold transition-colors" />
-            </button>
-          )}
-
-          {productsCarouselEnabled && currentProductPage < totalProductPages - 1 && (
-            <button
-              onClick={nextProductPage}
-              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-bg/95 hover:bg-bg rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 group"
-              aria-label="Próximos produtos"
-            >
-              <ChevronRight size={24} className="text-olive group-hover:text-gold transition-colors" />
-            </button>
-          )}
-
-          <div className="px-6 sm:px-8">
-            <p className="mb-10 mx-auto max-w-4xl text-center text-base sm:text-lg font-serif italic text-[#735746]">
-              {productsPhrase}
-            </p>
-            {loading && <p className="text-bg/70 font-sans">Carregando...</p>}
-            {!loading && (
-              <div className="flex flex-wrap justify-center gap-10">
-                {visibleProducts.map((product) => {
-                  const images = parseImages(product)
-                  const hasImages = images.length > 0
-                  return (
-                    <div key={product.id} className="w-full max-w-[286px] text-left sm:max-w-[308px] lg:max-w-[330px]">
-                      <div className="p-3 md:p-4 bg-[#eee9e2] flex flex-col w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
-                        <div className="relative aspect-[4/5] border border-[#e4dbcf] bg-[#efe9df]">
-                          {hasImages && (
-                            <MiniCarousel
-                              images={images}
-                              alt={product.name}
-                              className="h-full !min-h-0 !p-0"
-                            />
-                          )}
-                        </div>
-                        <div className="mt-3 flex items-end justify-between">
-                          <p className="flex items-center font-sans leading-none">
-                            <span className="mr-2 text-[13px] text-[#3b2f26]">R$</span>
-                            <span className="text-[20px] md:text-[26px] font-normal text-[#3b2f26]">{formatPriceText(product.price_text)}</span>
-                          </p>
-                          <p className="text-[13px] tracking-[0.08em] text-[#3b2f26] font-thin font-sans pb-1">
-                            Exclusivo
-                          </p>
-                        </div>
-                        <div className="mt-4 flex items-center gap-4">
-                          <button
-                            type="button"
-                            onClick={() => addToCart(product.id)}
-                            disabled={addingToCartProductId === product.id}
-                            className="shrink-0 text-[#3b2f26] transition-colors hover:text-[#644435] disabled:opacity-60"
-                            aria-label="Adicionar ao carrinho"
-                          >
-                            <ShoppingCart size={20} className="text-[#3b2f26]" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => checkoutProduct(product.id)}
-                            disabled={checkoutLoadingProductId === product.id}
-                            className="flex-1 bg-[#735746] hover:bg-[#644435] px-3 py-1 rounded-sm text-[#f5f1eb] transition-colors disabled:opacity-60"
-                          >
-                                <span className="flex items-center font-thin justify-center font-sans text-[21px] leading-none">
-                                  {checkoutLoadingProductId === product.id ? '...' : 'Compre agora'}
-                                </span>
-                          </button>
-                        </div>
-                      </div>
-                      <div className="mt-8 w-full max-w-[286px] sm:max-w-[308px] lg:max-w-[330px] mx-auto">
-                        <h3 className="flex justify-center text-[14px] md:text-[18px] text-[#735746] font-thin text-center gap-4">
-                              <span>
-                                {product.name} | {product.author}
-                              </span>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedProduct(product)}
-                            className="transition-colors hover:text-[#735746]"
-                            aria-label={`Abrir detalhes de ${product.name}`}
-                          >
-                            <SquareArrowUpRight size={20} />
-                          </button>
-                        </h3>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-
-            {/* Product Page Indicators */}
-            {productsCarouselEnabled && totalProductPages > 1 && (
-              <div className="flex justify-center gap-3 mt-12">
-                {Array.from({ length: totalProductPages }).map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentProductPage(index)}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      index === currentProductPage
-                        ? 'bg-gold w-12'
-                        : 'bg-bg/40 w-2 hover:bg-bg/70'
-                    }`}
-                    aria-label={`Ir para página ${index + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-          {checkoutMessage && (
-            <p className="text-center mt-8 text-sm text-bg/80">{checkoutMessage}</p>
-          )}
-        </section>
-
-        {/* Exhibitors - Chevrons only on hover, positioned at exhibitors */}
-        <section ref={exhibitorsSectionRef} className="relative overflow-hidden bg-[#f5f1eb] pt-8 pb-16 group/exhibitors before:pointer-events-none before:absolute before:left-0 before:right-0 before:top-0 before:h-5 before:bg-gradient-to-b before:from-[#d9cdb8]/15 before:to-transparent">
-          <div className="px-6 sm:px-8 lg:px-24">
-            <div className="mb-12">
-              <h2 className="text-[41px] font-serif text-[#b89b5e]">
-                Expositores
-              </h2>
-              <p className="mt-3 text-[17px] font-serif text-[#735746]">
-                Nossa arte tem o propósito de trazer vida para o que chamamos de lar.
+        {/* Hero */}
+        <section className="relative flex min-h-[92vh] flex-col justify-end bg-[url('/frame.png')] bg-cover bg-[center_30%] sm:min-h-screen">
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to bottom, rgba(12,8,4,.7) 0%, rgba(12,8,4,.38) 35%, rgba(12,8,4,.82) 70%, rgba(12,8,4,.97) 100%)'
+            }}
+          />
+          <div className="relative z-10 px-6 pb-16 pt-24 sm:px-8 lg:px-16 lg:pb-20">
+            <div className="mb-5 flex items-center gap-3.5">
+              <span className="h-px w-[30px] bg-[#B89B5E]/55" />
+              <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B89B5E]">
+                Galeria & Curadoria
               </p>
             </div>
+            <h1 className="mb-6 font-poetic text-[44px] font-light italic leading-[1.08] text-[#e8d9b8] sm:text-[64px] lg:text-[96px]">
+              Uma exposição
+              <br />
+              em aberto.
+            </h1>
+            <div className="mb-5 h-px w-[50px] bg-[#B89B5E]/40" />
+            <p className="max-w-[420px] font-poetic text-[15px] font-light italic leading-[1.65] text-[#F5F1EB]/50 sm:text-[18px]">
+              Peças autorais escolhidas com intenção,<br />
+              para dialogar com o espaço e a identidade de quem habita.
+            </p>
+          </div>
+          <div className="absolute bottom-7 right-6 z-10 flex flex-col items-center gap-2 sm:right-8 lg:right-16">
+            <span className="h-9 w-px bg-gradient-to-b from-[#B89B5E]/45 to-transparent" />
+            <span className="font-sans text-[9px] uppercase tracking-[0.22em] text-[#B89B5E]/45">Explorar</span>
+          </div>
+        </section>
 
-            {/* Exhibitors with chevrons */}
-            <div className="relative px-0">
-              {/* Chevrons - show only on section hover, positioned at exhibitors */}
-              {exhibitorsCarouselEnabled && (
-                <>
-                  {/* Always visible on touch devices; hover-only on desktop */}
+        {/* Obras em Exposição */}
+        <section className="bg-[#ede8df] px-6 pt-16 sm:px-8 sm:pt-20 lg:px-16 lg:pt-24" id="obras">
+          <div className="mx-auto mb-12 flex max-w-[1100px] flex-wrap items-end justify-between gap-6 sm:mb-16">
+            <div className="max-w-[520px]">
+              <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B89B5E]">
+                Coleção atual
+              </p>
+              <h2 className="mt-3 font-serif text-[26px] leading-[1.15] text-[#3b2f26] sm:text-[32px] lg:text-[40px]">
+                Obras em Exposição
+              </h2>
+            </div>
+            <p className="max-w-[380px] font-poetic text-[14px] font-light italic leading-[1.7] text-[#8a7560] sm:text-right sm:text-[16px]">
+              Cada peça é exclusiva, <br />adquirida, sai da coleção.
+            </p>
+          </div>
+
+          {loading && (
+            <p className="mx-auto max-w-[1100px] pb-16 font-sans text-[#8a7560]">Carregando...</p>
+          )}
+
+          {!loading && products.map((product, index) => {
+            const images = parseImages(product)
+            const hasImages = images.length > 0
+            const blankSide = product.image_blank_side === 'left' ? 'left' : 'right'
+
+            const info = (
+              <>
+                <p className="mb-5 flex items-center gap-3 font-poetic text-[12px] tracking-[0.28em] text-[#B89B5E]">
+                  {String(index + 1).padStart(2, '0')}
+                  <span className="h-px max-w-9 flex-1 bg-[#B89B5E]/25" />
+                </p>
+
+                <div className="mb-2 flex items-start gap-3">
+                  <h3 className="line-clamp-2 font-serif text-[20px] leading-tight text-[#3b2f26] sm:text-[24px] lg:text-[28px]">
+                    {product.name}
+                  </h3>
                   <button
-                    onClick={prevExhibitorPage}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-100 lg:opacity-0 lg:group-hover/exhibitors:opacity-100 lg:-left-14"
-                    aria-label="Expositores anteriores"
+                    type="button"
+                    onClick={() => setSelectedProduct(product)}
+                    className="mt-1 shrink-0 text-[#8a7560] transition-colors hover:text-[#3b2f26]"
+                    aria-label={`Abrir detalhes de ${product.name}`}
                   >
-                    <ChevronLeft size={22} className="text-olive" />
+                    <SquareArrowUpRight size={18} />
+                  </button>
+                </div>
+
+                {product.author && (
+                  <p className="mb-3 font-poetic text-[17px] font-light italic text-[#8a7560]">por {product.author}</p>
+                )}
+
+                {product.description && (
+                  <p className="mb-8 line-clamp-4 border-l-2 border-[#B89B5E]/25 pl-3.5 font-poetic text-[15px] font-light italic leading-[1.7] text-[#8a7560]">
+                    {product.description}
+                  </p>
+                )}
+
+                <div className="mb-5 flex flex-wrap items-center gap-4">
+                  <p className="font-serif text-[22px] text-[#3b2f26]">
+                    <sub className="mr-1 font-sans text-[13px] font-light text-[#8a7560]">R$</sub>
+                    {formatPriceText(product.price_text)}
+                  </p>
+                  <span className="rounded-sm border border-[#B89B5E]/30 px-2.5 py-1 font-sans text-[9px] font-medium uppercase tracking-[0.22em] text-[#B89B5E]">
+                    Exclusivo
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => checkoutProduct(product.id)}
+                    disabled={checkoutLoadingProductId === product.id}
+                    className="rounded-sm bg-[#3b2f26] px-7 py-3 font-sans text-[11px] font-semibold uppercase tracking-[0.13em] text-[#f5f1eb] transition-colors hover:bg-[#5a3c28] disabled:opacity-60"
+                  >
+                    {checkoutLoadingProductId === product.id ? '...' : 'Compre agora'}
                   </button>
                   <button
-                    onClick={nextExhibitorPage}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-bg/95 hover:bg-bg rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 opacity-100 lg:opacity-0 lg:group-hover/exhibitors:opacity-100 lg:-right-14"
-                    aria-label="Próximos expositores"
+                    type="button"
+                    onClick={() => addToCart(product.id)}
+                    disabled={addingToCartProductId === product.id}
+                    className="flex items-center gap-2 rounded-sm border border-[#3b2f26]/20 px-5 py-[11px] font-sans text-[11px] text-[#8a7560] transition-colors hover:border-[#3b2f26] hover:text-[#3b2f26] disabled:opacity-60"
                   >
-                    <ChevronRight size={22} className="text-olive" />
+                    <ShoppingCart size={15} />
+                    Adicionar ao carrinho
                   </button>
-                </>
-              )}
+                </div>
+              </>
+            )
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
-                {visibleExhibitors.map((exhibitor) => {
-                  const instagramHandle = exhibitor.instagram_path
-                    ? exhibitor.instagram_path.replace(/^@/, '').toLowerCase()
-                    : null
-                  const instagramHref = instagramHandle
-                    ? `https://instagram.com/${instagramHandle}`
-                    : null
+            return (
+              <article
+                key={product.id}
+                data-reveal
+                className={`mx-auto grid max-w-[1100px] grid-cols-1 gap-x-10 border-t border-[#3b2f26]/10 last:border-b lg:grid-cols-2 lg:gap-x-16 ${revealClasses}`}
+              >
+                {/* The first image is a product cutout with a transparent background — it floats
+                    on the section's flat color, so object-contain keeps it fully visible at any size. */}
+                <div
+                  className={`relative min-h-[320px] sm:min-h-[400px] lg:min-h-[520px] ${
+                    blankSide === 'right' ? 'lg:order-1' : 'lg:order-2'
+                  }`}
+                >
+                  {hasImages && (
+                    <Image
+                      src={images[0]}
+                      alt={product.name}
+                      fill
+                      className="object-contain py-10 sm:py-12 lg:py-16"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  )}
+                </div>
 
-                  return (
-                    <article
-                      key={exhibitor.id}
-                      data-exhibitor-reveal
-                      className="flex min-w-0 items-start gap-4 sm:gap-6 opacity-0 translate-y-2 scale-[0.995] transition-[opacity,transform] duration-[1200ms] ease-out will-change-transform [transition-delay:var(--reveal-delay,0ms)] [&.is-visible]:opacity-100 [&.is-visible]:translate-y-0 [&.is-visible]:scale-100"
-                    >
-                      <div className="relative w-24 h-24 sm:w-[132px] sm:h-[132px] rounded-[6px] overflow-hidden shrink-0">
-                        {exhibitor.avatar_url && (
-                          <Image
-                            src={exhibitor.avatar_url}
-                            alt={exhibitor.name}
-                            fill
-                            className="object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="min-w-0 pt-1">
-                        <h3 className="font-serif text-[18px] text-text leading-tight mb-2">
-                          {exhibitor.name.split('\n').map((line, i) => (
-                            <span key={i} className="block">
-                              {line}
-                            </span>
-                          ))}
-                        </h3>
-                        <p className="text-[13px] text-[#735746] font-serif font-thin leading-relaxed">
-                          {(exhibitor.title || '').split('\n').map((line, i) => (
-                            <span key={i} className="block">
-                              {line}
-                            </span>
-                          ))}
-                        </p>
-                        {instagramHref && (
-                          <a
-                            href={instagramHref}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-6 inline-flex items-center gap-1 font-serif font-thin text-[12px] text-[#735746]/80 transition-colors hover:text-[#9f8450]"
-                          >
-                            <Instagram size={12} className="text-[#b89b5e]" />
-                            {instagramHandle}
-                          </a>
-                        )}
-                      </div>
-                    </article>
-                  )
-                })}
+                <div
+                  className={`flex flex-col justify-center py-10 sm:py-12 ${
+                    blankSide === 'right' ? 'lg:order-2' : 'lg:order-1'
+                  }`}
+                >
+                  {info}
+                </div>
+              </article>
+            )
+          })}
+
+          {checkoutMessage && (
+            <p className="px-6 py-8 text-center font-sans text-sm text-[#8a7560]">{checkoutMessage}</p>
+          )}
+        </section>
+
+        {/* Encomendas */}
+        <section className="texture-brown relative bg-[#160f08] bg-cover bg-center px-6 py-20 sm:px-8 sm:py-24 lg:px-16" id="encomendas">
+          <div className="absolute inset-0 bg-[#0c0804]/78" />
+          <div className="relative z-10 mx-auto max-w-[1100px]">
+            <div className="mb-14 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-[72px]">
+              <div data-reveal className={revealClasses}>
+                <p className="mb-5 font-sans text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B89B5E]">
+                  Encomendas personalizadas
+                </p>
+                <h2 className="mb-6 font-poetic text-[36px] font-light italic leading-[1.05] text-[#e8d9b8] sm:text-[48px] lg:text-[60px]">
+                  Sua visão,
+                  <br />
+                  nossa tela.
+                </h2>
+                <div className="mb-5 h-px w-10 bg-[#B89B5E]/40" />
+                <p className="font-poetic text-[17px] font-light italic leading-[1.72] text-[#F5F1EB]/55 sm:text-[18px]">
+                  Cada ambiente tem uma história para contar. Criamos telas e bastidores sob medida, pensados junto com você, para o espaço que você habita.
+                </p>
+              </div>
+
+              <div data-reveal className={`pt-1.5 ${revealClasses}`}>
+                {commissionTypes.map((item, i) => (
+                  <div
+                    key={item.title}
+                    className={`flex items-start gap-4 border-t border-[#B89B5E]/15 py-5 sm:gap-5 ${i === commissionTypes.length - 1 ? 'border-b' : ''}`}
+                  >
+                    <span className="min-w-[26px] pt-0.5 font-poetic text-[13px] font-light tracking-[0.1em] text-[#B89B5E]/45">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div>
+                      <p className="mb-1 font-serif text-[16px] text-[#F5F1EB]/90">{item.title}</p>
+                      <p className="font-poetic text-[14px] italic leading-[1.5] text-[#F5F1EB]/40">{item.sub}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Dots */}
-            {exhibitorsCarouselEnabled && totalExhibitorPages > 1 && (
-              <div className="flex justify-center gap-3 mt-10">
-                {Array.from({ length: totalExhibitorPages }).map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentExhibitorPage(index)}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      index === currentExhibitorPage
-                        ? 'bg-gold w-12'
-                        : 'bg-bg/40 w-2 hover:bg-bg/70'
-                    }`}
-                    aria-label={`Ir para página de expositores ${index + 1}`}
-                  />
-                ))}
-              </div>
-            )}
+            <div data-reveal className={`flex flex-wrap items-center gap-10 border-t border-[#B89B5E]/15 pt-10 ${revealClasses}`}>
+              <p className="min-w-[200px] flex-1 font-poetic text-[16px] italic leading-[1.6] text-[#F5F1EB]/40">
+                Cada encomenda começa com uma conversa. Conta pra gente o que você imagina.
+              </p>
+              <a
+                href={commissionsWhatsappHref}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-3 whitespace-nowrap rounded-sm bg-[#B89B5E] px-9 py-4 font-sans text-[12px] font-semibold uppercase tracking-[0.14em] text-[#1a0e04] transition-all hover:-translate-y-0.5 hover:bg-[#cdb278] hover:shadow-[0_14px_36px_rgba(184,155,94,0.22)]"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.17 1.6 5.97L0 24l6.22-1.57A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.21-3.48-8.52ZM12 22c-1.85 0-3.66-.5-5.24-1.44l-.38-.22-3.93.99 1.03-3.81-.24-.39A9.95 9.95 0 0 1 2 12C2 6.49 6.49 2 12 2c2.67 0 5.18 1.04 7.07 2.93A9.95 9.95 0 0 1 22 12c0 5.51-4.49 10-10 10Zm5.47-7.34c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.34.22-.64.07-.3-.15-1.26-.47-2.4-1.49-.89-.8-1.49-1.78-1.66-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.34.45-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.06 2.89 1.21 3.09c.15.2 2.09 3.19 5.07 4.48.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.11.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.34Z" />
+                </svg>
+                Encomendar via WhatsApp
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Expositores */}
+        <section className="bg-[#f5f1eb] px-6 py-20 sm:px-8 sm:py-24 lg:px-16" id="expositores">
+          <div data-reveal className={`mb-12 sm:mb-14 ${revealClasses}`}>
+            <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.3em] text-[#B89B5E]">Nossa rede</p>
+            <h2 className="mt-3 font-serif text-[28px] text-[#b89b5e] sm:text-[32px] lg:text-[36px]">Expositores</h2>
+            <p className="mt-2 font-poetic text-[15px] italic text-[#8a7560] sm:text-[16px]">
+              Nossa arte tem o propósito de trazer vida para o que chamamos de lar.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-x-12 gap-y-10">
+            {exhibitors.map((exhibitor) => {
+              const instagramHandle = exhibitor.instagram_path
+                ? exhibitor.instagram_path.replace(/^@/, '').toLowerCase()
+                : null
+              const instagramHref = instagramHandle
+                ? `https://instagram.com/${instagramHandle}`
+                : null
+
+              return (
+                <article
+                  key={exhibitor.id}
+                  data-reveal
+                  className={`flex items-start gap-5 ${revealClasses}`}
+                >
+                  <div className="relative h-[88px] w-[88px] shrink-0 overflow-hidden rounded-[5px] bg-[#ede8df] sm:h-[100px] sm:w-[100px]">
+                    {exhibitor.avatar_url && (
+                      <Image
+                        src={exhibitor.avatar_url}
+                        alt={exhibitor.name}
+                        fill
+                        className="object-cover"
+                      />
+                    )}
+                  </div>
+                  <div className="min-w-0 pt-1">
+                    <h3 className="mb-1.5 font-serif text-[16px] leading-tight text-[#3b2f26] sm:text-[17px]">
+                      {exhibitor.name.split('\n').map((line, i) => (
+                        <span key={i} className="block">
+                          {line}
+                        </span>
+                      ))}
+                    </h3>
+                    <p className="font-poetic text-[13px] font-light italic leading-[1.55] text-[#8a7560] sm:text-[14px]">
+                      {(exhibitor.title || '').split('\n').map((line, i) => (
+                        <span key={i} className="block">
+                          {line}
+                        </span>
+                      ))}
+                    </p>
+                    {instagramHref && (
+                      <a
+                        href={instagramHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-3 inline-flex items-center gap-1.5 font-sans text-[11px] text-[#B89B5E]/75 transition-colors hover:text-[#B89B5E]"
+                      >
+                        <Instagram size={11} />
+                        {instagramHandle}
+                      </a>
+                    )}
+                  </div>
+                </article>
+              )
+            })}
           </div>
         </section>
 
@@ -638,13 +613,11 @@ export default function GaleriaPage() {
             <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
               {/* Image constrained on mobile so content below is reachable without endless scroll */}
               <div className="relative h-[260px] sm:h-[320px] md:h-auto md:aspect-[4/5] bg-[#ebe4d9]">
-                {selectedProductImage ? (
-                  <Image
-                    src={selectedProductImage}
+                {selectedProductImages.length > 0 ? (
+                  <MiniCarousel
+                    images={selectedProductImages}
                     alt={selectedProduct.name}
-                    fill
-                    className="object-cover"
-                    unoptimized
+                    className="h-full !min-h-0 !p-0"
                   />
                 ) : (
                   <div className="h-full w-full bg-[#ebe4d9]" />
