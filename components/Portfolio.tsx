@@ -62,9 +62,8 @@ const Portfolio = ({ initialProjects }: PortfolioProps) => {
   const portfolioEmpty = 'Em breve, novos projetos serão adicionados'
 
   useEffect(() => {
-    if (initialProjects) return
     void fetchPortfolioImages()
-  }, [initialProjects])
+  }, [])
 
   useEffect(() => {
     if (!activeProject) return

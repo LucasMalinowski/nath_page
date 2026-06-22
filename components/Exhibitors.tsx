@@ -19,9 +19,8 @@ const Exhibitors = ({ initialExhibitors }: ExhibitorsProps) => {
   const sectionRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    if (initialExhibitors) return
     void fetchExhibitors()
-  }, [initialExhibitors])
+  }, [])
 
   useEffect(() => {
     const root = sectionRef.current
